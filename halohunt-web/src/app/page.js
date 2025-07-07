@@ -1,147 +1,6 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Search, Bell, ShoppingCart, User, Menu } from 'lucide-react';
-import useEmblaCarousel from 'embla-carousel-react';
-
-const Navigation = ({ className }) => {
-  return (
-    <nav className={`${className} bg-white`}>
-      <div className="flex md:flex-col items-center justify-between md:justify-start md:gap-8 p-4">
-        <button className="flex flex-col items-center gap-1 text-purple-700">
-          <Home className="w-6 h-6" />
-          <span className="text-xs md:text-sm">Home</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-purple-700">
-          <Bell className="w-6 h-6" />
-          <span className="text-xs md:text-sm">Live</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-purple-700">
-          <Search className="w-6 h-6" />
-          <span className="text-xs md:text-sm">Search</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-purple-700">
-          <ShoppingCart className="w-6 h-6" />
-          <span className="text-xs md:text-sm">Cart</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-500 hover:text-purple-700">
-          <User className="w-6 h-6" />
-          <span className="text-xs md:text-sm">Profile</span>
-        </button>
-      </div>
-    </nav>
-  );
-};
-
-const LiveEventCarousel = ({ events }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState([]);
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    setScrollSnaps(emblaApi.scrollSnapList());
-    emblaApi.on('select', onSelect);
-    return () => emblaApi.off('select', onSelect);
-  }, [emblaApi, onSelect]);
-
-  return (
-    <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {events.map((event) => (
-            <div key={event.id} className="relative flex-[0_0_100%] min-w-0 pl-4">
-              <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="relative">
-                  <img 
-                    src={event.image} 
-                    alt={`Live stream by ${event.host}`}
-                    className="w-full h-[400px] object-cover"
-                  />
-                  
-                  {/* Live Badge */}
-                  {event.isLive && (
-                    <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      LIVE
-                    </div>
-                  )}
-                  
-                  {/* Sale Overlay */}
-                  {event.type === "sale" && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-red-400 text-6xl font-bold mb-2">SALE</div>
-                        <div className="text-red-400 text-4xl font-bold">50%</div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Host Info */}
-                  <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                      <img 
-                        src={event.image} 
-                        alt={event.host}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    </div>
-                    <span className="text-white font-semibold text-sm">{event.host}</span>
-                  </div>
-                  
-                  {/* Viewer Count */}
-                  <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-                    <Eye className="w-4 h-4" />
-                    <span>{event.viewers}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Navigation Buttons */}
-      <button 
-        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-10"
-        onClick={scrollPrev}
-      >
-        <ChevronLeft className="w-6 h-6 text-gray-600" />
-      </button>
-      <button 
-        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors z-10"
-        onClick={scrollNext}
-      >
-        <ChevronRight className="w-6 h-6 text-gray-600" />
-      </button>
-
-      {/* Dots */}
-      <div className="flex justify-center gap-2 mt-4">
-        {scrollSnaps.map((_, index) => (
-          <button
-            key={index}
-            className={`w-2 h-2 rounded-full transition-colors ${
-              index === selectedIndex ? 'bg-purple-600' : 'bg-gray-300'
-            }`}
-            onClick={() => emblaApi?.scrollTo(index)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+import React from 'react';
+import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart } from 'lucide-react';
 
 const LiveShoppingUI = () => {
   const products = [
@@ -152,7 +11,11 @@ const LiveShoppingUI = () => {
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center",
-      liveTaggable: true
+      liveTaggable: true,
+      tagger: {
+        name: "Emma Wilson",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 2,
@@ -161,7 +24,11 @@ const LiveShoppingUI = () => {
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop&crop=center",
-      liveTaggable: true
+      liveTaggable: true,
+      tagger: {
+        name: "Alex Chen",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 3,
@@ -170,7 +37,11 @@ const LiveShoppingUI = () => {
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&crop=center",
-      liveTaggable: true
+      liveTaggable: true,
+      tagger: {
+        name: "Sarah Kim",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 4,
@@ -179,7 +50,11 @@ const LiveShoppingUI = () => {
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
-      liveTaggable: true
+      liveTaggable: true,
+      tagger: {
+        name: "Mike Johnson",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     }
   ];
 
@@ -286,174 +161,181 @@ const LiveShoppingUI = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 md:flex">
-      {/* Desktop Navigation */}
-      <Navigation className="hidden md:block w-24 fixed left-0 top-0 h-full border-r border-gray-200" />
-
-      {/* Main Content */}
-      <main className="flex-1 md:ml-24 pb-20 md:pb-0">
-        {/* Search Header */}
-        <header className="bg-white sticky top-0 z-50 shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 py-3">
-            <div className="flex items-center gap-4">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="Search by filter"
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:border-purple-500"
-                />
-                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              </div>
-              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                <Menu className="w-6 h-6 text-gray-600" />
-              </button>
-            </div>
+    <>
+      {/* Cart Icon in Header */}
+      <div className="fixed top-4 right-4 z-50">
+        <a href="/cart" className="relative bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-shadow">
+          <div className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+            2
           </div>
-        </header>
+          <ShoppingCart className="w-6 h-6 text-gray-700" />
+        </a>
+      </div>
 
-        {/* Trending Banner Carousel */}
-        <div className="px-4 py-4">
-          <div className="relative">
-            <div className="overflow-hidden rounded-lg">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="flex-none w-full">
-                    <div className="bg-purple-700 h-32 rounded-lg flex items-center justify-center text-white text-xl">
-                      Trending Banner {item}
-                    </div>
+      {/* Trending Banner Carousel */}
+      <div className="px-4 py-4">
+        <div className="relative">
+          <div className="overflow-hidden rounded-lg">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div key={item} className="flex-none w-full">
+                  <div className="bg-purple-700 h-32 rounded-lg flex items-center justify-center text-white text-xl">
+                    Trending Banner {item}
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-center gap-1 mt-3">
-              {[1, 2, 3, 4, 5].map((dot) => (
-                <button key={dot} className={`w-2 h-2 rounded-full ${dot === 1 ? 'bg-purple-600' : 'bg-gray-300'}`} />
+                </div>
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Categories */}
-        <div className="px-4 py-4">
-          <h2 className="text-xl font-bold mb-4">Categories</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {categories.map((category) => {
-              const IconComponent = category.icon;
-              return (
-                <div key={category.id} className="bg-purple-100 rounded-lg p-3 text-center">
-                  <IconComponent className="w-6 h-6 mx-auto mb-2 text-purple-700" />
-                  <span className="text-sm text-gray-800">{category.name}</span>
-                </div>
-              );
-            })}
+          <div className="flex justify-center gap-1 mt-3">
+            {[1, 2, 3, 4, 5].map((dot) => (
+              <button key={dot} className={`w-2 h-2 rounded-full ${dot === 1 ? 'bg-purple-600' : 'bg-gray-300'}`} />
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* Live Now */}
-        <div className="px-4 py-4">
-          <h2 className="text-xl font-bold mb-4">Live Now</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {liveEvents.slice(0, 2).map((event) => (
-              <div key={event.id} className="relative bg-white rounded-lg overflow-hidden shadow">
-                <div className="aspect-w-16 aspect-h-9 relative">
+      {/* Categories */}
+      <div className="px-4 py-4">
+        <h2 className="text-xl font-bold mb-4">Categories</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {categories.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <div key={category.id} className="bg-purple-100 rounded-lg p-3 text-center">
+                <IconComponent className="w-6 h-6 mx-auto mb-2 text-purple-700" />
+                <span className="text-sm text-gray-800">{category.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Live Now */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Live Now</h2>
+          <button className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+            Explore More Lives
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {liveEvents.slice(0, 2).map((event) => (
+            <div key={event.id} className="relative bg-white rounded-lg overflow-hidden shadow">
+              <div className="aspect-w-16 aspect-h-9 relative">
+                <img 
+                  src={event.image} 
+                  alt={`Live stream by ${event.host}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+                  LIVE
+                </div>
+                <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                  <Eye className="w-3 h-3" />
+                  <span>{event.viewers}</span>
+                </div>
+              </div>
+              <div className="p-2">
+                <h3 className="text-sm font-medium">
+                  {event.type === 'sale' ? 'Fashion Flash Sale' : 'Tech Flash Sale'}
+                </h3>
+                <p className="text-xs text-gray-500">by {event.host}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Products Section */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Products</h2>
+          <button className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+            View All Products
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+          {products.map((product) => (
+            <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+              <div className="aspect-w-1 aspect-h-1 relative">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+                {product.liveTaggable && (
+                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                    <img 
+                      src={product.tagger.image} 
+                      alt={product.tagger.name}
+                      className="w-6 h-6 rounded-full border-2 border-white"
+                    />
+                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                      {product.tagger.name}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    {product.rating}
+                  </div>
+                </div>
+                <button 
+                  onClick={() => window.location.href = '/cart'} 
+                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Upcoming Live Section */}
+      <div className="px-4 py-4">
+        <h2 className="text-xl font-bold mb-4">Upcoming Live</h2>
+        <div className="space-y-3">
+          {upcomingEvents.map((event) => (
+            <div key={event.id} className="bg-white rounded-lg shadow p-2.5">
+              <div className="flex gap-3 items-center">
+                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                   <img 
                     src={event.image} 
-                    alt={`Live stream by ${event.host}`}
+                    alt={event.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
-                    LIVE
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Clock className="w-3.5 h-3.5 text-purple-600" />
+                    <span className="text-purple-600 text-xs font-medium">{event.time}</span>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    <span>{event.viewers}</span>
+                  <h3 className="font-medium text-sm mb-0.5 truncate">{event.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-500">by {event.host}</p>
+                    <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[10px]">
+                      {event.category}
+                    </span>
                   </div>
                 </div>
-                <div className="p-2">
-                  <h3 className="text-sm font-medium">
-                    {event.type === 'sale' ? 'Fashion Flash Sale' : 'Tech Flash Sale'}
-                  </h3>
-                  <p className="text-xs text-gray-500">by {event.host}</p>
-                </div>
+                <button className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors">
+                  <Bell className="w-3 h-3" />
+                  <span>Remind</span>
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-
-        {/* Products Section */}
-        <div className="px-4 py-4">
-          <h2 className="text-xl font-bold mb-4">Products</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
-            {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow">
-                <div className="relative w-full pb-[100%]">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
-                  />
-                  {product.liveTaggable && (
-                    <div className="absolute top-1 right-1 bg-yellow-400 text-black px-1.5 py-0.5 rounded-full text-xs font-medium">
-                      Live
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <h3 className="font-medium text-xs truncate mb-0.5">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-purple-600 font-bold text-sm">{product.price}</span>
-                    <div className="flex items-center gap-0.5">
-                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xs text-gray-600">{product.rating}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Upcoming Live Section */}
-        <div className="px-4 py-4">
-          <h2 className="text-xl font-bold mb-4">Upcoming Live</h2>
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="bg-white rounded-lg shadow p-2.5">
-                <div className="flex gap-3 items-center">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                    <img 
-                      src={event.image} 
-                      alt={event.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Clock className="w-3.5 h-3.5 text-purple-600" />
-                      <span className="text-purple-600 text-xs font-medium">{event.time}</span>
-                    </div>
-                    <h3 className="font-medium text-sm mb-0.5 truncate">{event.title}</h3>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-gray-500">by {event.host}</p>
-                      <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[10px]">
-                        {event.category}
-                      </span>
-                    </div>
-                  </div>
-                  <button className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors">
-                    <Bell className="w-3 h-3" />
-                    <span>Remind</span>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <Navigation className="fixed bottom-0 left-0 right-0 md:hidden border-t border-gray-200 bg-white" />
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 
