@@ -1,8 +1,10 @@
 "use client";
-import React from 'react';
-import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart, Search } from 'lucide-react';
 
 const LiveShoppingUI = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const products = [
     {
       id: 1,
@@ -162,15 +164,29 @@ const LiveShoppingUI = () => {
 
   return (
     <>
+      {/* Search Bar */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm px-4 py-3">
+        <div className="relative max-w-2xl mx-auto">
+          <input
+            type="text"
+            placeholder="Search products, brands, or live streams..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-colors"
+          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        </div>
+      </div>
+
       {/* Cart Icon in Header */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* <div className="fixed top-4 right-4 z-50">
         <a href="/cart" className="relative bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-shadow">
           <div className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
             2
           </div>
           <ShoppingCart className="w-6 h-6 text-gray-700" />
         </a>
-      </div>
+      </div> */}
 
       {/* Trending Banner Carousel */}
       <div className="px-4 py-4">
