@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Eye, Heart, Share2, MessageCircle, 
@@ -194,6 +194,7 @@ const ChatMessage = ({ message }) => {
 
 export default function LiveStreamPage() {
   const params = useParams();
+  const router = useRouter();
   const { id } = params;
   
   const [liveData, setLiveData] = useState(DUMMY_LIVE_DATA);
@@ -288,6 +289,11 @@ export default function LiveStreamPage() {
     }
   };
 
+  // Navigate to creator profile
+  const navigateToCreatorProfile = () => {
+    router.push(`/profile/${liveData.host.id}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-4">
@@ -322,7 +328,10 @@ export default function LiveStreamPage() {
             <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
               <h1 className="text-xl font-bold text-gray-900 mb-2">{liveData.title}</h1>
               <div className="flex flex-wrap items-center justify-between gap-y-3 mb-4">
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={navigateToCreatorProfile}
+                >
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img 
                       src={liveData.host.image} 
