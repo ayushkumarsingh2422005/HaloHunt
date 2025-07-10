@@ -5,7 +5,9 @@ import {
   ShoppingBag, Video, Menu, X,
   LogOut, Bell, Heart, HelpCircle,
   Settings, Warehouse, Shield, CreditCard,
-  MessageSquare, ChevronRight, UserCheck
+  MessageSquare, ChevronRight, UserCheck,
+  MapPin, Calendar, Instagram, Twitter, Globe,
+  Edit, ChevronUp
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -79,17 +81,106 @@ export default function ProfilePage() {
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showFullMenu, setShowFullMenu] = useState(false);
+  const [showAllBio, setShowAllBio] = useState(false);
 
   // Sample user data - in a real app this would come from your auth/user state
   const user = {
+    id: "user-123",
     name: "John Doe",
+    username: "@johndoe",
     email: "john@example.com",
+    bio: "Product designer and developer based in New York. I create digital products with focus on user experience. Join my live streams for exclusive product showcases and tutorials.",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces&auto=format",
+    coverImage: "https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=1200&h=400&fit=crop",
+    location: "New York, USA",
     joinedDate: "March 2024",
     isSeller: true,
     listingsCount: 12,
-    livesCount: 8
+    livesCount: 8,
+    followers: 1240,
+    following: 356,
+    socialLinks: {
+      instagram: "johndoe",
+      twitter: "johndoe",
+      website: "johndoe.com"
+    },
+    stats: {
+      totalViews: 25600,
+      totalLikes: 4320,
+      averageRating: 4.7
+    }
   };
+
+  // Sample products data
+  const products = [
+    {
+      id: "p1",
+      name: "Modern Desk Lamp",
+      price: 59.99,
+      discountPrice: 49.99,
+      image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300&h=400&fit=crop",
+      rating: 4.8,
+      reviews: 32
+    },
+    {
+      id: "p2",
+      name: "Minimalist Watch",
+      price: 129.99,
+      discountPrice: null,
+      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=400&fit=crop",
+      rating: 4.9,
+      reviews: 47
+    },
+    {
+      id: "p3",
+      name: "Wireless Earbuds",
+      price: 89.99,
+      discountPrice: 69.99,
+      image: "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=300&h=400&fit=crop",
+      rating: 4.7,
+      reviews: 28
+    },
+    {
+      id: "p4",
+      name: "Leather Wallet",
+      price: 45.00,
+      discountPrice: null,
+      image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=300&h=400&fit=crop",
+      rating: 4.6,
+      reviews: 19
+    }
+  ];
+
+  // Sample past lives data
+  const pastLives = [
+    {
+      id: "live-1",
+      title: "Product Design Masterclass",
+      thumbnail: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=600&h=400&fit=crop",
+      date: "3 days ago",
+      duration: "1:15:22",
+      views: 1450,
+      likes: 324
+    },
+    {
+      id: "live-2",
+      title: "New Product Showcase",
+      thumbnail: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop",
+      date: "1 week ago",
+      duration: "42:18",
+      views: 2760,
+      likes: 512
+    },
+    {
+      id: "live-3",
+      title: "Design Tips & Tricks",
+      thumbnail: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=400&fit=crop",
+      date: "2 weeks ago",
+      duration: "58:45",
+      views: 1890,
+      likes: 276
+    }
+  ];
 
   const menuItems = [
     { icon: Heart, label: 'Favorites', href: '/favorites' },
@@ -118,6 +209,83 @@ export default function ProfilePage() {
 
   const handleAddProduct = () => {
     console.log('Add product clicked');
+  };
+
+  const handleEditProfile = () => {
+    console.log('Edit profile clicked');
+  };
+
+  const ProductCard = ({ product }) => {
+    return (
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div className="relative aspect-[3/4] bg-gray-100">
+          <img 
+            src={product.image} 
+            alt={product.name} 
+            className="w-full h-full object-cover"
+          />
+          <button className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm hover:bg-gray-100">
+            <Heart className="w-4 h-4 text-gray-500" />
+          </button>
+        </div>
+        <div className="p-3">
+          <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+          <div className="flex items-center justify-between mt-1">
+            <div className="flex items-baseline gap-1">
+              {product.discountPrice ? (
+                <>
+                  <span className="text-sm font-bold text-purple-600">${product.discountPrice}</span>
+                  <span className="text-xs text-gray-500 line-through">${product.price}</span>
+                </>
+              ) : (
+                <span className="text-sm font-bold text-gray-900">${product.price}</span>
+              )}
+            </div>
+            <div className="flex items-center text-xs text-gray-500">
+              <span className="text-yellow-400">★</span>
+              <span>{product.rating}</span>
+              <span className="mx-1">·</span>
+              <span>{product.reviews} reviews</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const LiveCard = ({ live }) => {
+    return (
+      <Link href={`/live/${live.id}`} className="block">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+          <div className="relative aspect-video bg-gray-100">
+            <img 
+              src={live.thumbnail} 
+              alt={live.title} 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
+              <Video className="w-3 h-3" />
+              {live.duration}
+            </div>
+            <div className="absolute bottom-2 right-2 flex items-center gap-2">
+              <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
+                <User className="w-3 h-3" />
+                {live.views.toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
+                <Heart className="w-3 h-3" />
+                {live.likes.toLocaleString()}
+              </div>
+            </div>
+          </div>
+          <div className="p-3">
+            <h3 className="text-sm font-medium text-gray-900 truncate">{live.title}</h3>
+            <p className="text-xs text-gray-500 mt-1">{live.date}</p>
+          </div>
+        </div>
+      </Link>
+    );
   };
 
   return (
@@ -193,108 +361,220 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Cover Image */}
+      <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200 overflow-hidden">
+        <img 
+          src={user.coverImage} 
+          alt={`${user.name}'s cover`}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 pb-8">
         {/* Profile Header */}
-        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-            {/* Avatar and Basic Info */}
-            <div className="flex items-center gap-4 sm:gap-6">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-purple-100"
-              />
+        <div className="relative -mt-16 mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
+              {/* Avatar */}
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md overflow-hidden -mt-16 sm:-mt-20 bg-white">
+                <img 
+                  src={user.avatar} 
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* User Info */}
               <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl font-medium text-gray-900">{user.name}</h1>
-                <p className="text-sm text-gray-500">Member since {user.joinedDate}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{user.name}</h1>
+                <p className="text-sm text-gray-500 mb-2">{user.username}</p>
+                
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-xs text-gray-600">
+                  {user.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>{user.location}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    <span>Joined {user.joinedDate}</span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 mb-3 text-sm">
+                  <div>
+                    <span className="font-bold text-gray-900">{user.followers.toLocaleString()}</span>
+                    <span className="text-gray-600 ml-1">Followers</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900">{user.following.toLocaleString()}</span>
+                    <span className="text-gray-600 ml-1">Following</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900">{user.livesCount}</span>
+                    <span className="text-gray-600 ml-1">Lives</span>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900">{user.listingsCount}</span>
+                    <span className="text-gray-600 ml-1">Products</span>
+                  </div>
+                </div>
+                
+                {/* Social Links */}
+                <div className="flex gap-2 mb-4">
+                  {user.socialLinks.instagram && (
+                    <a href={`https://instagram.com/${user.socialLinks.instagram}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
+                      <Instagram className="w-4 h-4" />
+                    </a>
+                  )}
+                  {user.socialLinks.twitter && (
+                    <a href={`https://twitter.com/${user.socialLinks.twitter}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
+                      <Twitter className="w-4 h-4" />
+                    </a>
+                  )}
+                  {user.socialLinks.website && (
+                    <a href={`https://${user.socialLinks.website}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
+                      <Globe className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 sm:self-start sm:ml-auto">
+                <button 
+                  onClick={handleStartStream}
+                  className="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 flex items-center gap-2"
+                >
+                  <Video className="w-4 h-4" />
+                  <span>Start Stream</span>
+                </button>
+                <button 
+                  onClick={handleAddProduct}
+                  className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Add Product</span>
+                </button>
+                <button 
+                  onClick={handleEditProfile}
+                  className="p-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
               </div>
             </div>
             
-            {/* Action Buttons - Hidden on mobile, visible on PC */}
-            <div className="hidden sm:flex items-center gap-3 sm:ml-auto">
-              <ActionButton 
-                icon={Video} 
-                onClick={handleStartStream}
-                className="bg-purple-600 text-white hover:bg-purple-700"
-              >
-                Start Stream
-              </ActionButton>
-              <ActionButton 
-                icon={ShoppingBag} 
-                onClick={handleAddProduct}
-                className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-              >
-                Add Product
-              </ActionButton>
-            </div>
-          </div>
-
-          {/* Stats Section */}
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <div className="grid grid-cols-2 sm:flex sm:items-center sm:gap-6 gap-4">
-              <div className="text-center">
-                <div className="text-lg font-medium text-gray-900">{user.livesCount}</div>
-                <div className="text-xs sm:text-sm text-gray-500">Lives</div>
+            {/* Bio */}
+            {user.bio && (
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="text-sm text-gray-700">
+                  {showAllBio || user.bio.length <= 150 
+                    ? user.bio 
+                    : `${user.bio.substring(0, 150)}...`}
+                </p>
+                {user.bio.length > 150 && (
+                  <button 
+                    onClick={() => setShowAllBio(!showAllBio)}
+                    className="text-xs text-purple-600 font-medium mt-1 flex items-center"
+                  >
+                    {showAllBio ? (
+                      <>
+                        Show less <ChevronUp className="w-3 h-3 ml-1" />
+                      </>
+                    ) : (
+                      <>
+                        Show more <ChevronDown className="w-3 h-3 ml-1" />
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
-              <div className="text-center">
-                <div className="text-lg font-medium text-gray-900">{user.listingsCount}</div>
-                <div className="text-xs sm:text-sm text-gray-500">Products</div>
+            )}
+            
+            {/* Stats */}
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-2 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-gray-900">{user.stats.totalViews.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">Total Views</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-gray-900">{user.stats.totalLikes.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">Total Likes</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded-lg">
+                  <div className="text-lg font-bold text-gray-900">{user.stats.averageRating}</div>
+                  <div className="text-xs text-gray-500">Avg. Rating</div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          {/* Action Buttons - Visible on mobile, hidden on PC */}
-          <div className="flex items-center gap-3 mt-6 sm:hidden">
-            <ActionButton 
-              icon={Video} 
-              onClick={handleStartStream}
-              className="bg-purple-600 text-white hover:bg-purple-700 flex-1"
-            >
-              Start Stream
-            </ActionButton>
-            <ActionButton 
-              icon={ShoppingBag} 
-              onClick={handleAddProduct}
-              className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 flex-1"
-            >
-              Add Product
-            </ActionButton>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-200 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <TabButton
-            active={activeTab === 'lives'}
-            icon={Video}
-            onClick={() => setActiveTab('lives')}
-          >
-            Lives
-          </TabButton>
-          <TabButton
-            active={activeTab === 'products'}
-            icon={ShoppingBag}
-            onClick={() => setActiveTab('products')}
-          >
-            Products
-          </TabButton>
-        </div>
-
-        {/* Content Sections */}
-        <div className="grid gap-6">
-          {activeTab === 'lives' && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">My Lives</h2>
-              {/* Lives content */}
-            </div>
-          )}
+        {/* Tabs */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          <div className="flex border-b border-gray-100">
+            <button
+              onClick={() => setActiveTab('lives')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'lives' 
+                  ? 'text-purple-600 border-b-2 border-purple-600' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Lives
+            </button>
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'products' 
+                  ? 'text-purple-600 border-b-2 border-purple-600' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Products
+            </button>
+          </div>
           
-          {activeTab === 'products' && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">My Products</h2>
-              {/* Products content */}
-            </div>
-          )}
+          {/* Tab Content */}
+          <div className="p-4">
+            {activeTab === 'lives' && (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium text-gray-900">My Lives ({pastLives.length})</h2>
+                  <div className="flex items-center gap-2">
+                    {/* Add filters or sorting options here */}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {pastLives.map(live => (
+                    <LiveCard key={live.id} live={live} />
+                  ))}
+                </div>
+              </>
+            )}
+            
+            {activeTab === 'products' && (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium text-gray-900">My Products ({products.length})</h2>
+                  <div className="flex items-center gap-2">
+                    {/* Add filters or sorting options here */}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {products.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
