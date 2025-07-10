@@ -1,37 +1,13 @@
 "use client";
 import { useState } from 'react';
 import {
-  User, Store, MapPin, CreditCard, Bell, Lock, Package, 
-  Settings, ChevronRight, Edit2, Shield, Truck, Wallet,
-  BarChart, MessageSquare, Heart, Clock, LogOut, Plus, ChevronDown,
-  ShoppingBag, Video
+  User, Store, Plus, ChevronDown,
+  ShoppingBag, Video, Menu, X,
+  LogOut, Bell, Heart, HelpCircle,
+  Settings, Warehouse, Shield, CreditCard,
+  MessageSquare, ChevronRight, UserCheck
 } from 'lucide-react';
 import Link from 'next/link';
-
-const ProfileSection = ({ icon: Icon, title, description, href, onClick, badge }) => {
-  return (
-    <div 
-      onClick={onClick}
-      className={`p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow ${href || onClick ? 'cursor-pointer' : ''}`}
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
-          <Icon className="w-5 h-5 text-purple-600" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500 truncate">{description}</p>
-        </div>
-        {badge && (
-          <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-600 rounded-full">
-            {badge}
-          </span>
-        )}
-        {(href || onClick) && <ChevronRight className="w-5 h-5 text-gray-400" />}
-      </div>
-    </div>
-  );
-};
 
 const TabButton = ({ active, icon: Icon, children, onClick }) => {
   return (
@@ -58,28 +34,165 @@ const QuickActionButton = ({ icon: Icon, children }) => {
   );
 };
 
+const ActionButton = ({ icon: Icon, children, onClick, className }) => {
+  return (
+    <button 
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${className}`}
+    >
+      <Icon className="w-4 h-4" />
+      <span>{children}</span>
+    </button>
+  );
+};
+
+const MenuOption = ({ icon: Icon, label, href, onClick }) => {
+  const content = (
+    <>
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-purple-600" />
+        </div>
+        <span className="text-gray-700 font-medium">{label}</span>
+      </div>
+      <ChevronRight className="w-5 h-5 text-gray-400" />
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className="flex items-center justify-between p-4 hover:bg-gray-50">
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button onClick={onClick} className="flex items-center justify-between p-4 hover:bg-gray-50 w-full">
+      {content}
+    </button>
+  );
+};
+
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState('activity');
+  const [activeTab, setActiveTab] = useState('lives');
   const [showQuickActions, setShowQuickActions] = useState(false);
-  const [role, setRole] = useState('both'); // 'buyer', 'seller', 'both'
+  const [showMenu, setShowMenu] = useState(false);
+  const [showFullMenu, setShowFullMenu] = useState(false);
 
   // Sample user data - in a real app this would come from your auth/user state
   const user = {
     name: "John Doe",
     email: "john@example.com",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces&auto=format",
-    phone: "+1 (555) 123-4567",
     joinedDate: "March 2024",
     isSeller: true,
-    storeName: "John's Electronics",
-    ordersCount: 25,
     listingsCount: 12,
-    revenue: "5,230",
-    rating: 4.8
+    livesCount: 8
+  };
+
+  const menuItems = [
+    { icon: Heart, label: 'Favorites', href: '/favorites' },
+    { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: HelpCircle, label: 'Help & Support', href: '/support' },
+    { icon: LogOut, label: 'Sign Out', onClick: () => console.log('Sign out clicked') },
+  ];
+
+  const fullMenuOptions = [
+    { icon: Store, label: 'My Store', href: '/store' },
+    { icon: Warehouse, label: 'Manage Warehouses', href: '/warehouses' },
+    { icon: Heart, label: 'Favorites', href: '/favorites' },
+    { icon: UserCheck, label: 'KYC Verification', href: '/kyc' },
+    { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: MessageSquare, label: 'Messages', href: '/messages' },
+    { icon: CreditCard, label: 'Payment Methods', href: '/payments' },
+    { icon: Shield, label: 'Privacy & Security', href: '/privacy' },
+    { icon: Settings, label: 'Account Settings', href: '/settings' },
+    { icon: HelpCircle, label: 'Help & Support', href: '/support' },
+    { icon: LogOut, label: 'Logout', onClick: () => console.log('Logout clicked') }
+  ];
+
+  const handleStartStream = () => {
+    console.log('Start stream clicked');
+  };
+
+  const handleAddProduct = () => {
+    console.log('Add product clicked');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Full Screen Menu */}
+      {showFullMenu && (
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="max-w-6xl mx-auto px-4">
+            {/* Header */}
+            <div className="flex items-center justify-between py-4 border-b border-gray-100">
+              <button 
+                onClick={() => setShowFullMenu(false)}
+                className="p-2 text-gray-600 hover:text-purple-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h1 className="text-xl font-bold text-gray-900">Menu</h1>
+              <div className="w-10"></div> {/* Empty div for centering */}
+            </div>
+
+            {/* User Info */}
+            <div className="py-6 border-b border-gray-100">
+              <div className="flex items-center gap-4">
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-16 h-16 rounded-full object-cover border-4 border-purple-100"
+                />
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900">{user.name}</h2>
+                  <p className="text-sm text-gray-500">{user.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Options */}
+            <div className="py-4 divide-y divide-gray-100">
+              {fullMenuOptions.map((option, index) => (
+                <MenuOption
+                  key={index}
+                  icon={option.icon}
+                  label={option.label}
+                  href={option.href}
+                  onClick={option.onClick}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Navigation Bar */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Left Side - Logo */}
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <span className="text-xl font-bold text-purple-600">HaloHunt</span>
+              </Link>
+            </div>
+
+            {/* Right Side - Hamburger Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFullMenu(true)}
+                className="p-2 text-gray-600 hover:text-purple-600 transition-colors"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
@@ -96,156 +209,90 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-500">Member since {user.joinedDate}</p>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-between sm:justify-end gap-3 mt-4 sm:mt-0 sm:ml-auto">
-              {/* Quick Actions Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowQuickActions(!showQuickActions)}
-                  className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span className="hidden sm:inline">Add New</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {showQuickActions && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10">
-                    <QuickActionButton icon={Video}>
-                      Start Live Stream
-                    </QuickActionButton>
-                    <QuickActionButton icon={ShoppingBag}>
-                      Add New Product
-                    </QuickActionButton>
-                  </div>
-                )}
-              </div>
-              {/* Settings Link */}
-              <Link
-                href="/settings"
-                className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
+            
+            {/* Action Buttons - Hidden on mobile, visible on PC */}
+            <div className="hidden sm:flex items-center gap-3 sm:ml-auto">
+              <ActionButton 
+                icon={Video} 
+                onClick={handleStartStream}
+                className="bg-purple-600 text-white hover:bg-purple-700"
               >
-                <Settings className="w-5 h-5" />
-              </Link>
+                Start Stream
+              </ActionButton>
+              <ActionButton 
+                icon={ShoppingBag} 
+                onClick={handleAddProduct}
+                className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+              >
+                Add Product
+              </ActionButton>
             </div>
           </div>
 
           {/* Stats Section */}
-          {user.isSeller && (
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <div className="grid grid-cols-2 sm:flex sm:items-center sm:gap-6 gap-4">
-                <div className="text-center">
-                  <div className="text-lg font-medium text-gray-900">{user.ordersCount}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Orders</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-medium text-gray-900">{user.listingsCount}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Listings</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-medium text-gray-900">${user.revenue}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Revenue</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-medium text-gray-900">{user.rating}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">Rating</div>
-                </div>
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <div className="grid grid-cols-2 sm:flex sm:items-center sm:gap-6 gap-4">
+              <div className="text-center">
+                <div className="text-lg font-medium text-gray-900">{user.livesCount}</div>
+                <div className="text-xs sm:text-sm text-gray-500">Lives</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-medium text-gray-900">{user.listingsCount}</div>
+                <div className="text-xs sm:text-sm text-gray-500">Products</div>
               </div>
             </div>
-          )}
+          </div>
+          
+          {/* Action Buttons - Visible on mobile, hidden on PC */}
+          <div className="flex items-center gap-3 mt-6 sm:hidden">
+            <ActionButton 
+              icon={Video} 
+              onClick={handleStartStream}
+              className="bg-purple-600 text-white hover:bg-purple-700 flex-1"
+            >
+              Start Stream
+            </ActionButton>
+            <ActionButton 
+              icon={ShoppingBag} 
+              onClick={handleAddProduct}
+              className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 flex-1"
+            >
+              Add Product
+            </ActionButton>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-purple-200 -mx-4 px-4 sm:mx-0 sm:px-0">
           <TabButton
-            active={activeTab === 'activity'}
-            icon={User}
-            onClick={() => setActiveTab('activity')}
+            active={activeTab === 'lives'}
+            icon={Video}
+            onClick={() => setActiveTab('lives')}
           >
-            Activity
+            Lives
           </TabButton>
           <TabButton
-            active={activeTab === 'orders'}
-            icon={Package}
-            onClick={() => setActiveTab('orders')}
+            active={activeTab === 'products'}
+            icon={ShoppingBag}
+            onClick={() => setActiveTab('products')}
           >
-            Orders
-          </TabButton>
-          <TabButton
-            active={activeTab === 'wishlist'}
-            icon={Heart}
-            onClick={() => setActiveTab('wishlist')}
-          >
-            Wishlist
-          </TabButton>
-          {user.isSeller && (
-            <>
-              <TabButton
-                active={activeTab === 'store'}
-                icon={Store}
-                onClick={() => setActiveTab('store')}
-              >
-                Store
-              </TabButton>
-              <TabButton
-                active={activeTab === 'analytics'}
-                icon={BarChart}
-                onClick={() => setActiveTab('analytics')}
-              >
-                Analytics
-              </TabButton>
-            </>
-          )}
-          <TabButton
-            active={activeTab === 'messages'}
-            icon={MessageSquare}
-            onClick={() => setActiveTab('messages')}
-          >
-            Messages
+            Products
           </TabButton>
         </div>
 
         {/* Content Sections */}
         <div className="grid gap-6">
-          {activeTab === 'activity' && (
+          {activeTab === 'lives' && (
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">Recent Activity</h2>
-              {/* Activity content */}
+              <h2 className="text-lg font-medium mb-4">My Lives</h2>
+              {/* Lives content */}
             </div>
           )}
           
-          {activeTab === 'orders' && (
+          {activeTab === 'products' && (
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">My Orders</h2>
-              {/* Orders content */}
-            </div>
-          )}
-
-          {activeTab === 'wishlist' && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">Wishlist</h2>
-              {/* Wishlist content */}
-            </div>
-          )}
-
-          {activeTab === 'store' && user.isSeller && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">Store Management</h2>
-              {/* Store content */}
-            </div>
-          )}
-
-          {activeTab === 'analytics' && user.isSeller && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">Analytics</h2>
-              {/* Analytics content */}
-            </div>
-          )}
-
-          {activeTab === 'messages' && (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-              <h2 className="text-lg font-medium mb-4">Messages</h2>
-              {/* Messages content */}
+              <h2 className="text-lg font-medium mb-4">My Products</h2>
+              {/* Products content */}
             </div>
           )}
         </div>
