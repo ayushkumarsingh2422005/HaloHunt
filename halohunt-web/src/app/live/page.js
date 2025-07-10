@@ -20,7 +20,7 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
 
   const handleClick = () => {
     // Navigate to the individual live stream page with the stream's ID
-    router.push(`/live/${stream.id}`);
+    router.push(`/live/view/${stream.id}`);
   };
 
   const handleHostClick = (e) => {
