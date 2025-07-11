@@ -7,17 +7,17 @@
 - Home: `https://halo-hunt.vercel.app/`
 - Landing: `https://halo-hunt.vercel.app/landing`
 - Profile: `https://halo-hunt.vercel.app/profile`
-- User Profile: `https://halo-hunt.vercel.app/profile/[id]`
+- User Profile: `https://halo-hunt.vercel.app/profile/1`
 - Profile Notification Settings: `https://halo-hunt.vercel.app/profile/notification-settings`
 - KYC: `https://halo-hunt.vercel.app/kyc`
 - Cart: `https://halo-hunt.vercel.app/cart`
 - Checkout: `https://halo-hunt.vercel.app/checkout`
 - Search: `https://halo-hunt.vercel.app/search`
-- Product Details: `https://halo-hunt.vercel.app/search/[id]`
+- Product Details: `https://halo-hunt.vercel.app/search/1`
 - Favorites: `https://halo-hunt.vercel.app/favorites`
 - Notifications: `https://halo-hunt.vercel.app/notifications`
-- Notification Details: `https://halo-hunt.vercel.app/notifications/[id]`
+- Notification Details: `https://halo-hunt.vercel.app/notifications/1`
 - Live Shopping: `https://halo-hunt.vercel.app/live`
 - Host Live Shopping: `https://halo-hunt.vercel.app/live/host`
-- View Live Shopping: `https://halo-hunt.vercel.app/live/view/[id]`
+- View Live Shopping: `https://halo-hunt.vercel.app/live/view/1`
 - Warehouses: `https://halo-hunt.vercel.app/warehouses` 
