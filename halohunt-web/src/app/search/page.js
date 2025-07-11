@@ -4,6 +4,7 @@ import {
   Search, Star, X, ChevronDown, ChevronUp, Sliders, 
   Grid2X2, LayoutList, Check 
 } from 'lucide-react';
+import Link from 'next/link';
 
 const SearchPage = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -187,44 +188,55 @@ const SearchPage = () => {
           <div className="flex-1">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product) => (
-                <div
+                <Link
                   key={product.id}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow
-                           flex flex-row md:flex-col" // List view on mobile, grid view on desktop
+                  href={`/search/${product.id%2+1}`}
+                  className="block"
                 >
-                  {/* Image container */}
-                  <div className="w-32 md:w-full flex-shrink-0"> {/* Fixed width on mobile, full width on desktop */}
-                    <div className="aspect-square relative group">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity" />
-                    </div>
-                  </div>
-
-                  {/* Content container */}
-                  <div className="flex-1 p-3 md:p-4 flex flex-col">
-                    <h3 className="font-medium text-sm mb-1 line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm ml-1">{product.rating}</span>
+                  <div
+                    className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow
+                           flex flex-row md:flex-col h-full" // List view on mobile, grid view on desktop
+                  >
+                    {/* Image container */}
+                    <div className="w-32 md:w-full flex-shrink-0"> {/* Fixed width on mobile, full width on desktop */}
+                      <div className="aspect-square relative group">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity" />
                       </div>
-                      <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
                     </div>
-                    {/* Price and Cart - Stack on mobile, side by side on desktop */}
-                    <div className="mt-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <span className="text-purple-600 font-bold">${product.price}</span>
-                      <button className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-full hover:bg-purple-700 transition-colors">
-                        Add to Cart
-                      </button>
+
+                    {/* Content container */}
+                    <div className="flex-1 p-3 md:p-4 flex flex-col">
+                      <h3 className="font-medium text-sm mb-1 line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm ml-1">{product.rating}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
+                      </div>
+                      {/* Price and Cart - Stack on mobile, side by side on desktop */}
+                      <div className="mt-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <span className="text-purple-600 font-bold">${product.price}</span>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Add to cart logic
+                          }} 
+                          className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-full hover:bg-purple-700 transition-colors"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

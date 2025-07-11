@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart, Search, Menu } from 'lucide-react';
+import Link from 'next/link';
 
 const LiveShoppingUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -272,50 +273,55 @@ const LiveShoppingUI = () => {
       <div className="px-4 py-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Products</h2>
-          <button className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+          <Link href="/search" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
             View All Products
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
           {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-              <div className="aspect-w-1 aspect-h-1 relative">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                {product.liveTaggable && (
-                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                    <img 
-                      src={product.tagger.image} 
-                      alt={product.tagger.name}
-                      className="w-6 h-6 rounded-full border-2 border-white"
-                    />
-                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
-                      {product.tagger.name}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    {product.rating}
-                  </div>
+            <Link key={product.id} href={`/search/${product.id}`} className="block">
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                <div className="aspect-w-1 aspect-h-1 relative">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {product.liveTaggable && (
+                    <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                      <img 
+                        src={product.tagger.image} 
+                        alt={product.tagger.name}
+                        className="w-6 h-6 rounded-full border-2 border-white"
+                      />
+                      <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                        {product.tagger.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <button 
-                  onClick={() => window.location.href = '/cart'} 
-                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
-                >
-                  Add to Cart
-                </button>
+                <div className="p-3">
+                  <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                  <div className="mt-1 flex items-center justify-between">
+                    <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      {product.rating}
+                    </div>
+                  </div>
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.location.href = '/cart';
+                    }} 
+                    className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

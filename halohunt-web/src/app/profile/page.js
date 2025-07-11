@@ -405,14 +405,6 @@ export default function ProfilePage() {
                 
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
                   <div>
-                    <span className="font-bold text-gray-900">{user.followers.toLocaleString()}</span>
-                    <span className="text-gray-600 ml-1">Followers</span>
-                  </div>
-                  <div>
-                    <span className="font-bold text-gray-900">{user.following.toLocaleString()}</span>
-                    <span className="text-gray-600 ml-1">Following</span>
-                  </div>
-                  <div>
                     <span className="font-bold text-gray-900">{user.livesCount}</span>
                     <span className="text-gray-600 ml-1">Lives</span>
                   </div>
