@@ -195,6 +195,7 @@ export default function ProfilePage() {
     { icon: Heart, label: 'Favorites', href: '/favorites' },
     { icon: UserCheck, label: 'KYC Verification', href: '/kyc' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
+    { icon: Settings, label: 'Notification Settings', href: '/profile/notification-settings' },
     { icon: MessageSquare, label: 'Messages', href: '/messages' },
     { icon: CreditCard, label: 'Payment Methods', href: '/payments' },
     { icon: Shield, label: 'Privacy & Security', href: '/privacy' },

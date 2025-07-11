@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   Search, Star, X, ChevronDown, ChevronUp, Sliders, 
-  Grid2X2, LayoutList, Check 
+  Grid2X2, LayoutList, Check, Bell
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -166,6 +166,12 @@ const SearchPage = () => {
               />
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             </div>
+            <Link href="/notifications" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Bell className="w-6 h-6 text-gray-700" />
+              <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                3
+              </span>
+            </Link>
             <button
               onClick={() => setIsFilterOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
