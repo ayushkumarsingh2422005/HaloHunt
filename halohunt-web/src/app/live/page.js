@@ -15,6 +15,7 @@ const LIVE_BG_IMAGES = [
   "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
 ];
 
+// Modify the LiveStreamCard component to remove the hover zoom effect
 const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
   const router = useRouter();
 
@@ -32,35 +33,36 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
     <div
       ref={ref}
       onClick={handleClick}
-      className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer"
-      style={{ minHeight: 0 }}
+      className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer h-full"
     >
       {/* Thumbnail */}
       <div className="relative w-full aspect-[3/4] bg-gray-200 overflow-hidden">
         <img
           src={stream.thumbnail}
           alt={stream.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover"
           style={{ backgroundColor: "#eee" }}
           loading="lazy"
         />
         {/* Overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-        {/* Live badge or duration */}
-        {stream.isLive ? (
-          <div className="absolute top-2 left-2 flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow">
-            <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
-            LIVE
-          </div>
-        ) : (
-          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
-            <Play className="w-3 h-3" />
-            {stream.duration}
-          </div>
-        )}
+        {/* Live badge or duration - always in the same position */}
+        <div className="absolute top-2 left-2 flex items-center gap-1 py-0.5 rounded-full text-xs font-semibold">
+          {stream.isLive ? (
+            <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
+              LIVE
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full">
+              <Play className="w-3 h-3" />
+              {stream.duration}
+            </div>
+          )}
+        </div>
         {/* Host avatar */}
         <div 
-          className="absolute bottom-2 left-2 flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity z-20"
+          className="absolute bottom-2 left-2 flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity z-10"
           onClick={handleHostClick}
         >
           <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white shadow">
@@ -78,36 +80,34 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
           <Eye className="w-3 h-3" />
           {stream.viewers.toLocaleString()}
         </div>
-        {/* Hover overlay */}
-        <div className="absolute inset-0 flex items-center justify-center gap-8 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+        {/* Action buttons - now always visible instead of on hover */}
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-2 z-10">
           <button 
-            className="flex flex-col items-center hover:scale-110 transition-transform"
+            className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
             onClick={(e) => {
               e.stopPropagation(); // Prevent navigation when clicking the heart button
               console.log('Like clicked for stream:', stream.id);
             }}
           >
-            <Heart className="w-6 h-6 text-white" />
-            <span className="text-white text-xs mt-1">{stream.likes}</span>
+            <Heart className="w-4 h-4 text-white" />
           </button>
           <button 
-            className="flex flex-col items-center hover:scale-110 transition-transform"
+            className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
             onClick={(e) => {
               e.stopPropagation(); // Prevent navigation when clicking the comment button
               console.log('Comment clicked for stream:', stream.id);
             }}
           >
-            <MessageCircle className="w-6 h-6 text-white" />
-            <span className="text-white text-xs mt-1">{stream.comments}</span>
+            <MessageCircle className="w-4 h-4 text-white" />
           </button>
           <button 
-            className="flex flex-col items-center hover:scale-110 transition-transform"
+            className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
             onClick={(e) => {
               e.stopPropagation(); // Prevent navigation when clicking the share button
               console.log('Share clicked for stream:', stream.id);
             }}
           >
-            <Share2 className="w-6 h-6 text-white" />
+            <Share2 className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>
@@ -132,15 +132,97 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
 });
 LiveStreamCard.displayName = "LiveStreamCard";
 
+// Fix the MobileReelsView component to prevent overlapping and account for bottom navigation
+const MobileReelsView = ({ streams, lastStreamRef, loading, hasMore }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const reelsContainerRef = useRef(null);
+
+  useEffect(() => {
+    const container = reelsContainerRef.current;
+    if (!container) return;
+
+    // Set up snap scrolling behavior
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      const pageHeight = window.innerHeight * 0.8; // Use 90% of screen height
+      const newPage = Math.round(scrollTop / pageHeight);
+      
+      if (newPage !== currentPage) {
+        setCurrentPage(newPage);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [currentPage]);
+
+  // Group streams into pairs for 2 per screen
+  const groupedStreams = [];
+  for (let i = 0; i < streams.length; i += 2) {
+    groupedStreams.push(streams.slice(i, i + 2));
+  }
+
+  return (
+    <div 
+      ref={reelsContainerRef}
+      className="h-[90vh] overflow-y-scroll snap-y snap-mandatory reels-container"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
+      <style jsx global>{`
+        .reels-container::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      
+      {groupedStreams.map((pair, pageIndex) => (
+        <div 
+          key={`page-${pageIndex}`} 
+          className="h-[90vh] w-full snap-start flex flex-col p-2 gap-4"
+        >
+          {pair.map((stream, idx) => (
+            <div 
+              key={stream.id} 
+              className="h-[calc(43vh-0.5rem)]"
+              ref={pageIndex === groupedStreams.length - 1 && idx === pair.length - 1 ? lastStreamRef : null}
+            >
+              <LiveStreamCard stream={stream} />
+            </div>
+          ))}
+        </div>
+      ))}
+      
+      {/* Loading indicator */}
+      {loading && (
+        <div className="flex justify-center py-8">
+          <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LiveGrid = () => {
   const [streams, setStreams] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const observer = useRef();
   const lastStreamRef = useRef();
 
   // Use static images for thumbnails, repeat if needed
   const getThumbnail = (idx) => LIVE_BG_IMAGES[idx % LIVE_BG_IMAGES.length];
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
   // Mock data generator for infinite scroll
   const generateMockStreams = (startIndex, count) => {
@@ -203,29 +285,40 @@ const LiveGrid = () => {
   }, [streams, loading, hasMore, loadMoreStreams]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-6 pb-10">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {streams.map((stream, index) => (
-            <LiveStreamCard
-              key={stream.id}
-              stream={stream}
-              ref={index === streams.length - 1 ? lastStreamRef : null}
-            />
-          ))}
+    <div className="min-h-screen bg-gray-50">
+      {isMobile ? (
+        // Mobile reels-style view with snap scrolling
+        <MobileReelsView 
+          streams={streams} 
+          lastStreamRef={lastStreamRef} 
+          loading={loading} 
+          hasMore={hasMore} 
+        />
+      ) : (
+        // Desktop grid view
+        <div className="pt-6 pb-10 max-w-7xl mx-auto px-2 sm:px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {streams.map((stream, index) => (
+              <LiveStreamCard
+                key={stream.id}
+                stream={stream}
+                ref={index === streams.length - 1 ? lastStreamRef : null}
+              />
+            ))}
+          </div>
+          {/* Loading indicator */}
+          {loading && (
+            <div className="flex justify-center py-8">
+              <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+            </div>
+          )}
+          {!hasMore && (
+            <div className="flex justify-center py-8 text-gray-400 text-sm">
+              No more streams to load.
+            </div>
+          )}
         </div>
-        {/* Loading indicator */}
-        {loading && (
-          <div className="flex justify-center py-8">
-            <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
-          </div>
-        )}
-        {!hasMore && (
-          <div className="flex justify-center py-8 text-gray-400 text-sm">
-            No more streams to load.
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
