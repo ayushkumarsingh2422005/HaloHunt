@@ -8,6 +8,7 @@ import {
   MapPin, Calendar, Instagram, Twitter, 
   Globe, ChevronDown, ChevronUp, Play, Eye
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Dummy creator data
 const DUMMY_CREATOR = {
@@ -288,8 +289,13 @@ export default function CreatorProfilePage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{creator.name}</h1>
                   {creator.verified && (
-                    <span className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-[10px]">✓</span>
+                    <span className="relative inline-flex items-center justify-center">
+                      <span className="absolute inset-0 w-5 h-5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full shadow-md blur-[1px] opacity-40"></span>
+                      <span className="relative inline-flex items-center justify-center w-5 h-5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-white">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
                     </span>
                   )}
                 </div>
@@ -343,13 +349,23 @@ export default function CreatorProfilePage() {
               <div className="flex flex-wrap gap-3 sm:self-start sm:ml-auto">
                 <button 
                   onClick={handleFollow}
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                     isFollowing
-                      ? 'bg-gray-200 text-gray-800'
-                      : 'bg-purple-600 text-white hover:bg-purple-700'
+                      ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      : 'bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:shadow-md hover:from-purple-700 hover:to-purple-600'
                   }`}
                 >
-                  {isFollowing ? 'Following' : 'Follow'}
+                  {isFollowing ? (
+                    <>
+                      <span className="w-4 h-4 flex items-center justify-center">✓</span>
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-4 h-4 flex items-center justify-center">+</span>
+                      Follow
+                    </>
+                  )}
                 </button>
                 <button className="p-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100">
                   <MessageCircle className="w-5 h-5" />

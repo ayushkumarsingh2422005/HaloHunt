@@ -8,6 +8,7 @@ import {
   MoreHorizontal, User, Gift, ThumbsUp, Flag,
   X, ExternalLink, DollarSign, Video
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Dummy data for the live stream
 const DUMMY_LIVE_DATA = {
@@ -206,6 +207,7 @@ export default function LiveStreamPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [showStreamInfo, setShowStreamInfo] = useState(true);
   const [showAboutInfo, setShowAboutInfo] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
   
   const chatContainerRef = useRef(null);
   const videoRef = useRef(null);
@@ -295,6 +297,27 @@ export default function LiveStreamPage() {
     }
   };
 
+  const handleFollow = () => {
+    setIsFollowing(!isFollowing);
+    if (!isFollowing) {
+      setLiveData(prev => ({
+        ...prev,
+        host: {
+          ...prev.host,
+          followers: prev.host.followers + 1
+        }
+      }));
+    } else {
+      setLiveData(prev => ({
+        ...prev,
+        host: {
+          ...prev.host,
+          followers: prev.host.followers - 1
+        }
+      }));
+    }
+  };
+
   // Navigate to creator profile
   const navigateToCreatorProfile = () => {
     router.push(`/profile/${liveData.host.id}`);
@@ -360,8 +383,10 @@ export default function LiveStreamPage() {
                         <div className="flex items-center gap-1">
                           <h3 className="text-sm font-medium text-gray-900">{liveData.host.name}</h3>
                           {liveData.host.verified && (
-                            <span className="w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
-                              <span className="text-white text-[8px]">✓</span>
+                              <span className="relative inline-flex items-center justify-center">
+                                <span className="relative inline-flex items-center justify-center w-8 h-8 rounded-full">
+                                <Image src="/images/varify.png" alt="Verified" width={40} height={40} className="w-8 h-8" />
+                              </span>
                             </span>
                           )}
                         </div>
@@ -379,6 +404,26 @@ export default function LiveStreamPage() {
                       >
                         <Heart className={`w-4 h-4 ${isLiked ? 'fill-purple-600' : ''}`} />
                         {liveData.stats.likes.toLocaleString()}
+                      </button>
+                      <button 
+                        onClick={handleFollow}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                          isFollowing
+                            ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            : 'bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:shadow-sm hover:from-purple-700 hover:to-purple-600'
+                        }`}
+                      >
+                        {isFollowing ? (
+                          <>
+                            <span className="w-3 h-3 flex items-center justify-center">✓</span>
+                            Following
+                          </>
+                        ) : (
+                          <>
+                            <span className="w-3 h-3 flex items-center justify-center">+</span>
+                            Follow
+                          </>
+                        )}
                       </button>
                       <button className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-200">
                         <Share2 className="w-4 h-4" />
