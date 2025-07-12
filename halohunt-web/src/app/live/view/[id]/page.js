@@ -204,14 +204,20 @@ export default function LiveStreamPage() {
   const [showProducts, setShowProducts] = useState(true);
   const [showChat, setShowChat] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+  const [showStreamInfo, setShowStreamInfo] = useState(true);
+  const [showAboutInfo, setShowAboutInfo] = useState(true);
   
   const chatContainerRef = useRef(null);
   const videoRef = useRef(null);
+  const mobileChatContainerRef = useRef(null);
   
   // Scroll chat to bottom when new messages arrive
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+    if (mobileChatContainerRef.current) {
+      mobileChatContainerRef.current.scrollTop = mobileChatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
   
@@ -325,77 +331,95 @@ export default function LiveStreamPage() {
             </div>
             
             {/* Stream Info */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-              <h1 className="text-xl font-bold text-gray-900 mb-2">{liveData.title}</h1>
-              <div className="flex flex-wrap items-center justify-between gap-y-3 mb-4">
-                <div 
-                  className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={navigateToCreatorProfile}
-                >
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
-                    <img 
-                      src={liveData.host.image} 
-                      alt={liveData.host.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1">
-                      <h3 className="text-sm font-medium text-gray-900">{liveData.host.name}</h3>
-                      {liveData.host.verified && (
-                        <span className="w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-[8px]">✓</span>
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500">{liveData.host.followers.toLocaleString()} followers</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <button 
-                    onClick={handleLike}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-                      isLiked 
-                        ? 'bg-purple-100 text-purple-600' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-purple-600' : ''}`} />
-                    {liveData.stats.likes.toLocaleString()}
-                  </button>
-                  <button className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-200">
-                    <Share2 className="w-4 h-4" />
-                    Share
-                  </button>
-                  <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <p className="text-sm text-gray-700">{liveData.description}</p>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {liveData.tags.map(tag => (
-                  <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            {/* Featured Products - Mobile Only */}
-            <div className="lg:hidden bg-white rounded-lg shadow-sm p-4 mb-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-medium text-gray-900">Featured Products</h2>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+              <div className="p-4 flex items-center justify-between">
+                <h1 className="text-xl font-bold text-gray-900 truncate">{liveData.title}</h1>
                 <button 
-                  onClick={() => setShowProducts(!showProducts)}
-                  className="text-purple-600"
+                  onClick={() => setShowStreamInfo(!showStreamInfo)}
+                  className="p-1 text-gray-500 hover:bg-gray-100 rounded-full"
                 >
-                  {showProducts ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  {showStreamInfo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
               </div>
               
-              {showProducts && (
-                <div className="space-y-3">
+              {showStreamInfo && (
+                <div className="px-4 pb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-y-3 mb-4">
+                    <div 
+                      className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={navigateToCreatorProfile}
+                    >
+                      <div className="w-10 h-10 rounded-full overflow-hidden">
+                        <img 
+                          src={liveData.host.image} 
+                          alt={liveData.host.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1">
+                          <h3 className="text-sm font-medium text-gray-900">{liveData.host.name}</h3>
+                          {liveData.host.verified && (
+                            <span className="w-4 h-4 bg-purple-600 rounded-full flex items-center justify-center">
+                              <span className="text-white text-[8px]">✓</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">{liveData.host.followers.toLocaleString()} followers</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <button 
+                        onClick={handleLike}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
+                          isLiked 
+                            ? 'bg-purple-100 text-purple-600' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${isLiked ? 'fill-purple-600' : ''}`} />
+                        {liveData.stats.likes.toLocaleString()}
+                      </button>
+                      <button className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-200">
+                        <Share2 className="w-4 h-4" />
+                        Share
+                      </button>
+                      <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-700">{liveData.description}</p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {liveData.tags.map(tag => (
+                      <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Featured Products - Mobile Only */}
+            <div className="lg:hidden bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+              <div className="flex border-b border-gray-100">
+                <button 
+                  onClick={() => setShowProducts(true)}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                >
+                  Products
+                </button>
+                <button 
+                  onClick={() => setShowProducts(false)}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${!showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                >
+                  Live Chat
+                </button>
+              </div>
+              
+              {showProducts ? (
+                <div className="p-4 space-y-3">
                   {products.slice(0, 3).map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -406,29 +430,12 @@ export default function LiveStreamPage() {
                     View All Products
                   </Link>
                 </div>
-              )}
-            </div>
-
-            {/* Live Chat - Mobile Only */}
-            <div className="lg:hidden bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-              <div className="p-3 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-medium text-gray-900">Live Chat</h2>
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setShowChat(!showChat)}
-                    className="text-purple-600"
-                  >
-                    {showChat ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-              
-              {showChat && (
-                <>
+              ) : (
+                <div className="flex flex-col" style={{ height: '350px' }}>
                   {/* Chat Messages */}
                   <div 
-                    className="overflow-y-auto p-3 space-y-1 bg-gray-50"
-                    style={{ height: '300px' }}
+                    ref={mobileChatContainerRef}
+                    className="flex-1 overflow-y-auto p-3 space-y-1 bg-gray-50"
                   >
                     {chatMessages.map(message => (
                       <ChatMessage key={message.id} message={message} />
@@ -458,24 +465,39 @@ export default function LiveStreamPage() {
                       </div>
                     </div>
                   </form>
-                </>
+                </div>
               )}
             </div>
 
+            {/* Live Chat - Mobile Only - REMOVED AS IT'S NOW INTEGRATED IN THE TABS ABOVE */}
+
             {/* Additional content for scrolling demonstration */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-              <h2 className="text-lg font-medium mb-2">About This Stream</h2>
-              <p className="text-sm text-gray-700 mb-3">
-                This live shopping event showcases our latest collection with exclusive discounts for viewers. 
-                Our host will demonstrate each product and answer your questions in real-time.
-              </p>
-              <p className="text-sm text-gray-700 mb-3">
-                Remember to use code SUMMER20 at checkout for 20% off featured items. 
-                Limited quantities available, so don't miss out!
-              </p>
-              <p className="text-sm text-gray-700">
-                All purchases made during the stream will be eligible for free shipping and our extended 30-day return policy.
-              </p>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+              <div className="p-4 flex items-center justify-between">
+                <h2 className="text-lg font-medium">About This Stream</h2>
+                <button 
+                  onClick={() => setShowAboutInfo(!showAboutInfo)}
+                  className="p-1 text-gray-500 hover:bg-gray-100 rounded-full"
+                >
+                  {showAboutInfo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                </button>
+              </div>
+              
+              {showAboutInfo && (
+                <div className="px-4 pb-4">
+                  <p className="text-sm text-gray-700 mb-3">
+                    This live shopping event showcases our latest collection with exclusive discounts for viewers. 
+                    Our host will demonstrate each product and answer your questions in real-time.
+                  </p>
+                  <p className="text-sm text-gray-700 mb-3">
+                    Remember to use code SUMMER20 at checkout for 20% off featured items. 
+                    Limited quantities available, so don't miss out!
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    All purchases made during the stream will be eligible for free shipping and our extended 30-day return policy.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
