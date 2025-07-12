@@ -1,12 +1,18 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, Star, X, ChevronDown, ChevronUp, Sliders, 
-  Grid2X2, LayoutList, Check, Bell
+  Grid2X2, LayoutList, Check, Bell, Eye, Play
 } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const SearchPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = searchParams.get('q');
+  
+  const [searchInput, setSearchInput] = useState(query || '');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     categories: [],
@@ -14,6 +20,21 @@ const SearchPage = () => {
     rating: null,
     sortBy: 'popular'
   });
+
+  // Update search input when query changes
+  useEffect(() => {
+    setSearchInput(query || '');
+  }, [query]);
+
+  // Handle search submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchInput.trim())}`);
+    } else {
+      router.push('/search');
+    }
+  };
 
   // Mock categories
   const categories = [
@@ -23,6 +44,54 @@ const SearchPage = () => {
     { id: 'beauty', name: 'Beauty', count: 432 },
     { id: 'sports', name: 'Sports', count: 321 },
     { id: 'toys', name: 'Toys', count: 234 },
+  ];
+
+  // Mock live streams
+  const liveStreams = [
+    {
+      id: 1,
+      title: "Summer Fashion Collection Showcase",
+      host: {
+        name: "Fashion Forward",
+        image: "https://i.pravatar.cc/150?img=32"
+      },
+      thumbnail: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=300&fit=crop",
+      viewers: 1245,
+      isLive: true
+    },
+    {
+      id: 2,
+      title: "Tech Gadgets Review & Deals",
+      host: {
+        name: "Tech World",
+        image: "https://i.pravatar.cc/150?img=45"
+      },
+      thumbnail: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?w=400&h=300&fit=crop",
+      viewers: 856,
+      isLive: true
+    },
+    {
+      id: 3,
+      title: "Cooking Masterclass: Summer Recipes",
+      host: {
+        name: "Chef Julia",
+        image: "https://i.pravatar.cc/150?img=20"
+      },
+      thumbnail: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400&h=300&fit=crop",
+      viewers: 734,
+      isLive: true
+    },
+    {
+      id: 4,
+      title: "Home Decor Ideas for Small Spaces",
+      host: {
+        name: "Interior Dreams",
+        image: "https://i.pravatar.cc/150?img=28"
+      },
+      thumbnail: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=400&h=300&fit=crop",
+      viewers: 512,
+      isLive: true
+    }
   ];
 
   // Mock products with proper images and data
@@ -152,20 +221,70 @@ const SearchPage = () => {
     );
   };
 
+  // Live stream card component
+  const LiveStreamCard = ({ stream }) => {
+    return (
+      <Link href={`/live/view/${stream.id}`} className="block">
+        <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-200">
+          <img
+            src={stream.thumbnail}
+            alt={stream.title}
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+          
+          {/* Live badge */}
+          <div className="absolute top-2 left-2 flex items-center gap-1">
+            <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
+              LIVE
+            </div>
+            <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs">
+              <Eye className="w-3 h-3" />
+              {stream.viewers}
+            </div>
+          </div>
+          
+          {/* Host avatar */}
+          <div className="absolute bottom-2 left-2 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-white">
+              <img
+                src={stream.host.image}
+                alt={stream.host.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-white text-sm font-medium">{stream.host.name}</span>
+          </div>
+        </div>
+        <h3 className="mt-2 text-sm font-medium line-clamp-2">{stream.title}</h3>
+      </Link>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Header */}
       <div className="sticky top-0 z-20 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+          <form onSubmit={handleSearch} className="flex items-center gap-4">
             <div className="flex-1 relative">
               <input
                 type="text"
                 placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:border-purple-500"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             </div>
+            <button 
+              type="submit" 
+              className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <Link href="/notifications" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
               <Bell className="w-6 h-6 text-gray-700" />
               <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
@@ -173,6 +292,7 @@ const SearchPage = () => {
               </span>
             </Link>
             <button
+              type="button"
               onClick={() => setIsFilterOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
             >
@@ -184,14 +304,37 @@ const SearchPage = () => {
                 </span>
               )}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          {/* Product Grid/List */}
-          <div className="flex-1">
+        <div className="flex flex-col gap-8">
+          {/* Live Streams Section - Show only if no query parameter */}
+          {!query && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">Live Now</h2>
+                <Link href="/live" className="text-purple-600 text-sm font-medium hover:underline">
+                  View All
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {liveStreams.map(stream => (
+                  <LiveStreamCard key={stream.id} stream={stream} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Products Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Products</h2>
+              {query && (
+                <p className="text-gray-500">Showing results for "{query}"</p>
+              )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {products.map((product) => (
                 <Link
