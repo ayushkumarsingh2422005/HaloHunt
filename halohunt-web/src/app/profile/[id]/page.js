@@ -290,11 +290,8 @@ export default function CreatorProfilePage() {
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{creator.name}</h1>
                   {creator.verified && (
                     <span className="relative inline-flex items-center justify-center">
-                      <span className="absolute inset-0 w-5 h-5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full shadow-md blur-[1px] opacity-40"></span>
-                      <span className="relative inline-flex items-center justify-center w-5 h-5 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-white">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
+                      <span className="relative inline-flex items-center justify-center w-8 h-8 rounded-full">
+                        <Image src="/images/varify.png" alt="Verified" width={40} height={40} className="w-8 h-8" />
                       </span>
                     </span>
                   )}

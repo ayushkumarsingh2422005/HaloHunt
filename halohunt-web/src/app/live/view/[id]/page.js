@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Eye, Heart, Share2, MessageCircle, 
+import {
+  Eye, Heart, Share2, MessageCircle,
   Send, ShoppingBag, ChevronDown, ChevronUp,
   MoreHorizontal, User, Gift, ThumbsUp, Flag,
   X, ExternalLink, DollarSign, Video
@@ -141,9 +141,9 @@ const ProductCard = ({ product }) => {
   return (
     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
       <div className="w-16 h-16 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-        <img 
-          src={product.image} 
-          alt={product.name} 
+        <img
+          src={product.image}
+          alt={product.name}
           className="w-full h-full object-cover"
         />
       </div>
@@ -171,9 +171,9 @@ const ChatMessage = ({ message }) => {
   return (
     <div className="flex gap-2 mb-3">
       <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-        <img 
-          src={message.user.image} 
-          alt={message.user.name} 
+        <img
+          src={message.user.image}
+          alt={message.user.name}
           className="w-full h-full object-cover"
         />
       </div>
@@ -197,7 +197,7 @@ export default function LiveStreamPage() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
-  
+
   const [liveData, setLiveData] = useState(DUMMY_LIVE_DATA);
   const [products, setProducts] = useState(DUMMY_PRODUCTS);
   const [chatMessages, setChatMessages] = useState(DUMMY_CHAT_MESSAGES);
@@ -208,11 +208,11 @@ export default function LiveStreamPage() {
   const [showStreamInfo, setShowStreamInfo] = useState(true);
   const [showAboutInfo, setShowAboutInfo] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
-  
+
   const chatContainerRef = useRef(null);
   const videoRef = useRef(null);
   const mobileChatContainerRef = useRef(null);
-  
+
   // Scroll chat to bottom when new messages arrive
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -222,7 +222,7 @@ export default function LiveStreamPage() {
       mobileChatContainerRef.current.scrollTop = mobileChatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
-  
+
   // Simulate receiving new chat messages
   useEffect(() => {
     const interval = setInterval(() => {
@@ -231,7 +231,7 @@ export default function LiveStreamPage() {
         { id: "u7", name: "Michelle S.", image: "https://i.pravatar.cc/150?img=7" },
         { id: "u8", name: "Robert T.", image: "https://i.pravatar.cc/150?img=8" }
       ];
-      
+
       const randomMessages = [
         "Is this available in my size?",
         "When will these ship?",
@@ -240,27 +240,27 @@ export default function LiveStreamPage() {
         "Can you show the blue one again?",
         "What material is this made of?"
       ];
-      
+
       const randomUser = randomUsers[Math.floor(Math.random() * randomUsers.length)];
       const randomMessage = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-      
+
       const newMessage = {
         id: `m${Date.now()}`,
         user: randomUser,
         message: randomMessage,
         timestamp: "just now"
       };
-      
+
       setChatMessages(prev => [...prev, newMessage]);
     }, 8000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-    
+
     const userMessage = {
       id: `m${Date.now()}`,
       user: {
@@ -271,11 +271,11 @@ export default function LiveStreamPage() {
       message: newMessage,
       timestamp: "just now"
     };
-    
+
     setChatMessages(prev => [...prev, userMessage]);
     setNewMessage('');
   };
-  
+
   const handleLike = () => {
     setIsLiked(!isLiked);
     if (!isLiked) {
@@ -346,36 +346,36 @@ export default function LiveStreamPage() {
                   {liveData.stats.viewers.toLocaleString()}
                 </div>
               </div>
-              <video 
+              <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
                 poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop"
               />
             </div>
-            
+
             {/* Stream Info */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
               <div className="p-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold text-gray-900 truncate">{liveData.title}</h1>
-                <button 
+                <button
                   onClick={() => setShowStreamInfo(!showStreamInfo)}
                   className="p-1 text-gray-500 hover:bg-gray-100 rounded-full"
                 >
                   {showStreamInfo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
               </div>
-              
+
               {showStreamInfo && (
                 <div className="px-4 pb-4">
                   <div className="flex flex-wrap items-center justify-between gap-y-3 mb-4">
-                    <div 
+                    <div
                       className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={navigateToCreatorProfile}
                     >
                       <div className="w-10 h-10 rounded-full overflow-hidden">
-                        <img 
-                          src={liveData.host.image} 
-                          alt={liveData.host.name} 
+                        <img
+                          src={liveData.host.image}
+                          alt={liveData.host.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -383,8 +383,8 @@ export default function LiveStreamPage() {
                         <div className="flex items-center gap-1">
                           <h3 className="text-sm font-medium text-gray-900">{liveData.host.name}</h3>
                           {liveData.host.verified && (
-                              <span className="relative inline-flex items-center justify-center">
-                                <span className="relative inline-flex items-center justify-center w-8 h-8 rounded-full">
+                            <span className="relative inline-flex items-center justify-center">
+                              <span className="relative inline-flex items-center justify-center w-8 h-8 rounded-full">
                                 <Image src="/images/varify.png" alt="Verified" width={40} height={40} className="w-8 h-8" />
                               </span>
                             </span>
@@ -394,24 +394,22 @@ export default function LiveStreamPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
-                      <button 
+                      <button
                         onClick={handleLike}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-                          isLiked 
-                            ? 'bg-purple-100 text-purple-600' 
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${isLiked
+                            ? 'bg-purple-100 text-purple-600'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
+                          }`}
                       >
                         <Heart className={`w-4 h-4 ${isLiked ? 'fill-purple-600' : ''}`} />
                         {liveData.stats.likes.toLocaleString()}
                       </button>
-                      <button 
+                      <button
                         onClick={handleFollow}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                          isFollowing
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${isFollowing
                             ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                             : 'bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:shadow-sm hover:from-purple-700 hover:to-purple-600'
-                        }`}
+                          }`}
                       >
                         {isFollowing ? (
                           <>
@@ -445,31 +443,31 @@ export default function LiveStreamPage() {
                 </div>
               )}
             </div>
-            
+
             {/* Featured Products - Mobile Only */}
             <div className="lg:hidden bg-white rounded-lg shadow-sm overflow-hidden mb-4">
               <div className="flex border-b border-gray-100">
-                <button 
+                <button
                   onClick={() => setShowProducts(true)}
                   className={`flex-1 py-3 text-center font-medium text-sm ${showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
                 >
                   Products
                 </button>
-                <button 
+                <button
                   onClick={() => setShowProducts(false)}
                   className={`flex-1 py-3 text-center font-medium text-sm ${!showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
                 >
                   Live Chat
                 </button>
               </div>
-              
+
               {showProducts ? (
                 <div className="p-4 space-y-3">
                   {products.slice(0, 3).map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
-                  <Link 
-                    href="#" 
+                  <Link
+                    href="#"
                     className="block text-center py-2 text-sm text-purple-600 font-medium hover:underline"
                   >
                     View All Products
@@ -478,7 +476,7 @@ export default function LiveStreamPage() {
               ) : (
                 <div className="flex flex-col" style={{ height: '350px' }}>
                   {/* Chat Messages */}
-                  <div 
+                  <div
                     ref={mobileChatContainerRef}
                     className="flex-1 overflow-y-auto p-3 space-y-1 bg-gray-50"
                   >
@@ -486,7 +484,7 @@ export default function LiveStreamPage() {
                       <ChatMessage key={message.id} message={message} />
                     ))}
                   </div>
-                  
+
                   {/* Chat Input */}
                   <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 bg-white">
                     <div className="flex items-center gap-2">
@@ -501,7 +499,7 @@ export default function LiveStreamPage() {
                           placeholder="Say something..."
                           className="w-full py-2 px-3 pr-10 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white"
                         />
-                        <button 
+                        <button
                           type="submit"
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 p-1"
                         >
@@ -520,22 +518,22 @@ export default function LiveStreamPage() {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
               <div className="p-4 flex items-center justify-between">
                 <h2 className="text-lg font-medium">About This Stream</h2>
-                <button 
+                <button
                   onClick={() => setShowAboutInfo(!showAboutInfo)}
                   className="p-1 text-gray-500 hover:bg-gray-100 rounded-full"
                 >
                   {showAboutInfo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </button>
               </div>
-              
+
               {showAboutInfo && (
                 <div className="px-4 pb-4">
                   <p className="text-sm text-gray-700 mb-3">
-                    This live shopping event showcases our latest collection with exclusive discounts for viewers. 
+                    This live shopping event showcases our latest collection with exclusive discounts for viewers.
                     Our host will demonstrate each product and answer your questions in real-time.
                   </p>
                   <p className="text-sm text-gray-700 mb-3">
-                    Remember to use code SUMMER20 at checkout for 20% off featured items. 
+                    Remember to use code SUMMER20 at checkout for 20% off featured items.
                     Limited quantities available, so don't miss out!
                   </p>
                   <p className="text-sm text-gray-700">
@@ -569,15 +567,15 @@ export default function LiveStreamPage() {
               </div>
             </div>
           </div>
-          
+
           {/* Sidebar - Chat and Products - Independently Scrollable - Desktop Only */}
           <div className="hidden lg:flex lg:col-span-1 lg:h-[calc(100vh-2rem)] lg:overflow-hidden flex-col">
             {/* Products Section - Desktop Only */}
             <div className="bg-white rounded-lg shadow-sm p-4 mb-4 lg:overflow-y-auto" style={{ maxHeight: '40%' }}>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-medium text-gray-900">Featured Products</h2>
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
                 >
                   View All
@@ -590,7 +588,7 @@ export default function LiveStreamPage() {
                 ))}
               </div>
             </div>
-            
+
             {/* Live Chat - Desktop Only */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-1">
               <div className="p-3 border-b border-gray-100 flex items-center justify-between">
@@ -604,9 +602,9 @@ export default function LiveStreamPage() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Chat Messages */}
-              <div 
+              <div
                 ref={chatContainerRef}
                 className="flex-1 overflow-y-auto p-3 space-y-1 bg-gray-50"
                 style={{ height: '100%' }}
@@ -615,7 +613,7 @@ export default function LiveStreamPage() {
                   <ChatMessage key={message.id} message={message} />
                 ))}
               </div>
-              
+
               {/* Chat Input */}
               <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 bg-white">
                 <div className="flex items-center gap-2">
@@ -630,7 +628,7 @@ export default function LiveStreamPage() {
                       placeholder="Say something..."
                       className="w-full py-2 px-3 pr-10 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white"
                     />
-                    <button 
+                    <button
                       type="submit"
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 p-1"
                     >
