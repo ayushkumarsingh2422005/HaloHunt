@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={geist.className}>
         <AuthProvider>
-          <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>{children}</ClientLayout>
         </AuthProvider>
       </body>
     </html>

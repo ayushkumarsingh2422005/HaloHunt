@@ -90,14 +90,54 @@ const LiveShoppingUI = () => {
   ];
 
   const categories = [
-    { id: 1, name: "Fashion", icon: Grid3X3 },
-    { id: 2, name: "Electronics", icon: Monitor },
-    { id: 3, name: "Home & Living", icon: Home },
-    { id: 4, name: "Beauty", icon: Zap },
-    { id: 5, name: "Sports", icon: Trophy },
-    { id: 6, name: "Toys", icon: Car },
-    { id: 7, name: "Digital Goods", icon: Laptop },
-    { id: 8, name: "Others", icon: MoreHorizontal }
+    { 
+      id: 1, 
+      name: "Fashion", 
+      icon: Grid3X3,
+      image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&h=300&fit=crop&crop=center" // Fashion clothing rack
+    },
+    { 
+      id: 2, 
+      name: "Electronics", 
+      icon: Monitor,
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop&crop=center" // Electronics gadgets
+    },
+    { 
+      id: 3, 
+      name: "Home & Living", 
+      icon: Home,
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop&crop=center" // Cozy living room
+    },
+    { 
+      id: 4, 
+      name: "Beauty", 
+      icon: Zap,
+      image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=400&h=300&fit=crop&crop=center" // Beauty products
+    },
+    { 
+      id: 5, 
+      name: "Sports", 
+      icon: Trophy,
+      image: "https://images.unsplash.com/photo-1505843279827-4b522fae12fa?w=400&h=300&fit=crop&crop=center" // Sports equipment
+    },
+    { 
+      id: 6, 
+      name: "Toys", 
+      icon: Car,
+      image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400&h=300&fit=crop&crop=center" // Toys
+    },
+    { 
+      id: 7, 
+      name: "Digital Goods", 
+      icon: Laptop,
+      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop&crop=center" // Digital workspace
+    },
+    { 
+      id: 8, 
+      name: "Others", 
+      icon: MoreHorizontal,
+      image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400&h=300&fit=crop&crop=center" // Miscellaneous
+    }
   ];
 
   const upcomingEvents = [
@@ -186,8 +226,8 @@ const LiveShoppingUI = () => {
               </span>
             </Link>
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <Menu className="w-6 h-6 text-gray-700" />
-            </button>
+            <Menu className="w-6 h-6 text-gray-700" />
+          </button>
           </div>
         </div>
       </div>
@@ -225,15 +265,21 @@ const LiveShoppingUI = () => {
       </div>
 
       {/* Categories */}
-      <div className="px-4 py-4">
-        <h2 className="text-xl font-bold mb-4">Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="px-4 py-3">
+        <h2 className="text-lg font-bold mb-3">Categories</h2>
+        <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
-              <div key={category.id} className="bg-purple-100 rounded-lg p-3 text-center">
-                <IconComponent className="w-6 h-6 mx-auto mb-2 text-purple-700" />
-                <span className="text-sm text-gray-800">{category.name}</span>
+              <div key={category.id} className="flex flex-col items-center flex-shrink-0">
+                <div className="rounded-full w-16 h-16 flex items-center justify-center shadow-sm mb-1.5 bg-red-50">
+                  <img 
+                    src={category.image} 
+                    alt={category.name}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+                <span className="text-xs text-gray-800 whitespace-nowrap">{category.name}</span>
               </div>
             );
           })}
@@ -290,45 +336,45 @@ const LiveShoppingUI = () => {
           {products.map((product) => (
             <Link key={product.id} href={`/search/${product.id}`} className="block">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-                <div className="aspect-w-1 aspect-h-1 relative">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                  {product.liveTaggable && (
-                    <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                      <img 
-                        src={product.tagger.image} 
-                        alt={product.tagger.name}
-                        className="w-6 h-6 rounded-full border-2 border-white"
-                      />
-                      <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
-                        {product.tagger.name}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                  <div className="mt-1 flex items-center justify-between">
-                    <span className="text-sm font-medium text-purple-600">{product.price}</span>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      {product.rating}
-                    </div>
+              <div className="aspect-w-1 aspect-h-1 relative">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+                {product.liveTaggable && (
+                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                    <img 
+                      src={product.tagger.image} 
+                      alt={product.tagger.name}
+                      className="w-6 h-6 rounded-full border-2 border-white"
+                    />
+                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                      {product.tagger.name}
+                    </span>
                   </div>
-                  <button 
+                )}
+              </div>
+              <div className="p-3">
+                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    {product.rating}
+                  </div>
+                </div>
+                <button 
                     onClick={(e) => {
                       e.preventDefault();
                       window.location.href = '/cart';
                     }} 
-                    className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
+                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                >
+                  Add to Cart
+                </button>
               </div>
+            </div>
             </Link>
           ))}
         </div>
