@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Search, Star, X, ChevronDown, ChevronUp, Sliders, 
-  Grid2X2, LayoutList, Check, Bell, Eye, Play
+  Grid2X2, LayoutList, Check, Bell, Eye, Play, Heart, MessageCircle, Share2
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -98,83 +98,55 @@ const SearchPage = () => {
   const products = [
     {
       id: 1,
-      name: "Premium Wireless Headphones",
-      price: 299.99,
+      name: "Premium Watch",
+      price: "$299.99",
+      seller: "John Smith",
       rating: 4.8,
-      reviews: 1234,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80",
-      seller: "Tech World",
-      category: "Electronics"
+      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center",
+      liveTaggable: true,
+      tagger: {
+        name: "Emma Wilson",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 2,
-      name: "Smart Watch Series 5",
-      price: 399.99,
-      rating: 4.9,
-      reviews: 856,
-      image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop&q=80",
-      seller: "Smart Gear",
-      category: "Electronics"
+      name: "Premium Watch",
+      price: "$299.99",
+      seller: "John Smith",
+      rating: 4.8,
+      image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop&crop=center",
+      liveTaggable: true,
+      tagger: {
+        name: "Alex Chen",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 3,
-      name: "Designer Leather Handbag",
-      price: 199.99,
-      rating: 4.7,
-      reviews: 543,
-      image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop&q=80",
-      seller: "Fashion Hub",
-      category: "Fashion"
+      name: "Premium Watch",
+      price: "$299.99",
+      seller: "John Smith",
+      rating: 4.8,
+      image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&crop=center",
+      liveTaggable: true,
+      tagger: {
+        name: "Sarah Kim",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     },
     {
       id: 4,
-      name: "Running Shoes Pro",
-      price: 129.99,
-      rating: 4.6,
-      reviews: 921,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&q=80",
-      seller: "Sports Elite",
-      category: "Sports"
-    },
-    {
-      id: 5,
-      name: "4K Ultra HD Camera",
-      price: 899.99,
-      rating: 4.9,
-      reviews: 432,
-      image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop&q=80",
-      seller: "Photo Pro",
-      category: "Electronics"
-    },
-    {
-      id: 6,
-      name: "Minimalist Watch",
-      price: 159.99,
-      rating: 4.5,
-      reviews: 678,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&q=80",
-      seller: "Time Pieces",
-      category: "Fashion"
-    },
-    {
-      id: 7,
-      name: "Wireless Gaming Mouse",
-      price: 79.99,
-      rating: 4.7,
-      reviews: 345,
-      image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop&q=80",
-      seller: "Gaming World",
-      category: "Electronics"
-    },
-    {
-      id: 8,
-      name: "Mechanical Keyboard",
-      price: 149.99,
+      name: "Premium Watch",
+      price: "$299.99",
+      seller: "John Smith",
       rating: 4.8,
-      reviews: 567,
-      image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=400&h=400&fit=crop&q=80",
-      seller: "Tech Plus",
-      category: "Electronics"
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
+      liveTaggable: true,
+      tagger: {
+        name: "Mike Johnson",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format"
+      }
     }
   ];
 
@@ -225,40 +197,86 @@ const SearchPage = () => {
   const LiveStreamCard = ({ stream }) => {
     return (
       <Link href={`/live/view/${stream.id}`} className="block">
-        <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-200">
-          <img
-            src={stream.thumbnail}
-            alt={stream.title}
-            className="w-full h-full object-cover"
-          />
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-          
-          {/* Live badge */}
-          <div className="absolute top-2 left-2 flex items-center gap-1">
-            <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
-              <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
-              LIVE
+        <div className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer md:h-full h-[calc(43vh-0.5rem)]">
+          {/* Thumbnail */}
+          <div className="relative w-full aspect-[3/4] bg-gray-200 overflow-hidden">
+            <img
+              src={stream.thumbnail}
+              alt={stream.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+            
+            {/* Live badge */}
+            <div className="absolute top-2 left-2 flex items-center gap-1">
+              <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
+                LIVE
+              </div>
+              <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs">
+                <Eye className="w-3 h-3" />
+                {stream.viewers}
+              </div>
             </div>
-            <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs">
-              <Eye className="w-3 h-3" />
-              {stream.viewers}
+            
+            {/* Host avatar */}
+            <div className="absolute bottom-2 left-2 flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white shadow">
+                <img
+                  src={stream.host.image}
+                  alt={stream.host.name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-white text-xs font-medium bg-black/50 px-2 py-0.5 rounded">{stream.host.name}</span>
+            </div>
+            
+            {/* Action buttons */}
+            <div className="absolute top-2 right-2 flex flex-col items-end gap-2 z-10">
+              <button 
+                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Like clicked for stream:', stream.id);
+                }}
+              >
+                <Heart className="w-4 h-4 text-white" />
+              </button>
+              <button 
+                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Comment clicked for stream:', stream.id);
+                }}
+              >
+                <MessageCircle className="w-4 h-4 text-white" />
+              </button>
+              <button 
+                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Share clicked for stream:', stream.id);
+                }}
+              >
+                <Share2 className="w-4 h-4 text-white" />
+              </button>
             </div>
           </div>
-          
-          {/* Host avatar */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-white">
-              <img
-                src={stream.host.image}
-                alt={stream.host.name}
-                className="w-full h-full object-cover"
-              />
+          {/* Stream info */}
+          <div className="flex-1 flex flex-col px-3 py-2 bg-white">
+            <h3 className="font-semibold text-sm text-gray-900 mb-1 truncate">{stream.title}</h3>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span className="truncate">{stream.host.name}</span>
+              <span>
+                <Eye className="inline w-3 h-3 mr-1" />
+                {stream.viewers.toLocaleString()}
+              </span>
             </div>
-            <span className="text-white text-sm font-medium">{stream.host.name}</span>
           </div>
         </div>
-        <h3 className="mt-2 text-sm font-medium line-clamp-2">{stream.title}</h3>
       </Link>
     );
   };
@@ -335,59 +353,52 @@ const SearchPage = () => {
                 <p className="text-gray-500">Showing results for "{query}"</p>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/search/${product.id%2+1}`}
-                  className="block"
-                >
-                  <div
-                    className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow
-                           flex flex-row md:flex-col h-full" // List view on mobile, grid view on desktop
-                  >
-                    {/* Image container */}
-                    <div className="w-32 md:w-full flex-shrink-0"> {/* Fixed width on mobile, full width on desktop */}
-                      <div className="aspect-square relative group">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity" />
-                      </div>
-                    </div>
-
-                    {/* Content container */}
-                    <div className="flex-1 p-3 md:p-4 flex flex-col">
-                      <h3 className="font-medium text-sm mb-1 line-clamp-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm ml-1">{product.rating}</span>
-                        </div>
-                        <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
-                      </div>
-                      {/* Price and Cart - Stack on mobile, side by side on desktop */}
-                      <div className="mt-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                        <span className="text-purple-600 font-bold">${product.price}</span>
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Add to cart logic
-                          }} 
-                          className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-full hover:bg-purple-700 transition-colors"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+          {products.map((product) => (
+            <Link key={product.id} href={`/search/${product.id}`} className="block">
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+              <div className="aspect-w-1 aspect-h-1 relative">
+                <img 
+                  src={product.image} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+                {product.liveTaggable && (
+                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                    <img 
+                      src={product.tagger.image} 
+                      alt={product.tagger.name}
+                      className="w-6 h-6 rounded-full border-2 border-white"
+                    />
+                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                      {product.tagger.name}
+                    </span>
                   </div>
-                </Link>
-              ))}
+                )}
+              </div>
+              <div className="p-3">
+                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    {product.rating}
+                  </div>
+                </div>
+                <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.location.href = '/cart';
+                    }} 
+                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                >
+                  Add to Cart
+                </button>
+              </div>
             </div>
+            </Link>
+          ))}
+        </div>
           </div>
         </div>
       </div>
