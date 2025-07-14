@@ -57,7 +57,11 @@ const SearchPage = () => {
       },
       thumbnail: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=300&fit=crop",
       viewers: 1245,
-      isLive: true
+      isLive: true,
+      taggedProducts: [
+        { id: "prod-1-1", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center" },
+        { id: "prod-1-2", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop&crop=center" }
+      ]
     },
     {
       id: 2,
@@ -68,7 +72,12 @@ const SearchPage = () => {
       },
       thumbnail: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?w=400&h=300&fit=crop",
       viewers: 856,
-      isLive: true
+      isLive: true,
+      taggedProducts: [
+        { id: "prod-2-1", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center" },
+        { id: "prod-2-2", image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=80&h=80&fit=crop&crop=center" },
+        { id: "prod-2-3", image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=80&h=80&fit=crop&crop=center" }
+      ]
     },
     {
       id: 3,
@@ -79,7 +88,10 @@ const SearchPage = () => {
       },
       thumbnail: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400&h=300&fit=crop",
       viewers: 734,
-      isLive: true
+      isLive: true,
+      taggedProducts: [
+        { id: "prod-3-1", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop&crop=center" }
+      ]
     },
     {
       id: 4,
@@ -90,7 +102,11 @@ const SearchPage = () => {
       },
       thumbnail: "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=400&h=300&fit=crop",
       viewers: 512,
-      isLive: true
+      isLive: true,
+      taggedProducts: [
+        { id: "prod-4-1", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center" },
+        { id: "prod-4-2", image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop&crop=center" }
+      ]
     }
   ];
 
@@ -195,6 +211,12 @@ const SearchPage = () => {
 
   // Live stream card component
   const LiveStreamCard = ({ stream }) => {
+    const handleProductClick = (e, productId) => {
+      e.stopPropagation();
+      e.preventDefault();
+      router.push(`/search/${productId}`);
+    };
+
     return (
       <Link href={`/live/view/${stream.id}`} className="block">
         <div className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer md:h-full h-[calc(43vh-0.5rem)]">
@@ -220,6 +242,30 @@ const SearchPage = () => {
                 {stream.viewers}
               </div>
             </div>
+            
+            {/* Tagged Products */}
+            {stream.taggedProducts && stream.taggedProducts.length > 0 && (
+              <div className="absolute bottom-14 left-2 flex items-center gap-1.5">
+                {stream.taggedProducts.map((product) => (
+                  <div 
+                    key={product.id}
+                    onClick={(e) => handleProductClick(e, product.id)}
+                    className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shadow cursor-pointer hover:scale-110 transition-transform"
+                    title="Tagged Product"
+                  >
+                    <img
+                      src={product.image}
+                      alt="Tagged Product"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+                <span className="text-white text-xs font-medium bg-black/50 px-1.5 py-0.5 rounded-full">
+                  {stream.taggedProducts.length}
+                </span>
+              </div>
+            )}
             
             {/* Host avatar */}
             <div className="absolute bottom-2 left-2 flex items-center gap-2">
