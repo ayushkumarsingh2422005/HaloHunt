@@ -15,9 +15,16 @@ const LIVE_BG_IMAGES = [
   "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
 ];
 
-// Modify the LiveStreamCard component to remove the hover zoom effect
+// Modify the LiveStreamCard component to include tagged products
 const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
   const router = useRouter();
+
+  // Add mock tagged products to each stream
+  const taggedProducts = stream.taggedProducts || [
+    { id: `prod-${stream.id}-1`, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center" },
+    { id: `prod-${stream.id}-2`, image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=80&h=80&fit=crop&crop=center" },
+    { id: `prod-${stream.id}-3`, image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop&crop=center" },
+  ].slice(0, 2 + Math.floor(Math.random() * 2)); // Random 2-3 products
 
   const handleClick = () => {
     // Navigate to the individual live stream page with the stream's ID
@@ -27,6 +34,11 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
   const handleHostClick = (e) => {
     e.stopPropagation(); // Prevent triggering the card click
     router.push(`/profile/creator-${stream.host.name.toLowerCase().replace(/\s+/g, '-')}`);
+  };
+
+  const handleProductClick = (e, productId) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    router.push(`/search/${productId}`);
   };
 
   return (
@@ -74,6 +86,29 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
             />
           </div>
           <span className="text-white text-xs font-medium bg-black/50 px-2 py-0.5 rounded">{stream.host.name}</span>
+        </div>
+        {/* Tagged Products */}
+        <div className="absolute bottom-14 left-2 flex items-center gap-1.5">
+          {taggedProducts.map((product, idx) => (
+            <div 
+              key={product.id}
+              onClick={(e) => handleProductClick(e, product.id)}
+              className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shadow cursor-pointer hover:scale-110 transition-transform"
+              title="Tagged Product"
+            >
+              <img
+                src={product.image}
+                alt="Tagged Product"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+          {taggedProducts.length > 0 && (
+            <span className="text-white text-xs font-medium bg-black/50 px-1.5 py-0.5 rounded-full">
+              {taggedProducts.length}
+            </span>
+          )}
         </div>
         {/* Viewers */}
         <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
@@ -238,7 +273,12 @@ const LiveGrid = () => {
       likes: Math.floor(Math.random() * 5000) + 50,
       comments: Math.floor(Math.random() * 1000) + 10,
       isLive: Math.random() > 0.3,
-      duration: Math.floor(Math.random() * 60) + ":" + Math.floor(Math.random() * 60).toString().padStart(2, '0')
+      duration: Math.floor(Math.random() * 60) + ":" + Math.floor(Math.random() * 60).toString().padStart(2, '0'),
+      taggedProducts: [
+        { id: `prod-${startIndex + i}-1`, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center" },
+        { id: `prod-${startIndex + i}-2`, image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=80&h=80&fit=crop&crop=center" },
+        { id: `prod-${startIndex + i}-3`, image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=80&h=80&fit=crop&crop=center" },
+      ].slice(0, 2 + Math.floor(Math.random() * 2)) // Random 2-3 products
     }));
   };
 
