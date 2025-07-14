@@ -203,7 +203,7 @@ export default function LiveStreamPage() {
   const [chatMessages, setChatMessages] = useState(DUMMY_CHAT_MESSAGES);
   const [newMessage, setNewMessage] = useState('');
   const [showProducts, setShowProducts] = useState(true);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [showStreamInfo, setShowStreamInfo] = useState(true);
   const [showAboutInfo, setShowAboutInfo] = useState(true);
@@ -448,16 +448,22 @@ export default function LiveStreamPage() {
             <div className="lg:hidden bg-white rounded-lg shadow-sm overflow-hidden mb-4">
               <div className="flex border-b border-gray-100">
                 <button
-                  onClick={() => setShowProducts(true)}
+                  onClick={() => {setShowProducts(true); setShowChat(false);}}
                   className={`flex-1 py-3 text-center font-medium text-sm ${showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
                 >
                   Products
                 </button>
                 <button
-                  onClick={() => setShowProducts(false)}
-                  className={`flex-1 py-3 text-center font-medium text-sm ${!showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                  onClick={() => {setShowProducts(false); setShowChat(true);}}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${showChat ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
                 >
                   Live Chat
+                </button>
+                <button
+                  onClick={() => {setShowProducts(false); setShowChat(false);}}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${(!showProducts && !showChat) ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                >
+                  Watch More
                 </button>
               </div>
 
@@ -473,7 +479,7 @@ export default function LiveStreamPage() {
                     View All Products
                   </Link>
                 </div>
-              ) : (
+              ) : showChat ? (
                 <div className="flex flex-col" style={{ height: '350px' }}>
                   {/* Chat Messages */}
                   <div
@@ -508,6 +514,78 @@ export default function LiveStreamPage() {
                       </div>
                     </div>
                   </form>
+                </div>
+              ) : (
+                <div className="p-4 space-y-3" style={{ height: '350px', overflowY: 'auto' }}>
+                  <h3 className="font-medium text-gray-900 mb-2">Related Streams</h3>
+                  
+                  {/* Related Stream Items */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-20 h-12 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                      <img 
+                        src="https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=300&h=180&fit=crop" 
+                        alt="Fashion Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-red-500 text-white text-[8px] px-1 rounded">LIVE</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Men's Summer Collection</h4>
+                      <p className="text-xs text-gray-500">Fashion Forward</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-20 h-12 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                      <img 
+                        src="https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=300&h=180&fit=crop" 
+                        alt="Accessories Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-red-500 text-white text-[8px] px-1 rounded">LIVE</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Luxury Accessories Showcase</h4>
+                      <p className="text-xs text-gray-500">Style Maven</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-20 h-12 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                      <img 
+                        src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=300&h=180&fit=crop" 
+                        alt="Shoes Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-gray-700 text-white text-[8px] px-1 rounded">3:30</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Trending Footwear 2024</h4>
+                      <p className="text-xs text-gray-500">Shoe Experts</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-20 h-12 bg-gray-200 rounded-md overflow-hidden flex-shrink-0">
+                      <img 
+                        src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=300&h=180&fit=crop" 
+                        alt="Jewelry Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-gray-700 text-white text-[8px] px-1 rounded">12:45</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Handcrafted Jewelry Collection</h4>
+                      <p className="text-xs text-gray-500">Artisan Designs</p>
+                    </div>
+                  </div>
+                  
+                  <Link
+                    href="#"
+                    className="block text-center py-2 text-sm text-purple-600 font-medium hover:underline"
+                  >
+                    Browse All Streams
+                  </Link>
                 </div>
               )}
             </div>
@@ -570,74 +648,233 @@ export default function LiveStreamPage() {
 
           {/* Sidebar - Chat and Products - Independently Scrollable - Desktop Only */}
           <div className="hidden lg:flex lg:col-span-1 lg:h-[calc(100vh-2rem)] lg:overflow-hidden flex-col">
-            {/* Products Section - Desktop Only */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-4 lg:overflow-y-auto" style={{ maxHeight: '40%' }}>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="font-medium text-gray-900">Featured Products</h2>
-                <Link
-                  href="#"
-                  className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+            {/* Tabs for Desktop */}
+            <div className="bg-white rounded-lg shadow-sm mb-4">
+              <div className="flex border-b border-gray-100">
+                <button
+                  onClick={() => {setShowProducts(true); setShowChat(false);}}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${showProducts ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
                 >
-                  View All
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
-              <div className="space-y-3">
-                {products.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+                  Products
+                </button>
+                <button
+                  onClick={() => {setShowProducts(false); setShowChat(true);}}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${showChat ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                >
+                  Live Chat
+                </button>
+                <button
+                  onClick={() => {setShowProducts(false); setShowChat(false);}}
+                  className={`flex-1 py-3 text-center font-medium text-sm ${(!showProducts && !showChat) ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-600'}`}
+                >
+                  Watch More
+                </button>
               </div>
             </div>
 
-            {/* Live Chat - Desktop Only */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-1">
-              <div className="p-3 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-medium text-gray-900">Live Chat</h2>
-                <div className="flex items-center gap-2">
-                  <button className="p-1 text-gray-400 hover:text-gray-600">
-                    <Gift className="w-4 h-4" />
-                  </button>
-                  <button className="p-1 text-gray-400 hover:text-gray-600">
-                    <Flag className="w-4 h-4" />
-                  </button>
+            {/* Content based on selected tab */}
+            {showProducts && (
+              <div className="bg-white rounded-lg shadow-sm p-4 mb-4 lg:overflow-y-auto" style={{ height: 'calc(100% - 56px)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-medium text-gray-900">Featured Products</h2>
+                  <Link
+                    href="#"
+                    className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+                  >
+                    View All
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {products.map(product => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Chat Messages */}
-              <div
-                ref={chatContainerRef}
-                className="flex-1 overflow-y-auto p-3 space-y-1 bg-gray-50"
-                style={{ height: '100%' }}
-              >
-                {chatMessages.map(message => (
-                  <ChatMessage key={message.id} message={message} />
-                ))}
-              </div>
-
-              {/* Chat Input */}
-              <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 bg-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-gray-500" />
-                  </div>
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Say something..."
-                      className="w-full py-2 px-3 pr-10 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white"
-                    />
-                    <button
-                      type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 p-1"
-                    >
-                      <Send className="w-4 h-4" />
+            {showChat && (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col" style={{ height: 'calc(100% - 56px)' }}>
+                <div className="p-3 border-b border-gray-100 flex items-center justify-between">
+                  <h2 className="font-medium text-gray-900">Live Chat</h2>
+                  <div className="flex items-center gap-2">
+                    <button className="p-1 text-gray-400 hover:text-gray-600">
+                      <Gift className="w-4 h-4" />
+                    </button>
+                    <button className="p-1 text-gray-400 hover:text-gray-600">
+                      <Flag className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-              </form>
-            </div>
+
+                {/* Chat Messages */}
+                <div
+                  ref={chatContainerRef}
+                  className="flex-1 overflow-y-auto p-3 space-y-1 bg-gray-50"
+                  style={{ height: '100%' }}
+                >
+                  {chatMessages.map(message => (
+                    <ChatMessage key={message.id} message={message} />
+                  ))}
+                </div>
+
+                {/* Chat Input */}
+                <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-100 bg-white">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Say something..."
+                        className="w-full py-2 px-3 pr-10 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white"
+                      />
+                      <button
+                        type="submit"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600 p-1"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {!showProducts && !showChat && (
+              <div className="bg-white rounded-lg shadow-sm p-4 lg:overflow-y-auto" style={{ height: 'calc(100% - 56px)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-medium text-gray-900">Related Streams</h2>
+                  <Link
+                    href="#"
+                    className="text-sm text-purple-600 font-medium hover:underline flex items-center gap-1"
+                  >
+                    View All
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+                <div className="space-y-4">
+                  {/* Related Stream Items */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-24 h-14 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src="https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=300&h=180&fit=crop" 
+                        alt="Fashion Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-red-500 text-white text-xs px-1 rounded">LIVE</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Men's Summer Collection</h4>
+                      <p className="text-xs text-gray-500">Fashion Forward</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> 1.2k
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Heart className="w-3 h-3" /> 342
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-24 h-14 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src="https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=300&h=180&fit=crop" 
+                        alt="Accessories Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-red-500 text-white text-xs px-1 rounded">LIVE</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Luxury Accessories Showcase</h4>
+                      <p className="text-xs text-gray-500">Style Maven</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> 876
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Heart className="w-3 h-3" /> 215
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-24 h-14 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=300&h=180&fit=crop" 
+                        alt="Shoes Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-gray-700 text-white text-xs px-1 rounded">3:30</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Trending Footwear 2024</h4>
+                      <p className="text-xs text-gray-500">Shoe Experts</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> 5.4k
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Heart className="w-3 h-3" /> 1.2k
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-24 h-14 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=300&h=180&fit=crop" 
+                        alt="Jewelry Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-gray-700 text-white text-xs px-1 rounded">12:45</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Handcrafted Jewelry Collection</h4>
+                      <p className="text-xs text-gray-500">Artisan Designs</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> 3.2k
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Heart className="w-3 h-3" /> 782
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="w-24 h-14 bg-gray-200 rounded-md overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=300&h=180&fit=crop" 
+                        alt="Makeup Stream"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-1 right-1 bg-gray-700 text-white text-xs px-1 rounded">45:12</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">Summer Makeup Trends</h4>
+                      <p className="text-xs text-gray-500">Beauty Insider</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> 7.8k
+                        </span>
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <Heart className="w-3 h-3" /> 2.1k
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
