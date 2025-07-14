@@ -11,6 +11,8 @@ const LiveShoppingUI = () => {
       id: 1,
       name: "Premium Watch",
       price: "$299.99",
+      originalPrice: "$399.99",
+      discount: "25%",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center",
@@ -24,6 +26,8 @@ const LiveShoppingUI = () => {
       id: 2,
       name: "Premium Watch",
       price: "$299.99",
+      originalPrice: "$349.99",
+      discount: "15%",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop&crop=center",
@@ -37,6 +41,8 @@ const LiveShoppingUI = () => {
       id: 3,
       name: "Premium Watch",
       price: "$299.99",
+      originalPrice: "$399.99",
+      discount: "25%",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&crop=center",
@@ -50,6 +56,8 @@ const LiveShoppingUI = () => {
       id: 4,
       name: "Premium Watch",
       price: "$299.99",
+      originalPrice: "$349.99",
+      discount: "15%",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
@@ -58,6 +66,33 @@ const LiveShoppingUI = () => {
         name: "Mike Johnson",
         image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces&auto=format"
       }
+    }
+  ];
+
+  const hotDeals = [
+    {
+      id: 1,
+      name: "Smart Watches",
+      startingPrice: "₹1,999",
+      discount: "40%",
+      image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&crop=center",
+      bgColor: "#e3f2fd" // Light blue
+    },
+    {
+      id: 2,
+      name: "Premium Headphones",
+      startingPrice: "₹2,499",
+      discount: "35%",
+      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&crop=center",
+      bgColor: "#f3e5f5" // Light purple
+    },
+    {
+      id: 3,
+      name: "Fitness Trackers",
+      startingPrice: "₹1,299",
+      discount: "50%",
+      image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=400&h=300&fit=crop&crop=center",
+      bgColor: "#e8f5e9" // Light green
     }
   ];
 
@@ -271,13 +306,10 @@ const LiveShoppingUI = () => {
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
-              <div key={category.id} className="flex flex-col items-center flex-shrink-0">
-                <div className="rounded-full w-16 h-16 flex items-center justify-center shadow-sm mb-1.5 bg-red-50">
-                  <img 
-                    src={category.image} 
-                    alt={category.name}
-                    className="w-full h-full object-cover rounded-full"
-                  />
+              <div key={category.id} className="flex flex-col items-center flex-shrink-0 mr-5">
+                <div className="relative rounded-full w-16 h-16 flex items-center justify-center border border-none mb-1.5">
+                  <IconComponent className="w-7 h-7 text-gray-700" />
+                  {/* <div className="absolute bottom-0 left-0 right-0 h-2 bg-yellow-400 rounded-b-full"></div> */}
                 </div>
                 <span className="text-xs text-gray-800 whitespace-nowrap">{category.name}</span>
               </div>
@@ -295,21 +327,22 @@ const LiveShoppingUI = () => {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {liveEvents.slice(0, 2).map((event) => (
+        <div className="grid grid-cols-2 gap-3">
+          {liveEvents.map((event) => (
             <div key={event.id} className="relative bg-white rounded-lg overflow-hidden shadow">
-              <div className="aspect-w-16 aspect-h-9 relative">
+              <div className="aspect-video relative">
                 <img 
                   src={event.image} 
                   alt={`Live stream by ${event.host}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover aspect-video"
                 />
                 <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
                   LIVE
                 </div>
                 <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
                   <Eye className="w-3 h-3" />
-                  <span>{event.viewers}</span>
+                  <span className="block sm:hidden">{event.viewers.replace(/\s*watching/i, '')}</span>
+                  <span className="hidden sm:block">{event.viewers}</span>
                 </div>
               </div>
               <div className="p-2">
@@ -336,12 +369,17 @@ const LiveShoppingUI = () => {
           {products.map((product) => (
             <Link key={product.id} href={`/search/${product.id}`} className="block">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-              <div className="aspect-w-1 aspect-h-1 relative">
+              <div className="aspect-w-4 aspect-h-3 relative">
                 <img 
                   src={product.image} 
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover aspect-[4/3]"
                 />
+                {product.discount && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-semibold shadow-sm">
+                    -{product.discount}
+                  </div>
+                )}
                 {product.liveTaggable && (
                   <div className="absolute bottom-2 left-2 flex items-center gap-2">
                     <img 
@@ -358,7 +396,12 @@ const LiveShoppingUI = () => {
               <div className="p-3">
                 <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
                 <div className="mt-1 flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    <span className="text-sm sm:text-base font-medium text-purple-600">{product.price}</span>
+                    {product.originalPrice && (
+                      <span className="text-xs sm:text-sm text-gray-500 line-through sm:ml-1.5">{product.originalPrice}</span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1 text-sm text-gray-500">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     {product.rating}
@@ -380,6 +423,48 @@ const LiveShoppingUI = () => {
         </div>
       </div>
 
+      {/* Hot Deals Section */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Hot Deals</h2>
+          <Link href="/search?category=deals" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+            View All Deals
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {hotDeals.map((deal) => (
+            <Link key={deal.id} href={`/search?deal=${deal.id}`} className="block">
+              <div 
+                className="rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-32 sm:h-40 relative"
+                style={{ backgroundColor: deal.bgColor }}
+              >
+                <div className="absolute inset-0 flex">
+                  <div className="w-1/2 p-3 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-gray-800 font-bold text-lg sm:text-xl">{deal.name}</h3>
+                      <div className="mt-1 bg-purple-600 text-white px-2 py-0.5 rounded text-xs sm:text-sm inline-block font-semibold">
+                        Up to {deal.discount} OFF
+                      </div>
+                    </div>
+                    <p className="text-gray-700 text-xs sm:text-sm">
+                      From <span className="font-bold">₹{deal.startingPrice.replace('₹', '')}</span>
+                    </p>
+                  </div>
+                  <div className="w-1/2 flex items-center justify-center relative">
+                    <img 
+                      src={deal.image} 
+                      alt={deal.name}
+                      className="h-24 sm:h-32 w-auto object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
       {/* Upcoming Live Section */}
       <div className="px-4 py-4">
         <h2 className="text-xl font-bold mb-4">Upcoming Live</h2>
@@ -387,7 +472,7 @@ const LiveShoppingUI = () => {
           {upcomingEvents.map((event) => (
             <div key={event.id} className="bg-white rounded-lg shadow p-2.5">
               <div className="flex gap-3 items-center">
-                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 aspect-w-4 aspect-h-3">
                   <img 
                     src={event.image} 
                     alt={event.title}
