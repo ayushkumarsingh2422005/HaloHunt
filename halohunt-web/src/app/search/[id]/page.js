@@ -125,6 +125,77 @@ const RELATED_PRODUCTS = [
   }
 ];
 
+// Popular products
+const POPULAR_PRODUCTS = [
+  {
+    id: "10",
+    name: "Smartphone Pro Max",
+    price: 1299.99,
+    discountPrice: 1199.99,
+    image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=400&fit=crop&q=80",
+    rating: 4.9,
+    reviews: 2543,
+    discount: "15%"
+  },
+  {
+    id: "11",
+    name: "Smart Home Speaker",
+    price: 199.99,
+    discountPrice: 149.99,
+    image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=400&fit=crop&q=80",
+    rating: 4.6,
+    reviews: 1876,
+    discount: "25%"
+  },
+  {
+    id: "12",
+    name: "Fitness Tracker Pro",
+    price: 129.99,
+    discountPrice: null,
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=400&h=400&fit=crop&q=80",
+    rating: 4.7,
+    reviews: 1243
+  },
+  {
+    id: "13",
+    name: "Wireless Earbuds",
+    price: 159.99,
+    discountPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=400&h=400&fit=crop&q=80",
+    rating: 4.8,
+    reviews: 2156,
+    discount: "20%"
+  }
+];
+
+// Hot deals data
+const HOT_DEALS = [
+  {
+    id: "d1",
+    name: "Smart Watches",
+    startingPrice: "$199",
+    discount: "40%",
+    image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#e3f2fd" // Light blue
+  },
+  {
+    id: "d2",
+    name: "Premium Headphones",
+    startingPrice: "$249",
+    discount: "35%",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#f3e5f5" // Light purple
+  },
+  {
+    id: "d3",
+    name: "Fitness Trackers",
+    startingPrice: "$129",
+    discount: "50%",
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#e8f5e9" // Light green
+  }
+];
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -132,6 +203,9 @@ export default function ProductDetailPage() {
   
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
+  const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
+  const [hotDeals, setHotDeals] = useState([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -152,8 +226,63 @@ export default function ProductDetailPage() {
         foundProduct.relatedProducts.includes(parseInt(p.id))
       );
       setRelatedProducts(related);
+      
+      // Set popular products (would be from API in real app)
+      setPopularProducts(POPULAR_PRODUCTS);
+      
+      // Set hot deals
+      setHotDeals(HOT_DEALS);
+      
+      // Store in recently viewed (localStorage)
+      addToRecentlyViewed(foundProduct);
     }
   }, [id]);
+  
+  // Load and manage recently viewed products
+  useEffect(() => {
+    loadRecentlyViewed();
+  }, []);
+  
+  const addToRecentlyViewed = (product) => {
+    try {
+      // Get existing recently viewed from localStorage
+      const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      
+      // Remove if already exists (to move to top)
+      const filteredRecent = recentlyViewed.filter(item => item.id !== product.id);
+      
+      // Add to beginning of array
+      const updatedRecent = [
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          discountPrice: product.discountPrice,
+          image: product.images[0],
+          rating: product.rating,
+          reviews: product.reviews
+        },
+        ...filteredRecent
+      ].slice(0, 4); // Keep only 4 items
+      
+      // Save back to localStorage
+      localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecent));
+      
+      // Update state
+      setRecentlyViewedProducts(updatedRecent);
+    } catch (error) {
+      console.error('Error saving to recently viewed:', error);
+    }
+  };
+  
+  const loadRecentlyViewed = () => {
+    try {
+      const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      setRecentlyViewedProducts(recentlyViewed);
+    } catch (error) {
+      console.error('Error loading recently viewed:', error);
+    }
+  };
   
   if (!product) {
     return (
@@ -210,6 +339,7 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Main product details */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="md:flex">
             {/* Product Images */}
@@ -459,32 +589,191 @@ export default function ProductDetailPage() {
           </div>
         </div>
         
+        {/* Hot Deals Section */}
+        {hotDeals.length > 0 && (
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">Hot Deals</h2>
+              <Link href="/search?category=deals" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {hotDeals.map((deal) => (
+                <Link key={deal.id} href={`/search?deal=${deal.id}`} className="block">
+                  <div 
+                    className="rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-28 sm:h-36 relative"
+                    style={{ backgroundColor: deal.bgColor }}
+                  >
+                    <div className="absolute inset-0 flex">
+                      <div className="w-1/2 p-3 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-gray-800 font-bold text-sm sm:text-lg">{deal.name}</h3>
+                          <div className="mt-1 bg-purple-600 text-white px-2 py-0.5 rounded text-xs inline-block font-semibold">
+                            Up to {deal.discount} OFF
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-xs">
+                          From <span className="font-bold">{deal.startingPrice}</span>
+                        </p>
+                      </div>
+                      <div className="w-1/2 flex items-center justify-center relative">
+                        <img 
+                          src={deal.image} 
+                          alt={deal.name}
+                          className="h-20 sm:h-28 w-auto object-contain"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-10">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Related Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">Related Products</h2>
+              <Link href="/search" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
               {relatedProducts.map((product) => (
-                <Link key={product.id} href={`/search/${product.id}`}>
-                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="aspect-square relative">
+                <Link key={product.id} href={`/search/${product.id}`} className="block">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <div className="aspect-[4/3] relative">
                       <img 
                         src={product.image} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
+                      {product.discountPrice && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
+                          -{Math.round((1 - product.discountPrice / product.price) * 100)}%
+                        </div>
+                      )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-baseline gap-1">
+                    <div className="p-2">
+                      <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="flex flex-col">
                           {product.discountPrice ? (
                             <>
-                              <span className="text-sm font-bold text-purple-600">${product.discountPrice}</span>
-                              <span className="text-xs text-gray-500 line-through">${product.price}</span>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
                             </>
                           ) : (
-                            <span className="text-sm font-bold text-gray-900">${product.price}</span>
+                            <span className="text-xs font-bold text-gray-900">${product.price}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
+                          {product.rating}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Popular Products */}
+        {popularProducts.length > 0 && (
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">Popular Products</h2>
+              <Link href="/search?sort=popular" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
+              {popularProducts.map((product) => (
+                <Link key={product.id} href={`/search/${product.id}`} className="block">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <div className="aspect-[4/3] relative">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {product.discount && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
+                          -{product.discount}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="flex flex-col">
+                          {product.discountPrice ? (
+                            <>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
+                            </>
+                          ) : (
+                            <span className="text-xs font-bold text-gray-900">${product.price}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
+                          {product.rating}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recently Viewed Products */}
+        {recentlyViewedProducts.length > 0 && (
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">Recently Viewed</h2>
+              <Link href="/search?category=history" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+              {recentlyViewedProducts.map((product) => (
+                <Link key={product.id} href={`/search/${product.id}`} className="block flex-shrink-0 w-[160px]">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <div className="aspect-[4/3] relative">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {product.discountPrice && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
+                          -{Math.round((1 - product.discountPrice / product.price) * 100)}%
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="flex flex-col">
+                          {product.discountPrice ? (
+                            <>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
+                            </>
+                          ) : (
+                            <span className="text-xs font-bold text-gray-900">${product.price}</span>
                           )}
                         </div>
                         <div className="flex items-center text-xs text-gray-500">

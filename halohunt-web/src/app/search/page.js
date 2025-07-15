@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, Star, X, ChevronDown, ChevronUp, Sliders, 
-  Grid2X2, LayoutList, Check, Bell, Eye, Play, Heart, MessageCircle, Share2
+import {
+  Search, Star, X, ChevronDown, ChevronUp, Sliders, Check, Bell, Eye, Heart, MessageCircle, Share2,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -11,9 +11,77 @@ const SearchPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
-  
+
+  // Remove the complex scrollbarHideStyle object
+
   const [searchInput, setSearchInput] = useState(query || '');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Add refs for scrolling the swipable sections
+  const mobileScrollRef = React.useRef(null);
+
+  // Track current slide for pagination dots
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  // Update window width on client side
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate items per view based on screen size
+  const getItemsPerView = () => {
+    if (windowWidth >= 1024) return 4; // Desktop
+    if (windowWidth >= 768) return 3;  // Tablet
+    return 2; // Mobile
+  };
+
+  // Function to scroll the swipable content
+  const scrollContent = (ref, direction) => {
+    if (ref.current) {
+      const itemsPerView = getItemsPerView();
+      const newSlide = direction === 'right'
+        ? Math.min(currentSlide + 1, Math.ceil(liveStreams.length / itemsPerView) - 1)
+        : Math.max(currentSlide - 1, 0);
+
+      setCurrentSlide(newSlide);
+
+      const scrollAmount = ref.current.clientWidth * 0.9;
+      const newScrollPosition = ref.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
+
+      ref.current.scrollTo({
+        left: newScrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Update current slide on scroll
+  const handleScroll = () => {
+    if (mobileScrollRef.current) {
+      const scrollPosition = mobileScrollRef.current.scrollLeft;
+      const viewWidth = mobileScrollRef.current.clientWidth;
+      const newSlide = Math.round(scrollPosition / viewWidth);
+      setCurrentSlide(newSlide);
+    }
+  };
+
+  // Add scroll event listener
+  useEffect(() => {
+    const scrollRef = mobileScrollRef.current;
+    if (scrollRef) {
+      scrollRef.addEventListener('scroll', handleScroll);
+      return () => scrollRef.removeEventListener('scroll', handleScroll);
+    }
+  }, [mobileScrollRef.current]);
+
   const [selectedFilters, setSelectedFilters] = useState({
     categories: [],
     priceRange: [0, 1000],
@@ -186,7 +254,7 @@ const SearchPage = () => {
 
   const FilterSection = ({ title, children, isOpen = true }) => {
     const [sectionOpen, setSectionOpen] = useState(isOpen);
-    
+
     return (
       <div className="border-b border-gray-200 py-4">
         <button
@@ -230,7 +298,7 @@ const SearchPage = () => {
             />
             {/* Overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-            
+
             {/* Live badge */}
             <div className="absolute top-2 left-2 flex items-center gap-1">
               <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
@@ -242,12 +310,12 @@ const SearchPage = () => {
                 {stream.viewers}
               </div>
             </div>
-            
+
             {/* Tagged Products */}
             {stream.taggedProducts && stream.taggedProducts.length > 0 && (
               <div className="absolute bottom-14 left-2 flex items-center gap-1.5">
                 {stream.taggedProducts.map((product) => (
-                  <div 
+                  <div
                     key={product.id}
                     onClick={(e) => handleProductClick(e, product.id)}
                     className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shadow cursor-pointer hover:scale-110 transition-transform"
@@ -266,7 +334,7 @@ const SearchPage = () => {
                 </span>
               </div>
             )}
-            
+
             {/* Host avatar */}
             <div className="absolute bottom-2 left-2 flex items-center gap-2">
               <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white shadow">
@@ -279,10 +347,10 @@ const SearchPage = () => {
               </div>
               <span className="text-white text-xs font-medium bg-black/50 px-2 py-0.5 rounded">{stream.host.name}</span>
             </div>
-            
+
             {/* Action buttons */}
             <div className="absolute top-2 right-2 flex flex-col items-end gap-2 z-10">
-              <button 
+              <button
                 className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -291,7 +359,7 @@ const SearchPage = () => {
               >
                 <Heart className="w-4 h-4 text-white" />
               </button>
-              <button 
+              <button
                 className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -300,7 +368,7 @@ const SearchPage = () => {
               >
                 <MessageCircle className="w-4 h-4 text-white" />
               </button>
-              <button 
+              <button
                 className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -343,8 +411,8 @@ const SearchPage = () => {
               />
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
             >
               <Search className="w-5 h-5" />
@@ -372,6 +440,32 @@ const SearchPage = () => {
         </div>
       </div>
 
+      {/* Add the CSS for hide-scrollbar directly in a style tag */}
+      <style jsx global>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;     /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;             /* Chrome, Safari and Opera */
+        }
+        
+        /* Responsive grid styles */
+        @media (min-width: 768px) {
+          .live-card-container {
+            width: calc(33.333% - 16px) !important;
+            max-width: none !important;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .live-card-container {
+            width: calc(25% - 16px) !important;
+            max-width: none !important;
+          }
+        }
+      `}</style>
+
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col gap-8">
           {/* Live Streams Section - Show only if no query parameter */}
@@ -383,10 +477,71 @@ const SearchPage = () => {
                   View All
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {liveStreams.map(stream => (
-                  <LiveStreamCard key={stream.id} stream={stream} />
-                ))}
+              <div className="relative">
+                {/* Single row swipable layout with responsive card count */}
+                <div
+                  className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory"
+                  ref={mobileScrollRef}
+                  onScroll={handleScroll}
+                >
+                  {/* All cards in a single container with responsive visibility */}
+                  {liveStreams.map((stream) => (
+                    <div
+                      key={stream.id}
+                      className="flex-shrink-0 snap-start mr-4 live-card-container"
+                      style={{
+                        width: 'calc(50% - 16px)',
+                        maxWidth: '280px'
+                      }}
+                    >
+                      <LiveStreamCard stream={stream} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Navigation buttons */}
+                {/* <div className="flex justify-between mt-2">
+                  <button
+                    onClick={() => scrollContent(mobileScrollRef, 'left')}
+                    className="p-1.5 bg-white rounded-full shadow hover:bg-gray-100"
+                    disabled={currentSlide === 0}
+                  >
+                    <ChevronLeft className={`w-5 h-5 ${currentSlide === 0 ? 'text-gray-300' : 'text-gray-600'}`} />
+                  </button>
+                  <button
+                    onClick={() => scrollContent(mobileScrollRef, 'right')}
+                    className="p-1.5 bg-white rounded-full shadow hover:bg-gray-100"
+                    disabled={currentSlide >= Math.ceil(liveStreams.length / getItemsPerView()) - 1}
+                  >
+                    <ChevronRight className={`w-5 h-5 ${currentSlide >= Math.ceil(liveStreams.length / getItemsPerView()) - 1
+                        ? 'text-gray-300'
+                        : 'text-gray-600'
+                      }`} />
+                  </button>
+                </div> */}
+
+                {/* Pagination dots */}
+                <div className="flex justify-center mt-2">
+                  <div className="flex space-x-1">
+                    {Array.from({ length: Math.ceil(liveStreams.length / getItemsPerView()) }).map((_, i) => (
+                      <div
+                        key={`dot-${i}`}
+                        className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${i === currentSlide ? 'bg-purple-600' : 'bg-gray-300'
+                          }`}
+                        onClick={() => {
+                          if (mobileScrollRef.current) {
+                            const viewWidth = mobileScrollRef.current.clientWidth;
+                            mobileScrollRef.current.scrollTo({
+                              left: i * viewWidth,
+                              behavior: 'smooth'
+                            });
+                            setCurrentSlide(i);
+                          }
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -400,62 +555,60 @@ const SearchPage = () => {
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
-          {products.map((product) => (
-            <Link key={product.id} href={`/search/${product.id}`} className="block">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-              <div className="aspect-w-1 aspect-h-1 relative">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-                {product.liveTaggable && (
-                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                    <img 
-                      src={product.tagger.image} 
-                      alt={product.tagger.name}
-                      className="w-6 h-6 rounded-full border-2 border-white"
-                    />
-                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
-                      {product.tagger.name}
-                    </span>
+              {products.map((product) => (
+                <Link key={product.id} href={`/search/${product.id}`} className="block">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <div className="aspect-w-1 aspect-h-1 relative">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {product.liveTaggable && (
+                        <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                          <img
+                            src={product.tagger.image}
+                            alt={product.tagger.name}
+                            className="w-6 h-6 rounded-full border-2 border-white"
+                          />
+                          <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                            {product.tagger.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span className="text-sm font-medium text-purple-600">{product.price}</span>
+                        <div className="flex items-center gap-1 text-sm text-gray-500">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          {product.rating}
+                        </div>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = '/cart';
+                        }}
+                        className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-600">{product.price}</span>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    {product.rating}
-                  </div>
-                </div>
-                <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.location.href = '/cart';
-                    }} 
-                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
-                >
-                  Add to Cart
-                </button>
-              </div>
+                </Link>
+              ))}
             </div>
-            </Link>
-          ))}
-        </div>
           </div>
         </div>
       </div>
 
       {/* Filter Drawer - Now for both mobile and desktop */}
-      <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity ${
-        isFilterOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}>
-        <div className={`absolute right-0 top-0 bottom-0 w-full max-w-md bg-white transform transition-transform duration-300 ${
-          isFilterOpen ? 'translate-x-0' : 'translate-x-full'
+      <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity ${isFilterOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}>
+        <div className={`absolute right-0 top-0 bottom-0 w-full max-w-md bg-white transform transition-transform duration-300 ${isFilterOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}>
           <div className="flex flex-col h-full">
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -483,7 +636,7 @@ const SearchPage = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-4">
               <FilterSection title="Categories">
                 {categories.map(category => (
@@ -529,9 +682,8 @@ const SearchPage = () => {
                   <button
                     key={rating}
                     onClick={() => toggleFilter('rating', rating)}
-                    className={`flex items-center gap-2 w-full px-2 py-1.5 rounded ${
-                      selectedFilters.rating === rating ? 'bg-purple-50 text-purple-600' : 'hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center gap-2 w-full px-2 py-1.5 rounded ${selectedFilters.rating === rating ? 'bg-purple-50 text-purple-600' : 'hover:bg-gray-50'
+                      }`}
                   >
                     <div className="flex items-center">
                       {Array.from({ length: rating }).map((_, i) => (
@@ -562,9 +714,8 @@ const SearchPage = () => {
                   <button
                     key={sort.id}
                     onClick={() => toggleFilter('sortBy', sort.id)}
-                    className={`flex items-center justify-between w-full px-2 py-1.5 rounded text-sm ${
-                      selectedFilters.sortBy === sort.id ? 'bg-purple-50 text-purple-600' : 'hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center justify-between w-full px-2 py-1.5 rounded text-sm ${selectedFilters.sortBy === sort.id ? 'bg-purple-50 text-purple-600' : 'hover:bg-gray-50'
+                      }`}
                   >
                     {sort.label}
                     {selectedFilters.sortBy === sort.id && (
