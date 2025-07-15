@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart, Search, Menu } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const LiveShoppingUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -243,6 +244,15 @@ const LiveShoppingUI = () => {
       {/* Search Bar */}
       <div className="sticky top-0 z-50 bg-white shadow-sm px-4 py-3">
         <div className="flex items-center justify-between gap-6">
+          {/* Logo for mobile view */}
+          <div className="flex md:hidden p-0">
+            <Image 
+              src="/logo/h_purple.png" 
+              alt="HaloHunt Logo" 
+              width={80} 
+              height={80}
+            />
+          </div>
           <div className="w-full max-w-md relative">
             <input
               type="text"

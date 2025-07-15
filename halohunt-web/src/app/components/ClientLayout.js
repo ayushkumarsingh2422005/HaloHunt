@@ -3,6 +3,7 @@ import { Search, Home, Bell, ShoppingCart, User, Menu, LogIn, LogOut } from 'luc
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import Image from 'next/image';
 
 const Navigation = ({ className }) => {
   const pathname = usePathname();
@@ -11,6 +12,15 @@ const Navigation = ({ className }) => {
   return (
     <nav className={`${className} bg-white`}>
       <div className="flex md:flex-col items-center justify-between md:justify-start md:gap-8 p-4">
+        {/* Logo - only visible on desktop */}
+        <div className="hidden md:flex justify-center mb-4 w-full">
+          <Image 
+            src="/logo/h_purple.png" 
+            alt="HaloHunt Logo" 
+            width={50} 
+            height={50}
+          />
+        </div>
         <Link href="/" className={`flex flex-col items-center gap-1 ${pathname === '/' ? 'text-purple-700' : 'text-gray-500 hover:text-purple-700'}`}>
           <Home className="w-6 h-6" />
           <span className="text-xs md:text-sm">Home</span>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Image from 'next/image';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -46,6 +47,15 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <Image 
+            src="/logo/full_purple.png" 
+            alt="HaloHunt Logo" 
+            width={280} 
+            height={280}
+          />
+        </div>
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Welcome back</h2>
           <p className="mt-2 text-sm text-gray-600">

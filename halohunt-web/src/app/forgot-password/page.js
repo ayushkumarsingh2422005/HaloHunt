@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Image from 'next/image';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
@@ -74,6 +75,15 @@ const ForgotPasswordPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <Image 
+            src="/logo/full_purple.png" 
+            alt="HaloHunt Logo" 
+            width={280} 
+            height={280}
+          />
+        </div>
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Forgot your password?</h2>
           <p className="mt-2 text-sm text-gray-600">
