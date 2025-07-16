@@ -414,25 +414,6 @@ export default function ProfilePage() {
                     <span className="text-gray-600 ml-1">Products</span>
                   </div>
                 </div>
-                
-                {/* Social Links */}
-                <div className="flex gap-2 mb-4">
-                  {user.socialLinks.instagram && (
-                    <a href={`https://instagram.com/${user.socialLinks.instagram}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
-                      <Instagram className="w-4 h-4" />
-                    </a>
-                  )}
-                  {user.socialLinks.twitter && (
-                    <a href={`https://twitter.com/${user.socialLinks.twitter}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
-                      <Twitter className="w-4 h-4" />
-                    </a>
-                  )}
-                  {user.socialLinks.website && (
-                    <a href={`https://${user.socialLinks.website}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-500 hover:text-purple-600">
-                      <Globe className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
               </div>
               
               {/* Action Buttons */}
