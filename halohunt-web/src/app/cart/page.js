@@ -125,11 +125,11 @@ const OrderSummary = ({ items }) => {
   const total = subtotal - discount;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 lg:p-6 fixed bottom-0 left-0 right-0 lg:static lg:rounded-lg">
+    <div className="bg-white rounded-lg shadow-sm p-0 lg:p-6 fixed bottom-0 left-0 right-0 lg:static lg:rounded-lg">
       <h2 className="text-lg font-medium mb-4 lg:block hidden">Order Summary</h2>
 
       {/* Price Breakdown */}
-      <div className="space-y-3 text-sm">
+      <div className="space-y-3 text-sm lg:block hidden">
         <div className="flex justify-between">
           <span className="text-gray-500">Subtotal</span>
           <span>₹ {subtotal.toFixed(2)}</span>
@@ -145,12 +145,15 @@ const OrderSummary = ({ items }) => {
       </div>
 
       {/* Checkout Button - Different for mobile and desktop */}
-      <div className="mt-4">
+      <div className="lg:mt-4 mt-0">
         {/* Mobile version with split design */}
         <div className="flex lg:hidden w-full">
+          <div className="w-2/3 flex items-center justify-center py-3 font-medium">
+            <span>₹ {total.toFixed(2)}</span>
+          </div>
           <Link href="/checkout" className='w-full'>
-            <button className="w-full bg-purple-600 text-white py-3 rounded-full font-medium hover:bg-purple-700 transition-colors">
-              Proceed to Checkout
+            <button className="w-full bg-purple-600 text-white py-3 font-medium hover:bg-purple-700 transition-colors">
+              Checkout
             </button>
           </Link>
         </div>
