@@ -1,11 +1,49 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, Star, Eye, Grid3X3, Monitor, Home, Zap, Trophy, Car, Laptop, MoreHorizontal, Clock, Bell, ShoppingCart, Search, Menu } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const LiveShoppingUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+  const [currentLiveSlide, setCurrentLiveSlide] = useState(0);
+  
+  // Reference for the live events scroll container
+  const liveScrollRef = React.useRef(null);
+
+  // Update window width on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // Handle scroll for live events section
+  const handleLiveScroll = () => {
+    if (liveScrollRef.current) {
+      const scrollPosition = liveScrollRef.current.scrollLeft;
+      const viewWidth = liveScrollRef.current.clientWidth;
+      const newSlide = Math.round(scrollPosition / viewWidth);
+      setCurrentLiveSlide(newSlide);
+    }
+  };
+
+  // Add scroll event listener for live events
+  useEffect(() => {
+    const scrollRef = liveScrollRef.current;
+    if (scrollRef) {
+      scrollRef.addEventListener('scroll', handleLiveScroll);
+      return () => scrollRef.removeEventListener('scroll', handleLiveScroll);
+    }
+  }, [liveScrollRef.current]);
 
   const products = [
     {
@@ -277,6 +315,23 @@ const LiveShoppingUI = () => {
         </div>
       </div>
 
+      {/* Add the CSS for hide-scrollbar directly in a style tag */}
+      <style jsx global>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;     /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;             /* Chrome, Safari and Opera */
+        }
+        
+        /* We're now using padding-bottom technique for consistent 16:9 aspect ratio
+           instead of the aspect-ratio property for better cross-browser support */
+        .pb-[56.25%] {
+          padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        }
+      `}</style>
+
       {/* Cart Icon in Header */}
       {/* <div className="fixed top-4 right-4 z-50">
         <a href="/cart" className="relative bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-shadow">
@@ -337,32 +392,68 @@ const LiveShoppingUI = () => {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          {liveEvents.map((event) => (
-            <div key={event.id} className="relative bg-white rounded-lg overflow-hidden shadow">
-              <div className="aspect-video relative">
-                <img 
-                  src={event.image} 
-                  alt={`Live stream by ${event.host}`}
-                  className="w-full h-full object-cover aspect-video"
-                />
-                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
-                  LIVE
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                  <Eye className="w-3 h-3" />
-                  <span className="block sm:hidden">{event.viewers.replace(/\s*watching/i, '')}</span>
-                  <span className="hidden sm:block">{event.viewers}</span>
+        <div className="relative">
+          {/* Swipable live events container */}
+          <div className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory" ref={liveScrollRef}>
+            {liveEvents.map((event) => (
+              <div 
+                key={event.id} 
+                className="flex-shrink-0 snap-start mr-4"
+                style={{
+                  width: windowWidth < 768 ? 'calc(100% - 16px)' : 'calc(50% - 16px)',
+                  maxWidth: windowWidth < 768 ? 'none' : '320px',
+                  height: '100%'
+                }}
+              >
+                <div className="relative bg-white rounded-lg overflow-hidden shadow h-full">
+                  <div className="w-full relative">
+                    {/* Using padding-bottom for 16:9 aspect ratio */}
+                    <div className="w-full relative pb-[56.25%]">
+                      <img 
+                        src={event.image} 
+                        alt={`Live stream by ${event.host}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+                      LIVE
+                    </div>
+                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      <span className="block sm:hidden">{event.viewers.replace(/\s*watching/i, '')}</span>
+                      <span className="hidden sm:block">{event.viewers}</span>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-medium">
+                      {event.type === 'sale' ? 'Fashion Flash Sale' : 'Tech Flash Sale'}
+                    </h3>
+                    <p className="text-xs text-gray-500">by {event.host}</p>
+                  </div>
                 </div>
               </div>
-              <div className="p-2">
-                <h3 className="text-sm font-medium">
-                  {event.type === 'sale' ? 'Fashion Flash Sale' : 'Tech Flash Sale'}
-                </h3>
-                <p className="text-xs text-gray-500">by {event.host}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          {/* Pagination dots */}
+          <div className="flex justify-center gap-1 mt-3">
+            {liveEvents.map((_, i) => (
+              <div
+                key={`dot-${i}`}
+                className={`w-2 h-2 rounded-full cursor-pointer ${i === currentLiveSlide ? 'bg-purple-600' : 'bg-gray-300'}`}
+                onClick={() => {
+                  if (liveScrollRef.current) {
+                    const viewWidth = liveScrollRef.current.clientWidth;
+                    liveScrollRef.current.scrollTo({
+                      left: i * viewWidth,
+                      behavior: 'smooth'
+                    });
+                    setCurrentLiveSlide(i);
+                  }
+                }}
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -379,12 +470,14 @@ const LiveShoppingUI = () => {
           {products.map((product) => (
             <Link key={product.id} href={`/search/${product.id}`} className="block">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-              <div className="aspect-w-4 aspect-h-3 relative">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover aspect-[4/3]"
-                />
+              <div className="relative">
+                <div className="w-full relative pb-[56.25%]">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
                 {product.discount && (
                   <div className="absolute top-2 right-2 bg-red-500 text-white px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-semibold shadow-sm">
                     -{product.discount}

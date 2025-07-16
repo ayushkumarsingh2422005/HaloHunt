@@ -286,58 +286,30 @@ const SearchPage = () => {
     };
 
     return (
-      <Link href={`/live/view/${stream.id}`} className="block">
-        <div className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer md:h-full h-[calc(43vh-0.5rem)]">
-          {/* Thumbnail */}
-          <div className="relative w-full aspect-[3/4] bg-gray-200 overflow-hidden">
-            <img
-              src={stream.thumbnail}
-              alt={stream.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-
-            {/* Live badge */}
-            <div className="absolute top-2 left-2 flex items-center gap-1">
-              <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
-                <span className="w-2 h-2 bg-white rounded-full animate-pulse mr-1" />
-                LIVE
-              </div>
-              <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs">
-                <Eye className="w-3 h-3" />
-                {stream.viewers}
-              </div>
+      <Link href={`/live/view/${stream.id}`} className="block h-full">
+        <div className="relative bg-white rounded-lg overflow-hidden shadow h-full">
+          <div className="w-full relative">
+            {/* Using a container with padding-top to maintain 16:9 aspect ratio */}
+            <div className="w-full relative pb-[56.25%]">
+              <img
+                src={stream.thumbnail}
+                alt={stream.title}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
-
-            {/* Tagged Products */}
-            {stream.taggedProducts && stream.taggedProducts.length > 0 && (
-              <div className="absolute bottom-14 left-2 flex items-center gap-1.5">
-                {stream.taggedProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    onClick={(e) => handleProductClick(e, product.id)}
-                    className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shadow cursor-pointer hover:scale-110 transition-transform"
-                    title="Tagged Product"
-                  >
-                    <img
-                      src={product.image}
-                      alt="Tagged Product"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-                <span className="text-white text-xs font-medium bg-black/50 px-1.5 py-0.5 rounded-full">
-                  {stream.taggedProducts.length}
-                </span>
-              </div>
-            )}
-
+            {/* Live badge */}
+            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+              LIVE
+            </div>
+            <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              <span>{stream.viewers.toLocaleString()}</span>
+            </div>
+            
             {/* Host avatar */}
             <div className="absolute bottom-2 left-2 flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white shadow">
+              <div className="w-7 h-7 rounded-full overflow-hidden ring-2 ring-white shadow">
                 <img
                   src={stream.host.image}
                   alt={stream.host.name}
@@ -345,50 +317,11 @@ const SearchPage = () => {
                   loading="lazy"
                 />
               </div>
-              <span className="text-white text-xs font-medium bg-black/50 px-2 py-0.5 rounded">{stream.host.name}</span>
-            </div>
-
-            {/* Action buttons */}
-            <div className="absolute top-2 right-2 flex flex-col items-end gap-2 z-10">
-              <button
-                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Like clicked for stream:', stream.id);
-                }}
-              >
-                <Heart className="w-4 h-4 text-white" />
-              </button>
-              <button
-                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Comment clicked for stream:', stream.id);
-                }}
-              >
-                <MessageCircle className="w-4 h-4 text-white" />
-              </button>
-              <button
-                className="w-8 h-8 flex items-center justify-center bg-black/40 rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Share clicked for stream:', stream.id);
-                }}
-              >
-                <Share2 className="w-4 h-4 text-white" />
-              </button>
             </div>
           </div>
-          {/* Stream info */}
-          <div className="flex-1 flex flex-col px-3 py-2 bg-white">
-            <h3 className="font-semibold text-sm text-gray-900 mb-1 truncate">{stream.title}</h3>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span className="truncate">{stream.host.name}</span>
-              <span>
-                <Eye className="inline w-3 h-3 mr-1" />
-                {stream.viewers.toLocaleString()}
-              </span>
-            </div>
+          <div className="p-3">
+            <h3 className="text-sm font-medium truncate">{stream.title}</h3>
+            <p className="text-xs text-gray-500">by {stream.host.name}</p>
           </div>
         </div>
       </Link>
@@ -464,6 +397,12 @@ const SearchPage = () => {
             max-width: none !important;
           }
         }
+
+        /* We're now using padding-bottom technique for consistent 16:9 aspect ratio
+           instead of the aspect-ratio property for better cross-browser support */
+        .pb-[56.25%] {
+          padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        }
       `}</style>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -478,7 +417,7 @@ const SearchPage = () => {
                 </Link>
               </div>
               <div className="relative">
-                {/* Single row swipable layout with responsive card count */}
+                {/* Single row swipable layout with one card at a time on mobile */}
                 <div
                   className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory"
                   ref={mobileScrollRef}
@@ -490,8 +429,9 @@ const SearchPage = () => {
                       key={stream.id}
                       className="flex-shrink-0 snap-start mr-4 live-card-container"
                       style={{
-                        width: 'calc(50% - 16px)',
-                        maxWidth: '280px'
+                        width: windowWidth < 768 ? 'calc(100% - 16px)' : 'calc(50% - 16px)',
+                        maxWidth: windowWidth < 768 ? 'none' : '320px',
+                        height: '100%'
                       }}
                     >
                       <LiveStreamCard stream={stream} />
@@ -558,12 +498,14 @@ const SearchPage = () => {
               {products.map((product) => (
                 <Link key={product.id} href={`/search/${product.id}`} className="block">
                   <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-                    <div className="aspect-w-1 aspect-h-1 relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="relative">
+                      <div className="w-full relative pb-[56.25%]">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
                       {product.liveTaggable && (
                         <div className="absolute bottom-2 left-2 flex items-center gap-2">
                           <img
