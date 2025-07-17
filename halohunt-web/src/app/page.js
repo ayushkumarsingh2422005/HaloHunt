@@ -8,9 +8,11 @@ const LiveShoppingUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const [currentLiveSlide, setCurrentLiveSlide] = useState(0);
+  const [currentProductSlide, setCurrentProductSlide] = useState(0);
   
   // Reference for the live events scroll container
   const liveScrollRef = React.useRef(null);
+  const productsScrollRef = React.useRef(null);
 
   // Update window width on client side
   useEffect(() => {
@@ -44,6 +46,25 @@ const LiveShoppingUI = () => {
       return () => scrollRef.removeEventListener('scroll', handleLiveScroll);
     }
   }, [liveScrollRef.current]);
+
+  // Handle scroll for products section
+  const handleProductScroll = () => {
+    if (productsScrollRef.current) {
+      const scrollPosition = productsScrollRef.current.scrollLeft;
+      const viewWidth = productsScrollRef.current.clientWidth;
+      const newSlide = Math.round(scrollPosition / viewWidth);
+      setCurrentProductSlide(newSlide);
+    }
+  };
+
+  // Add scroll event listener for products
+  useEffect(() => {
+    const scrollRef = productsScrollRef.current;
+    if (scrollRef) {
+      scrollRef.addEventListener('scroll', handleProductScroll);
+      return () => scrollRef.removeEventListener('scroll', handleProductScroll);
+    }
+  }, [productsScrollRef.current]);
 
   const products = [
     {
@@ -466,63 +487,99 @@ const LiveShoppingUI = () => {
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
-          {products.map((product) => (
-            <Link key={product.id} href={`/search/${product.id}`} className="block">
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
-              <div className="relative">
-                <div className="w-full relative pb-[56.25%]">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-                {product.discount && (
-                  <div className="absolute top-2 right-2 bg-red-500 text-white px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-semibold shadow-sm">
-                    -{product.discount}
+        <div className="relative">
+          <div 
+            className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory"
+            ref={productsScrollRef}
+            onScroll={handleProductScroll}
+          >
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="flex-shrink-0 snap-start mr-4"
+                style={{
+                  width: windowWidth < 768 ? 'calc(50% - 8px)' : windowWidth < 1024 ? 'calc(50% - 16px)' : 'calc(33.333% - 16px)',
+                  maxWidth: windowWidth < 768 ? '180px' : '320px',
+                  height: '100%'
+                }}
+              >
+                <Link href={`/search/${product.id}`} className="block h-full">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <div className="relative">
+                      <div className="w-full relative pb-[56.25%]">
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      </div>
+                      {product.discount && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2.5 py-1.5 rounded-md text-xs sm:text-sm font-semibold shadow-sm">
+                          -{product.discount}
+                        </div>
+                      )}
+                      {product.liveTaggable && (
+                        <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                          <img 
+                            src={product.tagger.image} 
+                            alt={product.tagger.name}
+                            className="w-6 h-6 rounded-full border-2 border-white"
+                          />
+                          <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
+                            {product.tagger.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2 sm:p-3">
+                      <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center">
+                          <span className="text-xs sm:text-sm font-medium text-purple-600">{product.price}</span>
+                          {product.originalPrice && (
+                            <span className="text-xs text-gray-500 line-through sm:ml-1.5">{product.originalPrice}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-500">
+                          <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
+                          {product.rating}
+                        </div>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = '/cart';
+                        }} 
+                        className="mt-2 w-full bg-purple-100 text-purple-600 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium hover:bg-purple-200 transition-colors"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
                   </div>
-                )}
-                {product.liveTaggable && (
-                  <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                    <img 
-                      src={product.tagger.image} 
-                      alt={product.tagger.name}
-                      className="w-6 h-6 rounded-full border-2 border-white"
-                    />
-                    <span className="text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded-full">
-                      {product.tagger.name}
-                    </span>
-                  </div>
-                )}
+                </Link>
               </div>
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
-                <div className="mt-1 flex items-center justify-between">
-                  <div className="flex flex-col sm:flex-row sm:items-center">
-                    <span className="text-sm sm:text-base font-medium text-purple-600">{product.price}</span>
-                    {product.originalPrice && (
-                      <span className="text-xs sm:text-sm text-gray-500 line-through sm:ml-1.5">{product.originalPrice}</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    {product.rating}
-                  </div>
-                </div>
-                <button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.location.href = '/cart';
-                    }} 
-                  className="mt-2 w-full bg-purple-100 text-purple-600 px-3 py-1.5 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
-                >
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-            </Link>
-          ))}
+            ))}
+          </div>
+
+          {/* Pagination dots for products */}
+          <div className="flex justify-center gap-1 mt-3">
+            {products.map((_, i) => (
+              <div
+                key={`product-dot-${i}`}
+                className={`w-2 h-2 rounded-full cursor-pointer ${i === currentProductSlide ? 'bg-purple-600' : 'bg-gray-300'}`}
+                onClick={() => {
+                  if (productsScrollRef.current) {
+                    const viewWidth = productsScrollRef.current.clientWidth;
+                    productsScrollRef.current.scrollTo({
+                      left: i * viewWidth,
+                      behavior: 'smooth'
+                    });
+                    setCurrentProductSlide(i);
+                  }
+                }}
+              ></div>
+            ))}
+          </div>
         </div>
       </div>
 
