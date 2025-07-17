@@ -27,6 +27,17 @@ const initialCartItems = [
     color: "Silver",
     variant: "XM4",
     delivery: "Express delivery available"
+  },
+  {
+    id: 3,
+    name: "Wireless Noise Cancelling Headphones",
+    price: 1500,
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2",
+    quantity: 1,
+    seller: "Sony Electronics",
+    color: "Silver",
+    variant: "XM4",
+    delivery: "Express delivery available"
   }
 ];
 
@@ -146,18 +157,6 @@ const OrderSummary = ({ items }) => {
 
       {/* Checkout Button - Different for mobile and desktop */}
       <div className="lg:mt-4 mt-0">
-        {/* Mobile version with split design */}
-        <div className="flex lg:hidden w-full">
-          <div className="w-2/3 flex items-center justify-center py-3 font-medium">
-            <span>₹ {total.toFixed(2)}</span>
-          </div>
-          <Link href="/checkout" className='w-full'>
-            <button className="w-full bg-purple-600 text-white py-3 font-medium hover:bg-purple-700 transition-colors">
-              Checkout
-            </button>
-          </Link>
-        </div>
-
         {/* Desktop version with single button */}
         <div className="hidden lg:block">
           <Link href="/checkout">
@@ -289,6 +288,38 @@ export default function CartPage() {
                   onRemove={handleRemoveItem}
                 />
               ))}
+            </div>
+
+            {/* Mobile version with split design */}
+            {/* <div className="flex sticky bottom-18 lg:hidden w-full bg-white mt-4 border-none">
+              <div className="w-2/3 flex items-center justify-center py-3 font-medium">
+                <span>₹ {888}</span>
+              </div>
+              <Link href="/checkout" className='w-full'>
+                <button className="w-full bg-purple-600 text-white py-3 font-medium hover:bg-purple-700 transition-colors">
+                  Checkout
+                </button>
+              </Link>
+            </div> */}
+
+            <div className="lg:hidden sticky flex  bottom-18 left-0 right-0 z-50 bg-white mt-5">
+              <div className="px-4 border-t border-gray-200 w-full flex flex-col justify-center">
+                <div className="text-sm">
+                  <span className="text-gray-700">Total: </span>
+                  <span className="font-medium">₹ {888}</span>
+                </div>
+                <div className="text-xs text-green-600 mb-1">
+                  <span>You saved ₹ 125</span>
+                </div>
+              </div>
+
+              <div className="flex w-full">
+                <Link href="/checkout" className="w-full">
+                  <button className="w-full bg-purple-600 text-white py-3 font-medium hover:bg-purple-700 transition-colors">
+                    Checkout
+                  </button>
+                </Link>
+              </div>
             </div>
 
             {/* Recommended Products */}

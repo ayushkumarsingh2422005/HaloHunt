@@ -59,7 +59,7 @@ export default function ClientLayout({ children }) {
   const { loading } = useAuth();
   
   // Check if current page is an auth page
-  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password' || pathname.startsWith('/reset-password') || pathname === '/cart' || pathname === '/checkout';
+  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password' || pathname.startsWith('/reset-password');
 
   if (loading) {
     return (
