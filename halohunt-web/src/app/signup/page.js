@@ -113,14 +113,14 @@ const SignupPage = () => {
 
   if (formSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-3 py-6 sm:px-6 sm:py-12">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-              <Check className="h-6 w-6 text-green-600" />
+            <div className="mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-100">
+              <Check className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
-            <h2 className="mt-3 text-2xl sm:text-3xl font-extrabold text-gray-900">Account created!</h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <h2 className="mt-2 sm:mt-3 text-xl sm:text-3xl font-extrabold text-gray-900">Account created!</h2>
+            <p className="mt-1 sm:mt-2 text-sm text-gray-600">
               Thank you for signing up. You'll be redirected to the home page shortly.
             </p>
           </div>
@@ -130,28 +130,29 @@ const SignupPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-3 py-6 sm:px-6 sm:py-12">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4 sm:mb-6">
           <Image 
             src="/logo/full_purple.png" 
             alt="HaloHunt Logo" 
-            width={280} 
-            height={280}
+            width={220} 
+            height={220}
+            className="w-48 h-auto sm:w-auto sm:h-auto"
             priority
           />
         </div>
         <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900">Create your account</h2>
+          <p className="mt-1 sm:mt-2 text-sm text-gray-600">
             Join HaloHunt to start shopping and selling
           </p>
         </div>
       </div>
 
-      <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-6 px-4 sm:py-8 sm:px-10 shadow sm:rounded-lg">
+      <div className="mt-4 sm:mt-8 mx-auto w-[95%] sm:w-full sm:max-w-md">
+        <div className="bg-white py-5 px-4 sm:py-8 sm:px-10 md:shadow rounded-lg">
           {errors.form && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-3 sm:p-4">
               <div className="flex">
@@ -174,7 +175,7 @@ const SignupPage = () => {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
                 <input
                   id="fullName"
@@ -184,9 +185,9 @@ const SignupPage = () => {
                   required
                   value={formData.fullName}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 sm:py-2.5 border ${
+                  className={`block w-full pl-9 sm:pl-10 pr-3 py-2 border ${
                     errors.fullName ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-                  } rounded-md focus:outline-none text-base`}
+                  } rounded-md focus:outline-none text-sm sm:text-base`}
                   placeholder="John Doe"
                 />
               </div>
@@ -201,7 +202,7 @@ const SignupPage = () => {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
                 <input
                   id="email"
@@ -212,9 +213,9 @@ const SignupPage = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 sm:py-2.5 border ${
+                  className={`block w-full pl-9 sm:pl-10 pr-3 py-2 border ${
                     errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-                  } rounded-md focus:outline-none text-base`}
+                  } rounded-md focus:outline-none text-sm sm:text-base`}
                   placeholder="you@example.com"
                 />
               </div>
@@ -229,7 +230,7 @@ const SignupPage = () => {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
                 <input
                   id="password"
@@ -239,21 +240,21 @@ const SignupPage = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-10 py-2 sm:py-2.5 border ${
+                  className={`block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 border ${
                     errors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-                  } rounded-md focus:outline-none text-base`}
+                  } rounded-md focus:outline-none text-sm sm:text-base`}
                   placeholder="••••••••"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-400 hover:text-gray-500 focus:outline-none p-1"
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
+                      <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
                     ) : (
-                      <Eye className="h-5 w-5" />
+                      <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
                     )}
                   </button>
                 </div>
@@ -273,7 +274,7 @@ const SignupPage = () => {
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                 </div>
                 <input
                   id="confirmPassword"
@@ -283,21 +284,21 @@ const SignupPage = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-10 py-2 sm:py-2.5 border ${
+                  className={`block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 border ${
                     errors.confirmPassword ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-purple-500 focus:border-purple-500'
-                  } rounded-md focus:outline-none text-base`}
+                  } rounded-md focus:outline-none text-sm sm:text-base`}
                   placeholder="••••••••"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-gray-400 hover:text-gray-500 focus:outline-none p-1"
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5" />
+                      <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
                     ) : (
-                      <Eye className="h-5 w-5" />
+                      <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
                     )}
                   </button>
                 </div>
@@ -307,20 +308,20 @@ const SignupPage = () => {
               )}
             </div>
 
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
+                          <div className="flex items-start">
+              <div className="flex items-center h-4 sm:h-5">
                 <input
                   id="agreeTerms"
                   name="agreeTerms"
                   type="checkbox"
                   checked={formData.agreeTerms}
                   onChange={handleChange}
-                  className={`h-4 w-4 ${
+                  className={`h-3 w-3 sm:h-4 sm:w-4 ${
                     errors.agreeTerms ? 'text-red-600 focus:ring-red-500 border-red-300' : 'text-purple-600 focus:ring-purple-500 border-gray-300'
                   } rounded`}
                 />
               </div>
-              <div className="ml-3 text-sm">
+              <div className="ml-1 sm:ml-3 text-xs sm:text-sm">
                 <label htmlFor="agreeTerms" className={`font-medium ${errors.agreeTerms ? 'text-red-700' : 'text-gray-700'}`}>
                   I agree to the{' '}
                   <a href="#" className="text-purple-600 hover:text-purple-500">
@@ -332,7 +333,7 @@ const SignupPage = () => {
                   </a>
                 </label>
                 {errors.agreeTerms && (
-                  <p className="mt-1 text-sm text-red-600">{errors.agreeTerms}</p>
+                  <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.agreeTerms}</p>
                 )}
               </div>
             </div>
@@ -341,13 +342,13 @@ const SignupPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center items-center py-2.5 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                className={`w-full flex justify-center items-center py-2 sm:py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
                   isLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -356,30 +357,30 @@ const SignupPage = () => {
                 ) : (
                   <>
                     Create account
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="ml-1 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                   </>
                 )}
               </button>
             </div>
           </form>
 
-          <div className="mt-5 sm:mt-6">
+          <div className="mt-4 sm:mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
-              <div className="relative flex justify-center text-sm">
+              <div className="relative flex justify-center text-xs sm:text-sm">
                 <span className="px-2 bg-white text-gray-500">Or sign up with</span>
               </div>
             </div>
 
-            <div className="mt-5 sm:mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-3 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3">
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full inline-flex justify-center py-2 sm:py-2.5 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <svg className="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
                     <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
                     <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
@@ -391,9 +392,9 @@ const SignupPage = () => {
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full inline-flex justify-center py-2 sm:py-2.5 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <svg className="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M22.675 0H1.325C0.593 0 0 0.593 0 1.325V22.676C0 23.407 0.593 24 1.325 24H12.82V14.706H9.692V11.084H12.82V8.413C12.82 5.313 14.713 3.625 17.479 3.625C18.804 3.625 19.942 3.724 20.274 3.768V7.008L18.356 7.009C16.852 7.009 16.561 7.724 16.561 8.772V11.085H20.148L19.681 14.707H16.561V24H22.677C23.407 24 24 23.407 24 22.675V1.325C24 0.593 23.407 0 22.675 0Z" fill="#1877F2" />
                   </svg>
                 </a>
@@ -401,7 +402,7 @@ const SignupPage = () => {
             </div>
           </div>
 
-          <div className="mt-5 sm:mt-6 text-center text-sm">
+          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
             <p className="text-gray-600">
               Already have an account?{' '}
               <Link href="/login" className="font-medium text-purple-600 hover:text-purple-500">
