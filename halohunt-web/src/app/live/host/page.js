@@ -345,6 +345,65 @@ export default function HostPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Sticky Video Player for Mobile */}
+      <div className="lg:hidden sticky top-0 z-10 w-full bg-black">
+        <div className="relative w-full aspect-video bg-black overflow-hidden">
+          <video 
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted={!isMicOn}
+            className="w-full h-full object-cover"
+          />
+          
+          {!isVideoOn && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+              <Camera className="w-16 h-16 text-gray-500" />
+            </div>
+          )}
+          
+          {/* Stream Status Indicators */}
+          {isStreaming && (
+            <div className="absolute bottom-4 left-4 flex items-center gap-2">
+              <div className="flex items-center gap-1 bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                LIVE
+              </div>
+              <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                <Eye className="w-3 h-3" />
+                {viewerCount}
+              </div>
+            </div>
+          )}
+          
+          {/* Tagged Products Overlay */}
+          {isStreaming && taggedProducts.length > 0 && (
+            <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
+              {taggedProducts.map(product => (
+                <div 
+                  key={product.id}
+                  className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
+                >
+                  <div className="w-10 h-10 rounded-md overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-white text-xs font-medium">{product.name}</p>
+                    <p className="text-purple-300 text-xs font-bold">
+                      ${product.discountPrice || product.price}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[calc(100vh-2rem)] lg:overflow-hidden">
           {/* Main Content - Video Stream */}
@@ -385,8 +444,8 @@ export default function HostPage() {
               )}
             </div>
             
-            {/* Video Preview */}
-            <div className="relative bg-black rounded-lg overflow-hidden flex-grow mb-4">
+            {/* Video Preview - Desktop Only */}
+            <div className="hidden lg:block relative bg-black rounded-lg overflow-hidden flex-grow mb-4">
               <video 
                 ref={videoRef}
                 autoPlay

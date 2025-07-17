@@ -325,12 +325,38 @@ export default function LiveStreamPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Sticky Video Player for Mobile */}
+      <div className="lg:hidden sticky top-0 z-10 w-full bg-black">
+        <div className="relative w-full aspect-video bg-black overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-4 flex items-center gap-2">
+            <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+              LIVE
+            </div>
+            <div className="bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              {liveData.stats.viewers.toLocaleString()}
+            </div>
+          </div>
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop"
+          />
+        </div>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:h-[calc(100vh-2rem)] lg:overflow-hidden">
           {/* Main Content - Video and Info - Independently Scrollable */}
           <div className="lg:col-span-2 lg:overflow-y-auto lg:pr-2" style={{ height: 'auto', maxHeight: 'calc(100vh - 2rem)' }}>
-            {/* Video Player */}
-            <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
+            {/* Video Player - Desktop Only */}
+            <div className="hidden lg:block relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
                   <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
@@ -408,7 +434,7 @@ export default function LiveStreamPage() {
                         onClick={handleFollow}
                         className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${isFollowing
                             ? 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                            : 'bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:shadow-sm hover:from-purple-700 hover:to-purple-600'
+                            : 'bg-purple-600 text-white hover:bg-purple-700'
                           }`}
                       >
                         {isFollowing ? (
