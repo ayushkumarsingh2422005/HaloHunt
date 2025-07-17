@@ -54,6 +54,7 @@ const LoginPage = () => {
             alt="HaloHunt Logo" 
             width={280} 
             height={280}
+            priority
           />
         </div>
         <div className="text-center">
@@ -65,7 +66,7 @@ const LoginPage = () => {
       </div>
 
       <div className="mt-6 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="lg:bg-white py-6 px-4 sm:py-8 sm:px-10 lg:shadow sm:rounded-lg">
+        <div className="bg-white py-6 px-4 sm:py-8 sm:px-10 shadow sm:rounded-lg">
           {error && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-3 sm:p-4">
               <div className="flex">

@@ -139,6 +139,7 @@ const SignupPage = () => {
             alt="HaloHunt Logo" 
             width={280} 
             height={280}
+            priority
           />
         </div>
         <div className="text-center">
@@ -180,6 +181,7 @@ const SignupPage = () => {
                   name="fullName"
                   type="text"
                   autoComplete="name"
+                  required
                   value={formData.fullName}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-3 py-2 sm:py-2.5 border ${
@@ -207,6 +209,7 @@ const SignupPage = () => {
                   type="email"
                   inputMode="email"
                   autoComplete="email"
+                  required
                   value={formData.email}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-3 py-2 sm:py-2.5 border ${
@@ -233,6 +236,7 @@ const SignupPage = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
+                  required
                   value={formData.password}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-10 py-2 sm:py-2.5 border ${
@@ -276,6 +280,7 @@ const SignupPage = () => {
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   autoComplete="new-password"
+                  required
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-10 py-2 sm:py-2.5 border ${
