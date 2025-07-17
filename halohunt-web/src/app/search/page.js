@@ -1,8 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import {
-  Search, Star, X, ChevronDown, ChevronUp, Sliders, Check, Bell, Eye, Heart, MessageCircle, Share2,
-  ChevronLeft, ChevronRight
+  Search, Star, X, ChevronDown, ChevronUp, Sliders, Check, Bell, Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -344,12 +343,12 @@ const SearchPage = () => {
               />
               <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             </div>
-            <button
+            {/* <button
               type="submit"
               className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
             >
               <Search className="w-5 h-5" />
-            </button>
+            </button> */}
             <Link href="/notifications" className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
               <Bell className="w-6 h-6 text-gray-700" />
               <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
