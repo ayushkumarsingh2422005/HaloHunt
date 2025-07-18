@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, Package, Truck, CheckCircle, Clock, MapPin, Download, Copy, ExternalLink, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Sample order data - in a real app, this would come from an API call
 const ordersData = {
@@ -247,6 +249,7 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Simulate fetching order data
   useEffect(() => {
@@ -262,6 +265,186 @@ export default function OrderDetailsPage() {
       navigator.clipboard.writeText(order.trackingNumber);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  // Generate PDF directly using jsPDF
+  const handleDownloadInvoice = () => {
+    if (order) {
+      try {
+        setIsDownloading(true);
+        
+        // Create new PDF document
+        const doc = new jsPDF();
+        
+        // Set document properties
+        doc.setProperties({
+          title: `Invoice ${order.id}`,
+          subject: 'Order Invoice',
+          author: 'HaloHunt',
+          creator: 'HaloHunt'
+        });
+        
+        // Add logo/header
+        doc.setFontSize(20);
+        doc.setTextColor(147, 51, 234); // Purple color
+        doc.text('HaloHunt', 20, 20);
+        
+        // Invoice title
+        doc.setFontSize(16);
+        doc.setTextColor(147, 51, 234);
+        doc.text('INVOICE', 190, 20, { align: 'right' });
+        
+        // Company details
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('123 Commerce Street', 20, 30);
+        doc.text('Tech City, TC 12345', 20, 35);
+        doc.text('United States', 20, 40);
+        
+        // Invoice details
+        const invoiceNumber = `INV-${order.id.substring(3)}`;
+        const invoiceDate = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        doc.setFontSize(10);
+        doc.text(`Invoice #: ${invoiceNumber}`, 190, 30, { align: 'right' });
+        doc.text(`Order #: ${order.id}`, 190, 35, { align: 'right' });
+        doc.text(`Date: ${invoiceDate}`, 190, 40, { align: 'right' });
+        doc.text(`Payment: ${order.paymentMethod}`, 190, 45, { align: 'right' });
+        
+        // Billing address
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text('Bill To:', 20, 55);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(order.shippingAddress.name, 20, 62);
+        doc.text(order.shippingAddress.line1, 20, 67);
+        if (order.shippingAddress.line2) {
+          doc.text(order.shippingAddress.line2, 20, 72);
+          doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`, 20, 77);
+          doc.text(order.shippingAddress.country, 20, 82);
+        } else {
+          doc.text(`${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`, 20, 72);
+          doc.text(order.shippingAddress.country, 20, 77);
+        }
+        
+        // Items table
+        const startY = order.shippingAddress.line2 ? 90 : 85;
+        
+        // Prepare table data
+        const tableColumn = ["#", "Description", "Qty", "Unit Price", "Amount"];
+        const tableRows = [];
+        
+        // Add items to table
+        order.items.forEach((item, index) => {
+          const itemData = [
+            (index + 1).toString(),
+            `${item.name} (${item.color}, ${item.size})`,
+            item.quantity.toString(),
+            `$${item.price.toFixed(2)}`,
+            `$${(item.price * item.quantity).toFixed(2)}`
+          ];
+          tableRows.push(itemData);
+        });
+        
+        // Generate the table
+        autoTable(doc, {
+          head: [tableColumn],
+          body: tableRows,
+          startY: startY,
+          theme: 'grid',
+          styles: {
+            fontSize: 9,
+            cellPadding: 3
+          },
+          headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: {
+            fillColor: [248, 248, 248]
+          }
+        });
+        
+        // Get the final y position after the table
+        const finalY = (doc.lastAutoTable || {}).finalY || (startY + 50);
+        
+        // Summary table (subtotal, shipping, tax, total)
+        const summaryData = [
+          ["Subtotal:", `$${order.subtotal.toFixed(2)}`],
+          ["Shipping:", order.shipping === 0 ? 'Free' : `$${order.shipping.toFixed(2)}`]
+        ];
+        
+        if (order.tax > 0) {
+          summaryData.push(["Tax:", `$${order.tax.toFixed(2)}`]);
+        }
+        
+        autoTable(doc, {
+          body: summaryData,
+          startY: finalY + 10,
+          theme: 'plain',
+          styles: {
+            fontSize: 10
+          },
+          columnStyles: {
+            0: {
+              cellWidth: 130,
+              halign: 'right',
+              fontStyle: 'bold'
+            },
+            1: {
+              cellWidth: 30,
+              halign: 'right'
+            }
+          }
+        });
+        
+        // Total row
+        const totalY = (doc.lastAutoTable || {}).finalY || (finalY + 30);
+        
+        autoTable(doc, {
+          body: [["Total:", `$${order.total.toFixed(2)}`]],
+          startY: totalY + 1,
+          theme: 'plain',
+          styles: {
+            fontSize: 11,
+            fontStyle: 'bold'
+          },
+          columnStyles: {
+            0: {
+              cellWidth: 130,
+              halign: 'right'
+            },
+            1: {
+              cellWidth: 30,
+              halign: 'right'
+            }
+          }
+        });
+        
+        // Footer
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+        doc.text('Thank you for shopping with HaloHunt!', 105, pageHeight - 30, { align: 'center' });
+        doc.text('If you have any questions about this invoice, please contact our customer support at support@halohunt.com', 105, pageHeight - 25, { align: 'center' });
+        
+        // Save the PDF
+        doc.save(`${invoiceNumber}.pdf`);
+        
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('There was an error generating your invoice. Please try again.');
+      } finally {
+        setIsDownloading(false);
+      }
     }
   };
 
@@ -453,15 +636,30 @@ export default function OrderDetailsPage() {
         
         {/* Action Buttons */}
         <div className="mt-6 flex flex-wrap gap-3 justify-center sm:justify-start">
-          <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            <Download className="w-4 h-4" />
-            Download Invoice
+          <button 
+            className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full text-sm font-medium ${
+              isDownloading ? 'bg-gray-100 text-gray-400' : 'text-gray-700 hover:bg-gray-50'
+            } transition-colors`}
+            onClick={handleDownloadInvoice}
+            disabled={isDownloading}
+          >
+            {isDownloading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                Download Invoice PDF
+              </>
+            )}
           </button>
           <button className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
             <Share2 className="w-4 h-4" />
             Share Order Details
           </button>
-          {order.status !== 'delivered' && order.status !== 'cancelled' && (
+          {order?.status !== 'delivered' && order?.status !== 'cancelled' && (
             <button className="inline-flex items-center gap-2 px-4 py-2 border border-red-300 rounded-full text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
               Cancel Order
             </button>
