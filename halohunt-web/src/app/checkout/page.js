@@ -1,7 +1,13 @@
 "use client";
-import { useState } from 'react';
-import { CreditCard, Truck, Shield, Clock, MapPin, ChevronRight, Package, Wallet } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CreditCard, Truck, Shield, Clock, MapPin, ChevronRight, Package, Wallet, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import react-confetti with no SSR
+const ReactConfetti = dynamic(() => import('react-confetti'), {
+  ssr: false
+});
 
 // Sample data - in a real app this would come from your cart state
 const cartItems = [
@@ -109,6 +115,38 @@ const AddressCard = ({ address, selected, onSelect }) => {
 export default function CheckoutPage() {
   const [selectedAddress, setSelectedAddress] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('pay_now');
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [confettiActive, setConfettiActive] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0
+  });
+
+  // Update window size for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  // Handle order placement
+  const handlePlaceOrder = () => {
+    setOrderPlaced(true);
+    setConfettiActive(true);
+    
+    // Stop confetti after 6 seconds
+    setTimeout(() => {
+      setConfettiActive(false);
+    }, 6000);
+  };
 
   // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -120,6 +158,50 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Order Success Overlay */}
+      {orderPlaced && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center animate-bounce-in shadow-xl">
+            <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-green-100 mb-4 animate-success-pulse">
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Congratulations!</h2>
+            <p className="text-lg text-gray-700 mb-6">Your order has been placed successfully!</p>
+            <p className="text-sm text-gray-500 mb-6">Order confirmation details have been sent to your email.</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link 
+                href="/profile" 
+                className="px-6 py-2 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors"
+              >
+                View My Orders
+              </Link>
+              <Link 
+                href="/" 
+                className="px-6 py-2 border border-purple-600 text-purple-600 rounded-full font-medium hover:bg-purple-50 transition-colors"
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confetti overlay when order is placed - positioned on top of everything */}
+      {confettiActive && (
+        <div className="fixed inset-0 z-[100] pointer-events-none">
+          <ReactConfetti
+            width={windowSize.width}
+            height={windowSize.height}
+            recycle={false}
+            numberOfPieces={600}
+            gravity={0.15}
+            colors={['#9333ea', '#c084fc', '#f0abfc', '#ffd700', '#ff6b6b', '#4ade80']}
+            tweenDuration={5000}
+            initialVelocityY={15}
+          />
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-medium text-gray-900">Checkout</h1>
@@ -259,7 +341,10 @@ export default function CheckoutPage() {
               </div>
 
               {/* Place Order Button */}
-              <button className="w-full mt-6 bg-purple-600 text-white py-3 rounded-full font-medium hover:bg-purple-700 transition-colors">
+              <button 
+                className="w-full mt-6 bg-purple-600 text-white py-3 rounded-full font-medium hover:bg-purple-700 transition-colors"
+                onClick={handlePlaceOrder}
+              >
                 {paymentMethod === 'pay_now' ? 'Pay Now' : 'Place Order'}
               </button>
 
