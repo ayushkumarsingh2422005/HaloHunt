@@ -48,11 +48,11 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
       className="group relative flex flex-col bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer h-full"
     >
       {/* Thumbnail */}
-      <div className="relative w-full aspect-[3/4] bg-gray-200 overflow-hidden">
+      <div className="relative w-full pb-[56.25%] bg-gray-200 overflow-hidden">
         <img
           src={stream.thumbnail}
           alt={stream.title}
-          className="w-full h-full object-cover"
+          className="absolute top-0 left-0 w-full h-full object-cover"
           style={{ backgroundColor: "#eee" }}
           loading="lazy"
         />
@@ -217,7 +217,7 @@ const MobileReelsView = ({ streams, lastStreamRef, loading, hasMore }) => {
           {pair.map((stream, idx) => (
             <div 
               key={stream.id} 
-              className="h-[calc(43vh-0.5rem)]"
+              className="h-[calc(45vh-0.5rem)]"
               ref={pageIndex === groupedStreams.length - 1 && idx === pair.length - 1 ? lastStreamRef : null}
             >
               <LiveStreamCard stream={stream} />
@@ -337,7 +337,7 @@ const LiveGrid = () => {
       ) : (
         // Desktop grid view
         <div className="pt-6 pb-10 max-w-7xl mx-auto px-2 sm:px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {streams.map((stream, index) => (
               <LiveStreamCard
                 key={stream.id}

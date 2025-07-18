@@ -45,12 +45,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-3 py-6 sm:px-6 sm:py-12">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen flex flex-col justify-center px-3 py-6 sm:px-6 sm:py-12 bg-[url('/images/bg.png')] bg-cover bg-center h-screen overflow-y-scroll">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md mb-5">
         {/* Logo */}
-        <div className="flex justify-center mb-4 sm:mb-6">
+        <div className="flex justify-center mb-0 sm:mb-6">
           <Image 
-            src="/logo/full_purple.png" 
+            src="/logo/full_yellow.png" 
             alt="HaloHunt Logo" 
             width={220} 
             height={220}
@@ -59,15 +59,15 @@ const LoginPage = () => {
           />
         </div>
         <div className="text-center">
-          <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900">Welcome back</h2>
-          <p className="mt-1 sm:mt-2 text-sm text-gray-600">
-            Log in to your account to continue shopping
+          {/* <h2 className="text-xl sm:text-3xl font-extrabold text-yellow-400">Welcome back</h2> */}
+          <p className="text-sm text-yellow-400">
+            Where Shopping Goes Live
           </p>
         </div>
       </div>
 
-      <div className="mt-4 sm:mt-8 mx-auto w-[95%] sm:w-full sm:max-w-md">
-        <div className="bg-white py-5 px-4 sm:py-8 sm:px-10 md:shadow rounded-lg">
+      <div className="mt-4 sm:mt-8 mx-auto w-[80%] sm:w-full sm:max-w-md">
+        <div className="py-5 px-4 sm:py-8 sm:px-10 rounded-lg">
           {error && (
             <div className="mb-3 sm:mb-4 bg-red-50 border-l-4 border-red-400 p-2 sm:p-4">
               <div className="flex">
@@ -85,12 +85,12 @@ const LoginPage = () => {
 
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="email" className="block text-sm font-medium text-white">
+                Email/Phone
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                  <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                 </div>
                 <input
                   id="email"
@@ -101,19 +101,19 @@ const LoginPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-sm sm:text-base"
+                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm sm:text-base text-black bg-gray-100"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-white">
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                  <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                 </div>
                 <input
                   id="password"
@@ -123,7 +123,7 @@ const LoginPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-sm sm:text-base"
+                  className="block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yellow-500 focus:border-yellow-500 text-sm sm:text-base text-black bg-gray-100"
                   placeholder="••••••••"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -150,15 +150,15 @@ const LoginPage = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-1 sm:ml-2 block text-xs sm:text-sm text-gray-700">
+                <label htmlFor="remember-me" className="ml-1 sm:ml-2 block text-xs sm:text-sm text-white">
                   Remember me
                 </label>
               </div>
 
               <div className="text-xs sm:text-sm">
-                <Link href="/forgot-password" className="font-medium text-purple-600 hover:text-purple-500">
+                <Link href="/forgot-password" className="font-medium text-white hover:text-yellow-500">
                   Forgot password?
                 </Link>
               </div>
@@ -168,7 +168,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center items-center py-2 sm:py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                className={`w-full flex justify-center items-center py-2 sm:py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 ${
                   isLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
@@ -193,20 +193,20 @@ const LoginPage = () => {
           <div className="mt-4 sm:mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
+                <div className="w-full border-t border-white"></div>
               </div>
               <div className="relative flex justify-center text-xs sm:text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 text-white bg-clip-content">OR</span>
               </div>
             </div>
 
-            <div className="mt-3 sm:mt-5 grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="mt-3 sm:mt-5 flex justify-center gap-2 sm:gap-3">
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-2 sm:py-2.5 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="inline-flex justify-center py-1.5 px-1.5 border border-none shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-full aspect-square items-center"
                 >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z" fill="#EA4335" />
                     <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z" fill="#4285F4" />
                     <path d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z" fill="#FBBC05" />
@@ -218,9 +218,9 @@ const LoginPage = () => {
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-2 sm:py-2.5 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="inline-flex justify-center py-1.5 px-1.5 border border-none shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-full aspect-square items-center"
                 >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-6 w-6 sm:h-5 sm:w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M22.675 0H1.325C0.593 0 0 0.593 0 1.325V22.676C0 23.407 0.593 24 1.325 24H12.82V14.706H9.692V11.084H12.82V8.413C12.82 5.313 14.713 3.625 17.479 3.625C18.804 3.625 19.942 3.724 20.274 3.768V7.008L18.356 7.009C16.852 7.009 16.561 7.724 16.561 8.772V11.085H20.148L19.681 14.707H16.561V24H22.677C23.407 24 24 23.407 24 22.675V1.325C24 0.593 23.407 0 22.675 0Z" fill="#1877F2" />
                   </svg>
                 </a>
@@ -229,9 +229,9 @@ const LoginPage = () => {
           </div>
 
           <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
-            <p className="text-gray-600">
+            <p className="text-white">
               Don't have an account?{' '}
-              <Link href="/signup" className="font-medium text-purple-600 hover:text-purple-500">
+              <Link href="/signup" className="font-medium text-yellow-400 hover:text-yellow-500">
                 Sign up
               </Link>
             </p>
