@@ -256,21 +256,21 @@ export default function CartPage() {
             <div className="bg-white rounded-lg shadow-sm divide-y divide-gray-200">
               {/* Delivery Banner */}
               <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 rounded-t-lg">
-                <div className="px-6 py-4 flex items-center gap-3">
+                <div className="px-3 py-1 flex items-center gap-3">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                     <Gift className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
                     {cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0) >= 200 ? (
-                      <div className="text-purple-700 font-medium">
+                      <div className="text-purple-700 text-sm">
                         🎉 Congratulations! You've unlocked free shipping!
                       </div>
                     ) : (
                       <div>
-                        <span className="text-purple-700 font-medium">
+                        <span className="text-purple-700 text-sm">
                           You're <span className="text-purple-800 font-bold">₹{Math.max(0, 200 - cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0))}</span> away from free shipping!
                         </span>
-                        <p className="text-sm text-purple-600 mt-0.5">
+                        <p className="text-xs text-purple-600 mt-0.5">
                           Add more items to unlock free shipping
                         </p>
                       </div>
