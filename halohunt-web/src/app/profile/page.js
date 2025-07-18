@@ -190,6 +190,7 @@ export default function ProfilePage() {
   ];
 
   const fullMenuOptions = [
+    { icon: ShoppingBag, label: 'My Orders', href: '/profile/orders' },
     { icon: Store, label: 'My Store', href: '/store' },
     { icon: Warehouse, label: 'Manage Warehouses', href: '/warehouses' },
     { icon: Heart, label: 'Favorites', href: '/favorites' },
