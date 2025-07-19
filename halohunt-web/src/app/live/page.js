@@ -72,23 +72,9 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
             </div>
           )}
         </div>
-        {/* Host avatar */}
-        <div 
-          className="absolute bottom-2 left-2 flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity z-10"
-          onClick={handleHostClick}
-        >
-          <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white shadow">
-            <img
-              src={stream.host.image}
-              alt={stream.host.name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          <span className="text-white text-xs font-medium bg-black/50 px-2 py-0.5 rounded">{stream.host.name}</span>
-        </div>
+        {/* Remove host avatar from here */}
         {/* Tagged Products */}
-        <div className="absolute bottom-14 left-2 flex items-center gap-1.5">
+        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
           {taggedProducts.map((product, idx) => (
             <div 
               key={product.id}
@@ -146,20 +132,46 @@ const LiveStreamCard = React.forwardRef(({ stream }, ref) => {
           </button>
         </div>
       </div>
-      {/* Stream info */}
-      <div className="flex-1 flex flex-col px-3 py-2 bg-white">
-        <h3 className="font-semibold text-sm text-gray-900 mb-1 truncate">{stream.title}</h3>
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span 
-            className="truncate cursor-pointer hover:text-purple-600"
-            onClick={handleHostClick}
-          >
-            {stream.host.name}
-          </span>
-          <span>
-            <Eye className="inline w-3 h-3 mr-1" />
-            {stream.viewers.toLocaleString()}
-          </span>
+      {/* Stream info - YouTube style */}
+      <div className="flex-1 flex px-3 py-2 bg-white">
+        {/* Creator avatar - ensuring it's a circle */}
+        <div 
+          className="w-10 h-10 rounded-full overflow-hidden cursor-pointer flex-shrink-0 mr-3"
+          onClick={handleHostClick}
+        >
+          <img
+            src={stream.host.image}
+            alt={stream.host.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        
+        {/* Content column */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <h3 className="font-semibold text-sm text-gray-900 mb-1 line-clamp-2">
+            {stream.title}
+          </h3>
+          
+          {/* Channel name and stats */}
+          <div className="flex items-center text-xs text-gray-700 mb-1">
+            <span 
+              className="font-medium truncate cursor-pointer hover:text-purple-600"
+              onClick={handleHostClick}
+            >
+              {stream.host.name}
+            </span>
+            <span className="mx-1">•</span>
+            <span className="text-gray-500">
+              {stream.viewers.toLocaleString()} {stream.isLive ? 'watching' : 'views'}
+            </span>
+          </div>
+          
+          {/* Description */}
+          <p className="text-xs text-gray-600 line-clamp-1">
+            {stream.description || `Check out this amazing stream about ${stream.title.toLowerCase()}`}
+          </p>
         </div>
       </div>
     </div>
@@ -169,62 +181,18 @@ LiveStreamCard.displayName = "LiveStreamCard";
 
 // Fix the MobileReelsView component to prevent overlapping and account for bottom navigation
 const MobileReelsView = ({ streams, lastStreamRef, loading, hasMore }) => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const reelsContainerRef = useRef(null);
-
-  useEffect(() => {
-    const container = reelsContainerRef.current;
-    if (!container) return;
-
-    // Set up snap scrolling behavior
-    const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const pageHeight = window.innerHeight * 0.8; // Use 90% of screen height
-      const newPage = Math.round(scrollTop / pageHeight);
-      
-      if (newPage !== currentPage) {
-        setCurrentPage(newPage);
-      }
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [currentPage]);
-
-  // Group streams into pairs for 2 per screen
-  const groupedStreams = [];
-  for (let i = 0; i < streams.length; i += 2) {
-    groupedStreams.push(streams.slice(i, i + 2));
-  }
-
   return (
-    <div 
-      ref={reelsContainerRef}
-      className="h-[90vh] overflow-y-scroll snap-y snap-mandatory reels-container"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-    >
-      <style jsx global>{`
-        .reels-container::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-      
-      {groupedStreams.map((pair, pageIndex) => (
-        <div 
-          key={`page-${pageIndex}`} 
-          className="h-[90vh] w-full snap-start flex flex-col p-2 gap-4"
-        >
-          {pair.map((stream, idx) => (
-            <div 
-              key={stream.id} 
-              className="h-[calc(45vh-0.5rem)]"
-              ref={pageIndex === groupedStreams.length - 1 && idx === pair.length - 1 ? lastStreamRef : null}
-            >
-              <LiveStreamCard stream={stream} />
-            </div>
-          ))}
-        </div>
-      ))}
+    <div className="pb-16 pt-2 px-2">
+      <div className="flex flex-col gap-4">
+        {streams.map((stream, index) => (
+          <div 
+            key={stream.id} 
+            ref={index === streams.length - 1 ? lastStreamRef : null}
+          >
+            <LiveStreamCard stream={stream} />
+          </div>
+        ))}
+      </div>
       
       {/* Loading indicator */}
       {loading && (
@@ -264,6 +232,7 @@ const LiveGrid = () => {
     return Array.from({ length: count }, (_, i) => ({
       id: `stream-${startIndex + i}`,
       title: `Live Stream ${startIndex + i}`,
+      description: `Join our stream #${startIndex + i} where we showcase the latest trending products. Perfect for fashion enthusiasts and tech lovers alike!`,
       host: {
         name: `Creator ${startIndex + i}`,
         image: `https://i.pravatar.cc/150?img=${(startIndex + i) % 70}`
