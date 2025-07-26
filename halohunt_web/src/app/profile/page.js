@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   User, Store, Plus, ChevronDown,
   ShoppingBag, Video, Menu, X,
@@ -10,6 +10,8 @@ import {
   Edit, ChevronUp
 } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const TabButton = ({ active, icon: Icon, children, onClick }) => {
   return (
@@ -82,36 +84,41 @@ export default function ProfilePage() {
   const [showMenu, setShowMenu] = useState(false);
   const [showFullMenu, setShowFullMenu] = useState(false);
   const [showAllBio, setShowAllBio] = useState(false);
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
 
-  // Sample user data - in a real app this would come from your auth/user state
-  const user = {
-    id: "user-123",
-    name: "John Doe",
-    username: "@johndoe",
-    email: "john@example.com",
-    bio: "Product designer and developer based in New York. I create digital products with focus on user experience. Join my live streams for exclusive product showcases and tutorials.",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces&auto=format",
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  // Default placeholder data for fields not available in the user object
+  const defaultUserData = {
+    username: user ? `@${user?.fullName?.toLowerCase().replace(/\s+/g, '') || 'user'}` : '@user',
+    bio: "No bio available",
     coverImage: "https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=1200&h=400&fit=crop",
-    location: "New York, USA",
-    joinedDate: "March 2024",
-    isSeller: true,
-    listingsCount: 12,
-    livesCount: 8,
-    followers: 1240,
-    following: 356,
+    location: "Not specified",
+    joinedDate: user ? new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently",
+    isSeller: user?.role === 'seller',
+    listingsCount: 0,
+    livesCount: 0,
+    followers: 0,
+    following: 0,
     socialLinks: {
-      instagram: "johndoe",
-      twitter: "johndoe",
-      website: "johndoe.com"
+      instagram: "",
+      twitter: "",
+      website: ""
     },
     stats: {
-      totalViews: 25600,
-      totalLikes: 4320,
-      averageRating: 4.7
+      totalViews: 0,
+      totalLikes: 0,
+      averageRating: 0
     }
   };
 
-  // Sample products data
+  // Sample products data - would be fetched from API in a real app
   const products = [
     {
       id: "p1",
@@ -151,7 +158,7 @@ export default function ProfilePage() {
     }
   ];
 
-  // Sample past lives data
+  // Sample past lives data - would be fetched from API in a real app
   const pastLives = [
     {
       id: "live-1",
@@ -186,7 +193,7 @@ export default function ProfilePage() {
     { icon: Heart, label: 'Favorites', href: '/favorites' },
     { icon: Bell, label: 'Notifications', href: '/notifications' },
     { icon: HelpCircle, label: 'Help & Support', href: '/support' },
-    { icon: LogOut, label: 'Sign Out', onClick: () => console.log('Sign out clicked') },
+    { icon: LogOut, label: 'Sign Out', onClick: () => handleLogout() },
   ];
 
   const fullMenuOptions = [
@@ -203,11 +210,12 @@ export default function ProfilePage() {
     { icon: Shield, label: 'Privacy & Security', href: '/privacy' },
     { icon: Settings, label: 'Account Settings', href: '/settings' },
     { icon: HelpCircle, label: 'Help & Support', href: '/support' },
-    { icon: LogOut, label: 'Logout', onClick: () => console.log('Logout clicked') }
+    { icon: LogOut, label: 'Logout', onClick: () => handleLogout() }
   ];
 
   const handleStartStream = () => {
     console.log('Start stream clicked');
+    router.push('/live/host');
   };
 
   const handleAddProduct = () => {
@@ -217,6 +225,23 @@ export default function ProfilePage() {
   const handleEditProfile = () => {
     console.log('Edit profile clicked');
   };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
+
+  // If loading, show a simple loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   const ProductCard = ({ product }) => {
     return (
@@ -313,13 +338,13 @@ export default function ProfilePage() {
             <div className="py-6 border-b border-gray-100">
               <div className="flex items-center gap-4">
                 <img
-                  src={user.avatar}
-                  alt={user.name}
+                  src={user?.avatar || defaultUserData.avatar}
+                  alt={user?.fullName || "User"}
                   className="w-16 h-16 rounded-full object-cover border-4 border-purple-100"
                 />
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900">{user.name}</h2>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                  <h2 className="text-lg font-medium text-gray-900">{user?.fullName || "User"}</h2>
+                  <p className="text-sm text-gray-500">{user?.email || "No email"}</p>
                 </div>
               </div>
             </div>
@@ -367,8 +392,8 @@ export default function ProfilePage() {
       {/* Cover Image */}
       <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200 overflow-hidden">
         <img 
-          src={user.coverImage} 
-          alt={`${user.name}'s cover`}
+          src={defaultUserData.coverImage} 
+          alt={`${user?.fullName || "User"}'s cover`}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -382,37 +407,35 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md overflow-hidden -mt-16 sm:-mt-20 bg-white">
                 <img 
-                  src={user.avatar} 
-                  alt={user.name}
+                  src={user?.avatar || defaultUserData.avatar}
+                  alt={user?.fullName || "User"}
                   className="w-full h-full object-cover"
                 />
               </div>
               
               {/* User Info */}
               <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{user.name}</h1>
-                <p className="text-sm text-gray-500 mb-2">{user.username}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{user?.fullName || "User"}</h1>
+                <p className="text-sm text-gray-500 mb-2">{defaultUserData.username}</p>
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-xs text-gray-600">
-                  {user.location && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>{user.location}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    <span>{defaultUserData.location}</span>
+                  </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    <span>Joined {user.joinedDate}</span>
+                    <span>Joined {defaultUserData.joinedDate}</span>
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
                   <div>
-                    <span className="font-bold text-gray-900">{user.livesCount}</span>
+                    <span className="font-bold text-gray-900">{defaultUserData.livesCount}</span>
                     <span className="text-gray-600 ml-1">Lives</span>
                   </div>
                   <div>
-                    <span className="font-bold text-gray-900">{user.listingsCount}</span>
+                    <span className="font-bold text-gray-900">{defaultUserData.listingsCount}</span>
                     <span className="text-gray-600 ml-1">Products</span>
                   </div>
                 </div>
@@ -444,45 +467,43 @@ export default function ProfilePage() {
             </div>
             
             {/* Bio */}
-            {user.bio && (
-              <div className="mt-4 border-t border-gray-100 pt-4">
-                <p className="text-sm text-gray-700">
-                  {showAllBio || user.bio.length <= 150 
-                    ? user.bio 
-                    : `${user.bio.substring(0, 150)}...`}
-                </p>
-                {user.bio.length > 150 && (
-                  <button 
-                    onClick={() => setShowAllBio(!showAllBio)}
-                    className="text-xs text-purple-600 font-medium mt-1 flex items-center"
-                  >
-                    {showAllBio ? (
-                      <>
-                        Show less <ChevronUp className="w-3 h-3 ml-1" />
-                      </>
-                    ) : (
-                      <>
-                        Show more <ChevronDown className="w-3 h-3 ml-1" />
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <p className="text-sm text-gray-700">
+                {showAllBio || defaultUserData.bio.length <= 150 
+                  ? defaultUserData.bio 
+                  : `${defaultUserData.bio.substring(0, 150)}...`}
+              </p>
+              {defaultUserData.bio.length > 150 && (
+                <button 
+                  onClick={() => setShowAllBio(!showAllBio)}
+                  className="text-xs text-purple-600 font-medium mt-1 flex items-center"
+                >
+                  {showAllBio ? (
+                    <>
+                      Show less <ChevronUp className="w-3 h-3 ml-1" />
+                    </>
+                  ) : (
+                    <>
+                      Show more <ChevronDown className="w-3 h-3 ml-1" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
             
             {/* Stats */}
             <div className="mt-4 border-t border-gray-100 pt-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{user.stats.totalViews.toLocaleString()}</div>
+                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.totalViews.toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Total Views</div>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{user.stats.totalLikes.toLocaleString()}</div>
+                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.totalLikes.toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Total Likes</div>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{user.stats.averageRating}</div>
+                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.averageRating}</div>
                   <div className="text-xs text-gray-500">Avg. Rating</div>
                 </div>
               </div>

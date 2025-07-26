@@ -2,80 +2,94 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
-import config from '../config/config.js';
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    fullName: {
       type: String,
       required: [true, 'Please add a name'],
       trim: true,
-      maxlength: [50, 'Name cannot be more than 50 characters']
+      maxlength: [50, 'Name cannot be more than 50 characters'],
     },
     email: {
       type: String,
       required: [true, 'Please add an email'],
       unique: true,
-      validate: [validator.isEmail, 'Please add a valid email']
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
     },
     password: {
       type: String,
       required: function() {
-        return this.googleId ? false : true;
+        return !this.googleId; // Password is required only if not using Google auth
       },
-      minlength: [6, 'Password must be at least 6 characters'],
-      select: false
+      minlength: [8, 'Password must be at least 8 characters'],
+      select: false, // Don't return password in queries
+    },
+    role: {
+      type: String,
+      enum: ['user', 'seller', 'admin'],
+      default: 'user',
+    },
+    avatar: {
+      type: String,
+      default: 'https://randomuser.me/api/portraits/lego/5.jpg',
     },
     googleId: {
       type: String,
       unique: true,
-      sparse: true
-    },
-    profileImage: {
-      type: String,
-      default: 'default-avatar.jpg'
-    },
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user'
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false
+      sparse: true, // Allow null/undefined values (for non-Google users)
     },
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
+  // Only hash the password if it's modified (or new)
   if (!this.isModified('password')) {
     next();
   }
 
-  if (this.password) {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+  // Skip password hashing if using Google auth
+  if (this.googleId && !this.password) {
+    next();
+    return;
   }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
 // Sign JWT and return
-userSchema.methods.getSignedJwtToken = function() {
-  return jwt.sign({ id: this._id }, config.JWT_SECRET, {
-    expiresIn: config.JWT_EXPIRE
+userSchema.methods.getSignedJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
 // Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function(enteredPassword) {
-  if (!this.password) return false;
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  // If this is a Google user without a password, they can't log in with password
+  if (this.googleId && !this.password) {
+    return false;
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-export default mongoose.model('User', userSchema); 
+const User = mongoose.model('User', userSchema);
+
+export default User; 

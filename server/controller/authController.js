@@ -1,190 +1,327 @@
-import User from '../models/userModel.js';
 import { OAuth2Client } from 'google-auth-library';
-import config from '../config/config.js';
+import crypto from 'crypto';
+import asyncHandler from '../utils/asyncHandler.js';
+import ErrorResponse from '../utils/errorResponse.js';
+import User from '../models/userModel.js';
 
-// @desc    Register a user
-// @route   POST /api/auth/register
+// Initialize Google OAuth client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @desc    Register user
+// @route   POST /api/v1/auth/register
 // @access  Public
-export const register = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+export const register = asyncHandler(async (req, res, next) => {
+  const { fullName, email, password } = req.body;
 
-    // Check if user already exists
-    const userExists = await User.findOne({ email });
+  // Check if user already exists
+  const userExists = await User.findOne({ email });
 
-    if (userExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists'
-      });
-    }
-
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password
-    });
-
-    sendTokenResponse(user, 201, res);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+  if (userExists) {
+    return next(new ErrorResponse('Email already in use', 400));
   }
-};
+
+  // Create user
+  const user = await User.create({
+    fullName,
+    email,
+    password,
+  });
+
+  sendTokenResponse(user, 201, res);
+});
 
 // @desc    Login user
-// @route   POST /api/auth/login
+// @route   POST /api/v1/auth/login
 // @access  Public
-export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+export const login = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide an email and password'
-      });
-    }
-
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-
-    // Check if password matches
-    const isMatch = await user.matchPassword(password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-
-    sendTokenResponse(user, 200, res);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+  // Validate email & password
+  if (!email || !password) {
+    return next(new ErrorResponse('Please provide an email and password', 400));
   }
-};
 
-// @desc    Google login/signup
-// @route   POST /api/auth/google
+  // Check for user
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid credentials', 401));
+  }
+
+  // Check if password matches
+  const isMatch = await user.matchPassword(password);
+
+  if (!isMatch) {
+    return next(new ErrorResponse('Invalid credentials', 401));
+  }
+
+  sendTokenResponse(user, 200, res);
+});
+
+// @desc    Google OAuth login/register
+// @route   POST /api/v1/auth/google
 // @access  Public
-export const googleAuth = async (req, res) => {
+export const googleAuth = asyncHandler(async (req, res, next) => {
+  const { idToken } = req.body;
+
+  console.log('idToken', idToken);
+
+  if (!idToken) {
+    return next(new ErrorResponse('Please provide a valid Google token', 400));
+  }
+
+  console.log('Received Google auth request with token');
+  console.log('Google Client ID:', process.env.GOOGLE_CLIENT_ID);
+
   try {
-    const { tokenId } = req.body;
-    
-    const client = new OAuth2Client(config.GOOGLE_CLIENT_ID);
-    
-    const ticket = await client.verifyIdToken({
-      idToken: tokenId,
-      audience: config.GOOGLE_CLIENT_ID
-    });
-    
-    const { name, email, picture, sub } = ticket.getPayload();
-    
+    // Verify the Google token with more detailed error handling
+    let ticket;
+    try {
+      ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+    } catch (verifyError) {
+      console.error('Google token verification failed:', verifyError);
+      
+      // For development purposes only - this is not secure for production
+      // This allows testing without proper Google verification
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Development mode: Attempting to decode token without verification');
+        try {
+          // Extract payload from JWT without verification (DEVELOPMENT ONLY)
+          const parts = idToken.split('.');
+          if (parts.length !== 3) {
+            return next(new ErrorResponse('Invalid token format', 401));
+          }
+          
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+          console.log('Token payload:', payload);
+          
+          // Extract user info from payload
+          const email = payload.email;
+          const name = payload.name;
+          const picture = payload.picture;
+          const googleId = payload.sub;
+          
+          if (!email || !googleId) {
+            return next(new ErrorResponse('Invalid token payload', 401));
+          }
+          
+          // Continue with user lookup/creation
+          let user = await User.findOne({ email });
+
+          if (user) {
+            if (!user.googleId) {
+              user.googleId = googleId;
+              user.avatar = picture || user.avatar;
+              await user.save();
+            }
+          } else {
+            user = await User.create({
+              fullName: name || email.split('@')[0],
+              email,
+              googleId,
+              avatar: picture,
+              emailVerified: true,
+            });
+          }
+
+          return sendTokenResponse(user, 200, res);
+        } catch (decodeError) {
+          console.error('Failed to decode token:', decodeError);
+          return next(new ErrorResponse('Invalid token format', 401));
+        }
+      }
+      
+      return next(new ErrorResponse('Google token verification failed', 401));
+    }
+
+    const { email, name, picture, sub: googleId } = ticket.getPayload();
+    console.log('Google auth successful for:', email);
+
     // Check if user exists
     let user = await User.findOne({ email });
-    
-    if (!user) {
+
+    if (user) {
+      // Update user with Google ID if not already set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = picture || user.avatar;
+        await user.save();
+      }
+    } else {
       // Create new user
       user = await User.create({
-        name,
+        fullName: name,
         email,
-        googleId: sub,
-        profileImage: picture,
-        isEmailVerified: true
+        googleId,
+        avatar: picture,
+        emailVerified: true,
       });
-    } else if (!user.googleId) {
-      // If user exists but doesn't have googleId, update it
-      user.googleId = sub;
-      user.isEmailVerified = true;
-      await user.save();
     }
-    
+
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
+    console.error('Google auth error:', error);
+    return next(new ErrorResponse('Invalid Google token', 401));
   }
-};
+});
 
 // @desc    Get current logged in user
-// @route   GET /api/auth/session
+// @route   GET /api/v1/auth/me
 // @access  Private
-export const getMe = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    
-    res.status(200).json({
-      success: true,
-      data: user
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
+export const getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+});
 
 // @desc    Log user out / clear cookie
-// @route   GET /api/auth/logout
+// @route   GET /api/v1/auth/logout
 // @access  Private
-export const logout = async (req, res) => {
+export const logout = asyncHandler(async (req, res, next) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
 
   res.status(200).json({
     success: true,
-    message: 'User logged out successfully'
+    data: {},
   });
-};
+});
+
+// @desc    Update user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+export const updateDetails = asyncHandler(async (req, res, next) => {
+  const fieldsToUpdate = {
+    fullName: req.body.fullName,
+  };
+
+  const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+});
+
+// @desc    Update password
+// @route   PUT /api/v1/auth/updatepassword
+// @access  Private
+export const updatePassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+
+  // Check current password
+  if (!(await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse('Password is incorrect', 401));
+  }
+
+  user.password = req.body.newPassword;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
+
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgotpassword
+// @access  Public
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user with that email', 404));
+  }
+
+  // Get reset token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to resetPasswordToken field
+  user.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire
+  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  await user.save({ validateBeforeSave: false });
+
+  // In a real application, you would send an email with the reset token
+  // For now, we'll just return it in the response
+  res.status(200).json({
+    success: true,
+    data: {
+      resetToken,
+    },
+  });
+});
+
+// @desc    Reset password
+// @route   PUT /api/v1/auth/resetpassword/:resettoken
+// @access  Public
+export const resetPassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resettoken)
+    .digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid token', 400));
+  }
+
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
 
 // Helper function to get token from model, create cookie and send response
-export const sendTokenResponse = (user, statusCode, res) => {
+const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
 
+  // Ensure JWT_COOKIE_EXPIRE is a valid number, default to 30 if not
+  const cookieExpire = parseInt(process.env.JWT_COOKIE_EXPIRE) || 30;
+  
   const options = {
     expires: new Date(
-      Date.now() + parseInt(config.JWT_EXPIRE) * 24 * 60 * 60 * 1000
+      Date.now() + cookieExpire * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
+    httpOnly: true,
   };
 
-  if (config.NODE_ENV === 'production') {
+  // Use secure cookies in production
+  if (process.env.NODE_ENV === 'production') {
     options.secure = true;
   }
 
-  res
-    .status(statusCode)
-    .cookie('token', token, options)
-    .json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        profileImage: user.profileImage
-      }
-    });
+  res.status(statusCode).cookie('token', token, options).json({
+    success: true,
+    token,
+    user: {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    },
+  });
 }; 

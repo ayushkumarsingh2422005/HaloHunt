@@ -4,6 +4,9 @@ import { createContext, useState, useContext, useEffect } from 'react';
 // Create the auth context
 const AuthContext = createContext();
 
+// API URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 // Custom hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -26,14 +29,21 @@ export function AuthProvider({ children }) {
         const token = localStorage.getItem('authToken');
         
         if (token) {
-          // In a real app, you would validate the token with your backend
-          // For demo purposes, we'll just set a mock user
-          setUser({
-            id: '123',
-            name: 'Demo User',
-            email: 'user@example.com',
-            avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+          // Validate token with backend
+          const response = await fetch(`${API_URL}/api/v1/auth/me`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            setUser(data.data);
+          } else {
+            // Clear invalid token
+            localStorage.removeItem('authToken');
+          }
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -50,25 +60,26 @@ export function AuthProvider({ children }) {
   // Login function
   const login = async (email, password) => {
     try {
-      // In a real app, you would make an API call to your backend
-      // For demo purposes, we'll simulate a successful login for any credentials
+      const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data = await response.json();
       
-      // Set mock token and user
-      const mockToken = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
-      localStorage.setItem('authToken', mockToken);
-      
-      const mockUser = {
-        id: '123',
-        name: 'Demo User',
-        email,
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
-      };
-      
-      setUser(mockUser);
-      return { success: true };
+      if (data.success) {
+        localStorage.setItem('authToken', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          error: data.error || 'Login failed. Please try again.' 
+        };
+      }
     } catch (error) {
       console.error('Login failed:', error);
       return { 
@@ -78,28 +89,77 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Google login function
+  const googleLogin = async (idToken) => {
+    try {
+      console.log('Sending Google token to API:', `${API_URL}/api/v1/auth/google`);
+      
+      const response = await fetch(`${API_URL}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ idToken })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Google login API error:', response.status, errorText);
+        return { 
+          success: false, 
+          error: `API error (${response.status}): ${errorText.substring(0, 100)}...` 
+        };
+      }
+      
+      const data = await response.json();
+      console.log('Google login API response:', data);
+      
+      if (data.success) {
+        localStorage.setItem('authToken', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          error: data.error || 'Google login failed. Please try again.' 
+        };
+      }
+    } catch (error) {
+      console.error('Google login failed:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Google login failed. Please try again.' 
+      };
+    }
+  };
+
   // Signup function
   const signup = async (userData) => {
     try {
-      // In a real app, you would make an API call to your backend
-      // For demo purposes, we'll simulate a successful signup
+      const response = await fetch(`${API_URL}/api/v1/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fullName: userData.fullName,
+          email: userData.email,
+          password: userData.password
+        })
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const data = await response.json();
       
-      // Set mock token and user
-      const mockToken = 'mock-jwt-token-' + Math.random().toString(36).substring(2);
-      localStorage.setItem('authToken', mockToken);
-      
-      const mockUser = {
-        id: '123',
-        name: userData.fullName,
-        email: userData.email,
-        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
-      };
-      
-      setUser(mockUser);
-      return { success: true };
+      if (data.success) {
+        localStorage.setItem('authToken', data.token);
+        setUser(data.user);
+        return { success: true };
+      } else {
+        return { 
+          success: false, 
+          error: data.error || 'Signup failed. Please try again.' 
+        };
+      }
     } catch (error) {
       console.error('Signup failed:', error);
       return { 
@@ -110,21 +170,43 @@ export function AuthProvider({ children }) {
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (token) {
+        // Call logout endpoint (optional)
+        await fetch(`${API_URL}/api/v1/auth/logout`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('authToken');
+      setUser(null);
+    }
   };
 
   // Password reset request function
   const requestPasswordReset = async (email) => {
     try {
-      // In a real app, you would make an API call to your backend
-      // For demo purposes, we'll simulate a successful request
+      const response = await fetch(`${API_URL}/api/v1/auth/forgotpassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data = await response.json();
       
-      return { success: true };
+      return { 
+        success: data.success, 
+        error: data.success ? null : (data.error || 'Password reset request failed') 
+      };
     } catch (error) {
       console.error('Password reset request failed:', error);
       return { 
@@ -137,13 +219,25 @@ export function AuthProvider({ children }) {
   // Reset password function
   const resetPassword = async (token, newPassword) => {
     try {
-      // In a real app, you would make an API call to your backend
-      // For demo purposes, we'll simulate a successful password reset
+      const response = await fetch(`${API_URL}/api/v1/auth/resetpassword/${token}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: newPassword })
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const data = await response.json();
       
-      return { success: true };
+      if (data.success) {
+        localStorage.setItem('authToken', data.token);
+        setUser(data.user);
+      }
+      
+      return { 
+        success: data.success, 
+        error: data.success ? null : (data.error || 'Password reset failed') 
+      };
     } catch (error) {
       console.error('Password reset failed:', error);
       return { 
@@ -158,6 +252,7 @@ export function AuthProvider({ children }) {
     user,
     loading,
     login,
+    googleLogin,
     signup,
     logout,
     requestPasswordReset,
