@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import asyncHandler from '../utils/asyncHandler.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import User from '../models/userModel.js';
+import { sendPasswordResetEmail, sendPasswordResetSuccessEmail } from '../utils/emailService.js';
 
 // Initialize Google OAuth client
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -255,25 +256,74 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  // In a real application, you would send an email with the reset token
-  // For now, we'll just return it in the response
-  res.status(200).json({
-    success: true,
-    data: {
+  // Create reset URL
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+
+  try {
+    // Send email using Brevo
+    const emailResult = await sendPasswordResetEmail(
+      user.email,
+      user.fullName,
       resetToken,
-    },
-  });
+      resetUrl
+    );
+
+    if (!emailResult.success) {
+      console.log('Email service error:', emailResult.error);
+      
+      // In development, allow password reset without email
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Development mode: Returning reset token in response');
+        return res.status(200).json({
+          success: true,
+          message: 'Email service is not configured. In development mode only:',
+          data: {
+            resetToken,
+            resetUrl
+          }
+        });
+      }
+      
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      return next(new ErrorResponse('Email could not be sent', 500));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset email sent'
+    });
+  } catch (err) {
+    console.error('Password reset email error:', err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse('Email could not be sent', 500));
+  }
 });
 
 // @desc    Reset password
 // @route   PUT /api/v1/auth/resetpassword/:resettoken
 // @access  Public
 export const resetPassword = asyncHandler(async (req, res, next) => {
+  console.log('Reset password request received');
+  console.log('Token from params:', req.params.resettoken);
+  
   // Get hashed token
   const resetPasswordToken = crypto
     .createHash('sha256')
     .update(req.params.resettoken)
     .digest('hex');
+
+  console.log('Hashed token:', resetPasswordToken);
+  
+  // Check if password is provided
+  if (!req.body.password) {
+    return next(new ErrorResponse('Please provide a new password', 400));
+  }
 
   const user = await User.findOne({
     resetPasswordToken,
@@ -281,16 +331,35 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new ErrorResponse('Invalid token', 400));
+    console.log('Invalid or expired token');
+    return next(new ErrorResponse('Invalid or expired token', 400));
   }
+
+  console.log('User found:', user.email);
 
   // Set new password
   user.password = req.body.password;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
-  await user.save();
+  
+  try {
+    await user.save();
+    console.log('Password updated successfully');
+    
+    // Send confirmation email
+    try {
+      await sendPasswordResetSuccessEmail(user.email, user.fullName);
+      console.log('Password reset confirmation email sent');
+    } catch (err) {
+      console.error('Password reset success email error:', err);
+      // Continue even if confirmation email fails
+    }
 
-  sendTokenResponse(user, 200, res);
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    console.error('Error saving user:', err);
+    return next(new ErrorResponse('Error updating password', 500));
+  }
 });
 
 // Helper function to get token from model, create cookie and send response
