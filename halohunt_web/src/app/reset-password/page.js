@@ -1,14 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Check, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Image from 'next/image';
 
-const ResetPasswordPage = () => {
+const ResetPasswordPage = ({ initialToken }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -19,31 +18,22 @@ const ResetPasswordPage = () => {
   const [tokenValid, setTokenValid] = useState(true);
   const [tokenChecked, setTokenChecked] = useState(false);
 
-  // Get token from URL
-  const token = searchParams.get('token');
+  // Use the token passed as prop
+  const token = initialToken;
   
   const { resetPassword } = useAuth();
 
   useEffect(() => {
-    // Validate token (in a real app, this would be an API call)
-    const validateToken = async () => {
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // For demo purposes, we'll consider the token valid if it exists
-        if (!token) {
-          setTokenValid(false);
-        }
-        
-        setTokenChecked(true);
-      } catch (error) {
-        setTokenValid(false);
-        setTokenChecked(true);
-      }
-    };
+    // Validate token exists
+    if (!token) {
+      setTokenValid(false);
+      setTokenChecked(true);
+      return;
+    }
     
-    validateToken();
+    // Token exists, consider it valid initially
+    // The actual validation will happen when user submits the form
+    setTokenChecked(true);
   }, [token]);
 
   const handleSubmit = async (e) => {
@@ -74,8 +64,16 @@ const ResetPasswordPage = () => {
       if (result.success) {
         // Show success state
         setSuccess(true);
+        // Automatically redirect to login after 3 seconds
+        setTimeout(() => {
+          router.push('/login');
+        }, 3000);
       } else {
-        setError(result.error || 'An error occurred. Please try again.');
+        if (result.error?.includes('Invalid token') || result.error?.includes('expired')) {
+          setTokenValid(false);
+        } else {
+          setError(result.error || 'An error occurred. Please try again.');
+        }
       }
     } catch (err) {
       setError('An error occurred. Please try again.');

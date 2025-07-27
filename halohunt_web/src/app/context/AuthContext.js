@@ -205,12 +205,14 @@ export function AuthProvider({ children }) {
       
       return { 
         success: data.success, 
+        message: data.success ? 'Password reset email sent successfully. Please check your inbox.' : (data.error || 'Password reset request failed'),
         error: data.success ? null : (data.error || 'Password reset request failed') 
       };
     } catch (error) {
       console.error('Password reset request failed:', error);
       return { 
         success: false, 
+        message: 'Password reset request failed. Please try again.',
         error: error.message || 'Password reset request failed. Please try again.' 
       };
     }
@@ -219,7 +221,11 @@ export function AuthProvider({ children }) {
   // Reset password function
   const resetPassword = async (token, newPassword) => {
     try {
-      const response = await fetch(`${API_URL}/api/v1/auth/resetpassword/${token}`, {
+      console.log(`Sending reset password request for token: ${token}`);
+      const url = `${API_URL}/api/v1/auth/resetpassword/${token}`;
+      console.log(`Request URL: ${url}`);
+      
+      const response = await fetch(url, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -227,7 +233,31 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ password: newPassword })
       });
       
+      if (!response.ok) {
+        console.error('Reset password API error:', response.status);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        
+        try {
+          // Try to parse as JSON
+          const errorData = JSON.parse(errorText);
+          return { 
+            success: false, 
+            message: errorData.error || `API error (${response.status})`, 
+            error: errorData.error || `API error (${response.status})` 
+          };
+        } catch (e) {
+          // Not JSON, return as text
+          return { 
+            success: false, 
+            message: `API error (${response.status}): ${errorText.substring(0, 100)}...`, 
+            error: `API error (${response.status}): ${errorText.substring(0, 100)}...` 
+          };
+        }
+      }
+      
       const data = await response.json();
+      console.log('Reset password response:', data);
       
       if (data.success) {
         localStorage.setItem('authToken', data.token);
@@ -236,12 +266,14 @@ export function AuthProvider({ children }) {
       
       return { 
         success: data.success, 
+        message: data.success ? 'Password reset successful. You can now log in with your new password.' : (data.error || 'Password reset failed'),
         error: data.success ? null : (data.error || 'Password reset failed') 
       };
     } catch (error) {
       console.error('Password reset failed:', error);
       return { 
         success: false, 
+        message: 'Password reset failed. Please try again.',
         error: error.message || 'Password reset failed. Please try again.' 
       };
     }

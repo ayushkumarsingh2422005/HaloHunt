@@ -36,7 +36,7 @@ const ForgotPasswordPage = () => {
         // Show success state
         setSubmitted(true);
       } else {
-        setError(result.error || 'An error occurred. Please try again.');
+        setError(result.message || 'An error occurred. Please try again.');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
