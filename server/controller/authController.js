@@ -200,9 +200,29 @@ export const logout = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/updatedetails
 // @access  Private
 export const updateDetails = asyncHandler(async (req, res, next) => {
-  const fieldsToUpdate = {
-    fullName: req.body.fullName,
-  };
+  // Fields that are allowed to be updated
+  const allowedFields = [
+    'fullName',
+    'bio',
+    'location',
+    'phone',
+    'socialLinks',
+    'coverImage'
+  ];
+  
+  // Create an object with only allowed fields from the request body
+  const fieldsToUpdate = {};
+  
+  for (const field of allowedFields) {
+    if (req.body[field] !== undefined) {
+      fieldsToUpdate[field] = req.body[field];
+    }
+  }
+  
+  // If no fields to update, return error
+  if (Object.keys(fieldsToUpdate).length === 0) {
+    return next(new ErrorResponse('No fields to update', 400));
+  }
 
   const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
     new: true,

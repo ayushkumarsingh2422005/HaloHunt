@@ -16,11 +16,11 @@ export default function Hero() {
         <div className="absolute top-40 right-20 h-96 w-96 rounded-full bg-pink-50 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         <div className="absolute bottom-20 left-1/3 h-64 w-64 rounded-full bg-blue-50 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
       </div>
-      
+
       <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 pt-20 pb-16">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center min-h-[80vh]">
           {/* Left Content */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -37,36 +37,35 @@ export default function Hero() {
                 Coming Soon - Join the Waitlist
               </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="mb-6 text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl md:text-7xl"
+              className="mb-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl md:text-6xl"
             >
-              <span className="block">The Future of</span>
-              <span className="block bg-gradient-to-r from-halo-purple to-halo-purple-dark bg-clip-text text-transparent animate-gradient">
-                Live Commerce
+              <span className="block">Shop, Sell, and Connect</span>
+              <span className="block bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+                LIVE with HaloHunt
               </span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
               className="mb-8 text-xl text-gray-600 sm:text-2xl leading-relaxed"
             >
-              HaloHunt is revolutionizing how we shop online. Go live, showcase products in real-time, 
-              and sell instantly with our cutting-edge live commerce platform.
+              HaloHunt is transforming online shopping into a live show for everyone! Buyers can watch, engage, and buy as sellers showcase products in real time. Instantly connect, discover, and grow-on India’s most innovative live commerce platform.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 mb-8"
             >
-              <button 
+              <button
                 onClick={() => {
                   const element = document.getElementById('newsletter');
                   if (element) element.scrollIntoView({ behavior: 'smooth' });
@@ -78,7 +77,7 @@ export default function Hero() {
                   <BsArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
-              <button 
+              <button
                 onClick={() => {
                   const element = document.getElementById('newsletter');
                   if (element) element.scrollIntoView({ behavior: 'smooth' });
@@ -91,8 +90,8 @@ export default function Hero() {
                 </span>
               </button>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.8 }}
@@ -112,9 +111,9 @@ export default function Hero() {
               </div>
             </motion.div>
           </motion.div>
-          
+
           {/* Right Content - Platform Preview */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
@@ -132,7 +131,7 @@ export default function Hero() {
                       </div>
                       <span className="text-gray-900 font-bold text-lg">HaloHunt</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <FaBell className="text-gray-600 text-lg" />
@@ -143,7 +142,7 @@ export default function Hero() {
                       <div className="w-8 h-8 rounded-full bg-gray-200"></div>
                     </div>
                   </div>
-                  
+
                   {/* Search Bar */}
                   <div className="absolute top-20 left-4 right-4">
                     <div className="relative">
@@ -155,14 +154,14 @@ export default function Hero() {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Product Category Cards */}
                   <div className="absolute top-32 left-4 right-4 space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-lg font-semibold text-gray-900">Featured Categories</h3>
                       <span className="text-halo-purple text-sm font-medium">View All &gt;</span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-4">
                       {[
                         { title: "Smart Watches", discount: "40% OFF", price: "From ₹1,999", bg: "bg-blue-100", image: "⌚" },
@@ -198,9 +197,9 @@ export default function Hero() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Floating elements */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.8, duration: 0.8 }}
@@ -215,8 +214,8 @@ export default function Hero() {
                   </div>
                 </div>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2, duration: 0.8 }}

@@ -35,6 +35,33 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'https://randomuser.me/api/portraits/lego/5.jpg',
     },
+    avatarKey: {
+      type: String, // S3 key for the avatar image
+    },
+    bio: {
+      type: String,
+      maxlength: [500, 'Bio cannot be more than 500 characters'],
+    },
+    location: {
+      type: String,
+      maxlength: [100, 'Location cannot be more than 100 characters'],
+    },
+    phone: {
+      type: String,
+      maxlength: [20, 'Phone number cannot be more than 20 characters'],
+    },
+    socialLinks: {
+      instagram: String,
+      twitter: String,
+      website: String,
+    },
+    coverImage: {
+      type: String,
+      default: 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=1200&h=400&fit=crop',
+    },
+    coverImageKey: {
+      type: String, // S3 key for the cover image
+    },
     googleId: {
       type: String,
       unique: true,

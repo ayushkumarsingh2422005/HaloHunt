@@ -279,6 +279,122 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Update profile function
+  const updateProfile = async (profileData) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        return { 
+          success: false, 
+          message: 'Authentication required. Please log in.',
+          error: 'Authentication required' 
+        };
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/auth/updatedetails`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Profile update error:', errorText);
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          return { 
+            success: false, 
+            message: errorData.error || `API error (${response.status})`, 
+            error: errorData.error || `API error (${response.status})` 
+          };
+        } catch (e) {
+          return { 
+            success: false, 
+            message: `API error (${response.status})`, 
+            error: `API error (${response.status})` 
+          };
+        }
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.data);
+        return { 
+          success: true, 
+          message: 'Profile updated successfully',
+          data: data.data
+        };
+      } else {
+        return { 
+          success: false, 
+          message: data.error || 'Failed to update profile',
+          error: data.error || 'Failed to update profile'
+        };
+      }
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      return { 
+        success: false, 
+        message: 'Failed to update profile. Please try again.',
+        error: error.message || 'Failed to update profile'
+      };
+    }
+  };
+
+  // Update avatar function
+  const updateAvatar = async (avatarUrl) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        return { 
+          success: false, 
+          message: 'Authentication required. Please log in.',
+          error: 'Authentication required' 
+        };
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/auth/updateavatar`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ avatar: avatarUrl })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.data);
+        return { 
+          success: true, 
+          message: 'Avatar updated successfully',
+          data: data.data
+        };
+      } else {
+        return { 
+          success: false, 
+          message: data.error || 'Failed to update avatar',
+          error: data.error || 'Failed to update avatar'
+        };
+      }
+    } catch (error) {
+      console.error('Avatar update failed:', error);
+      return { 
+        success: false, 
+        message: 'Failed to update avatar. Please try again.',
+        error: error.message || 'Failed to update avatar'
+      };
+    }
+  };
+
   // Auth context value
   const value = {
     user,
@@ -289,6 +405,8 @@ export function AuthProvider({ children }) {
     logout,
     requestPasswordReset,
     resetPassword,
+    updateProfile,
+    updateAvatar,
     isAuthenticated: !!user
   };
 

@@ -87,20 +87,13 @@ export default function ProfilePage() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
-
   // Default placeholder data for fields not available in the user object
   const defaultUserData = {
     username: user ? `@${user?.fullName?.toLowerCase().replace(/\s+/g, '') || 'user'}` : '@user',
     bio: "No bio available",
     coverImage: "https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=1200&h=400&fit=crop",
     location: "Not specified",
-    joinedDate: user ? new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently",
+    joinedDate: user ? new Date(user?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently",
     isSeller: user?.role === 'seller',
     listingsCount: 0,
     livesCount: 0,
@@ -115,8 +108,34 @@ export default function ProfilePage() {
       totalViews: 0,
       totalLikes: 0,
       averageRating: 0
-    }
+    },
+    avatar: "https://ui-avatars.com/api/?name=User&background=EEE&color=888",
+    fullName: "User",
+    email: "No email"
   };
+
+  // Helper to get user data with fallback to default
+  const getUserData = (key) => {
+    if (!user || user[key] === undefined || user[key] === null || user[key] === "") {
+      return defaultUserData[key];
+    }
+    return user[key];
+  };
+
+  // Helper for nested stats
+  const getUserStat = (statKey) => {
+    if (!user || !user.stats || user.stats[statKey] === undefined || user.stats[statKey] === null) {
+      return defaultUserData.stats[statKey];
+    }
+    return user.stats[statKey];
+  };
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
 
   // Sample products data - would be fetched from API in a real app
   const products = [
@@ -224,6 +243,7 @@ export default function ProfilePage() {
 
   const handleEditProfile = () => {
     console.log('Edit profile clicked');
+    router.push('/profile/edit');
   };
 
   const handleLogout = async () => {
@@ -248,8 +268,8 @@ export default function ProfilePage() {
       <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
         <div className="relative aspect-[3/4] bg-gray-100">
           <img 
-            src={product.image} 
-            alt={product.name} 
+            src={product.image || "https://via.placeholder.com/300x400?text=No+Image"} 
+            alt={product.name || "Product"}
             className="w-full h-full object-cover"
           />
           <button className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm hover:bg-gray-100">
@@ -257,7 +277,7 @@ export default function ProfilePage() {
           </button>
         </div>
         <div className="p-3">
-          <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+          <h3 className="text-sm font-medium text-gray-900 truncate">{product.name || "Product"}</h3>
           <div className="flex items-center justify-between mt-1">
             <div className="flex items-baseline gap-1">
               {product.discountPrice ? (
@@ -271,9 +291,9 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center text-xs text-gray-500">
               <span className="text-yellow-400">★</span>
-              <span>{product.rating}</span>
+              <span>{product.rating || 0}</span>
               <span className="mx-1">·</span>
-              <span>{product.reviews} reviews</span>
+              <span>{product.reviews || 0} reviews</span>
             </div>
           </div>
         </div>
@@ -287,29 +307,29 @@ export default function ProfilePage() {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
           <div className="relative aspect-video bg-gray-100">
             <img 
-              src={live.thumbnail} 
-              alt={live.title} 
+              src={live.thumbnail || "https://via.placeholder.com/600x400?text=No+Thumbnail"} 
+              alt={live.title || "Live"}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
             <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
               <Video className="w-3 h-3" />
-              {live.duration}
+              {live.duration || "00:00:00"}
             </div>
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
               <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
                 <User className="w-3 h-3" />
-                {live.views.toLocaleString()}
+                {(live.views !== undefined && live.views !== null) ? live.views.toLocaleString() : "0"}
               </div>
               <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
                 <Heart className="w-3 h-3" />
-                {live.likes.toLocaleString()}
+                {(live.likes !== undefined && live.likes !== null) ? live.likes.toLocaleString() : "0"}
               </div>
             </div>
           </div>
           <div className="p-3">
-            <h3 className="text-sm font-medium text-gray-900 truncate">{live.title}</h3>
-            <p className="text-xs text-gray-500 mt-1">{live.date}</p>
+            <h3 className="text-sm font-medium text-gray-900 truncate">{live.title || "Live"}</h3>
+            <p className="text-xs text-gray-500 mt-1">{live.date || "Unknown date"}</p>
           </div>
         </div>
       </Link>
@@ -338,13 +358,13 @@ export default function ProfilePage() {
             <div className="py-6 border-b border-gray-100">
               <div className="flex items-center gap-4">
                 <img
-                  src={user?.avatar || defaultUserData.avatar}
-                  alt={user?.fullName || "User"}
+                  src={getUserData('avatar')}
+                  alt={getUserData('fullName')}
                   className="w-16 h-16 rounded-full object-cover border-4 border-purple-100"
                 />
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900">{user?.fullName || "User"}</h2>
-                  <p className="text-sm text-gray-500">{user?.email || "No email"}</p>
+                  <h2 className="text-lg font-medium text-gray-900">{getUserData('fullName')}</h2>
+                  <p className="text-sm text-gray-500">{getUserData('email')}</p>
                 </div>
               </div>
             </div>
@@ -392,8 +412,8 @@ export default function ProfilePage() {
       {/* Cover Image */}
       <div className="relative h-48 sm:h-64 md:h-80 bg-gray-200 overflow-hidden">
         <img 
-          src={defaultUserData.coverImage} 
-          alt={`${user?.fullName || "User"}'s cover`}
+          src={getUserData('coverImage')}
+          alt={`${getUserData('fullName')}'s cover`}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -407,35 +427,39 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md overflow-hidden -mt-16 sm:-mt-20 bg-white">
                 <img 
-                  src={user?.avatar || defaultUserData.avatar}
-                  alt={user?.fullName || "User"}
+                  src={getUserData('avatar')}
+                  alt={getUserData('fullName')}
                   className="w-full h-full object-cover"
                 />
               </div>
               
               {/* User Info */}
               <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{user?.fullName || "User"}</h1>
-                <p className="text-sm text-gray-500 mb-2">{defaultUserData.username}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{getUserData('fullName')}</h1>
+                <p className="text-sm text-gray-500 mb-2">{getUserData('username')}</p>
                 
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-xs text-gray-600">
                   <div className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    <span>{defaultUserData.location}</span>
+                    <span>{getUserData('location')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    <span>Joined {defaultUserData.joinedDate}</span>
+                    <span>
+                      Joined {user && user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                        : defaultUserData.joinedDate}
+                    </span>
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
                   <div>
-                    <span className="font-bold text-gray-900">{defaultUserData.livesCount}</span>
+                    <span className="font-bold text-gray-900">{getUserData('livesCount')}</span>
                     <span className="text-gray-600 ml-1">Lives</span>
                   </div>
                   <div>
-                    <span className="font-bold text-gray-900">{defaultUserData.listingsCount}</span>
+                    <span className="font-bold text-gray-900">{getUserData('listingsCount')}</span>
                     <span className="text-gray-600 ml-1">Products</span>
                   </div>
                 </div>
@@ -469,11 +493,17 @@ export default function ProfilePage() {
             {/* Bio */}
             <div className="mt-4 border-t border-gray-100 pt-4">
               <p className="text-sm text-gray-700">
-                {showAllBio || defaultUserData.bio.length <= 150 
-                  ? defaultUserData.bio 
-                  : `${defaultUserData.bio.substring(0, 150)}...`}
+                {(() => {
+                  const bio = getUserData('bio');
+                  if (!bio) return defaultUserData.bio;
+                  if (showAllBio || bio.length <= 150) return bio;
+                  return `${bio.substring(0, 150)}...`;
+                })()}
               </p>
-              {defaultUserData.bio.length > 150 && (
+              {(() => {
+                const bio = getUserData('bio');
+                return bio && bio.length > 150;
+              })() && (
                 <button 
                   onClick={() => setShowAllBio(!showAllBio)}
                   className="text-xs text-purple-600 font-medium mt-1 flex items-center"
@@ -495,15 +525,15 @@ export default function ProfilePage() {
             <div className="mt-4 border-t border-gray-100 pt-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.totalViews.toLocaleString()}</div>
+                  <div className="text-lg font-bold text-gray-900">{getUserStat('totalViews').toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Total Views</div>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.totalLikes.toLocaleString()}</div>
+                  <div className="text-lg font-bold text-gray-900">{getUserStat('totalLikes').toLocaleString()}</div>
                   <div className="text-xs text-gray-500">Total Likes</div>
                 </div>
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-lg font-bold text-gray-900">{defaultUserData.stats.averageRating}</div>
+                  <div className="text-lg font-bold text-gray-900">{getUserStat('averageRating')}</div>
                   <div className="text-xs text-gray-500">Avg. Rating</div>
                 </div>
               </div>
