@@ -7,11 +7,13 @@ import {
   Settings, Warehouse, Shield, CreditCard,
   MessageSquare, ChevronRight, UserCheck,
   MapPin, Calendar, Instagram, Twitter, Globe,
-  Edit, ChevronUp
+  Edit, ChevronUp, MoreVertical, Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import LiveModel from '../../components/liveModel';
+import { streamService } from '../services/streamService';
 
 const TabButton = ({ active, icon: Icon, children, onClick }) => {
   return (
@@ -84,6 +86,29 @@ export default function ProfilePage() {
   const [showMenu, setShowMenu] = useState(false);
   const [showFullMenu, setShowFullMenu] = useState(false);
   const [showAllBio, setShowAllBio] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showLiveModal, setShowLiveModal] = useState(false);
+  const [liveStreamSuccess, setLiveStreamSuccess] = useState(false);
+  const [userStreams, setUserStreams] = useState([]);
+  const [loadingStreams, setLoadingStreams] = useState(false);
+  const [editingStream, setEditingStream] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdown && !event.target.closest('.dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [openDropdown]);
   const { user, logout, loading } = useAuth();
   const router = useRouter();
 
@@ -136,6 +161,28 @@ export default function ProfilePage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  // Fetch user streams
+  const fetchUserStreams = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingStreams(true);
+      const result = await streamService.getMyStreams();
+      setUserStreams(result.data || []);
+    } catch (error) {
+      console.error('Error fetching user streams:', error);
+    } finally {
+      setLoadingStreams(false);
+    }
+  };
+
+  // Fetch streams when user is loaded
+  useEffect(() => {
+    if (user) {
+      fetchUserStreams();
+    }
+  }, [user]);
 
   // Sample products data - would be fetched from API in a real app
   const products = [
@@ -208,13 +255,6 @@ export default function ProfilePage() {
     }
   ];
 
-  const menuItems = [
-    { icon: Heart, label: 'Favorites', href: '/favorites' },
-    { icon: Bell, label: 'Notifications', href: '/notifications' },
-    { icon: HelpCircle, label: 'Help & Support', href: '/support' },
-    { icon: LogOut, label: 'Sign Out', onClick: () => handleLogout() },
-  ];
-
   const fullMenuOptions = [
     { icon: ShoppingBag, label: 'My Orders', href: '/profile/orders' },
     { icon: Store, label: 'My Sales', href: '/profile/sales' },
@@ -232,13 +272,60 @@ export default function ProfilePage() {
     { icon: LogOut, label: 'Logout', onClick: () => handleLogout() }
   ];
 
-  const handleStartStream = () => {
-    console.log('Start stream clicked');
-    router.push('/live/host');
-  };
-
   const handleAddProduct = () => {
     console.log('Add product clicked');
+  };
+
+  const handleLiveModalSubmit = async (formData) => {
+    try {
+      console.log('Live stream data:', formData);
+      
+      if (editingStream) {
+        // Update existing stream
+        const result = await streamService.updateStream(editingStream._id, formData);
+        console.log('Live stream updated successfully!', result);
+        setLiveStreamSuccess(true);
+        setEditingStream(null);
+      } else {
+        // Create new stream
+        const result = await streamService.createStream(formData);
+        console.log('Live stream created successfully!', result);
+        setLiveStreamSuccess(true);
+      }
+      
+      // Refresh the streams list
+      await fetchUserStreams();
+      
+    } catch (error) {
+      console.error('Error saving live stream:', error);
+      alert(`Failed to save live stream: ${error.message}`);
+      throw error; // Re-throw to prevent modal from closing
+    }
+  };
+
+  const handleEditStream = (stream) => {
+    console.log('handleEditStream called with stream:', stream);
+    setEditingStream(stream);
+    setShowLiveModal(true);
+    setOpenDropdown(null); // Close dropdown
+  };
+
+  const handleDeleteStream = async (streamId) => {
+    if (window.confirm('Are you sure you want to delete this stream? This action cannot be undone.')) {
+      try {
+        await streamService.deleteStream(streamId);
+        console.log('Stream deleted successfully!');
+        await fetchUserStreams(); // Refresh the streams list
+      } catch (error) {
+        console.error('Error deleting stream:', error);
+        alert(`Failed to delete stream: ${error.message}`);
+      }
+    }
+    setOpenDropdown(null); // Close dropdown
+  };
+
+  const handleStreamClick = (streamId) => {
+    router.push(`/live/host/${streamId}`);
   };
 
   const handleEditProfile = () => {
@@ -294,17 +381,100 @@ export default function ProfilePage() {
               <span>{product.rating || 0}</span>
               <span className="mx-1">·</span>
               <span>{product.reviews || 0} reviews</span>
-            </div>
-          </div>
+                      </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   const LiveCard = ({ live }) => {
+    // Format date for display
+    const formatDate = (dateString) => {
+      if (!dateString) return "Unknown date";
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1) return "Today";
+      if (diffDays === 2) return "Yesterday";
+      if (diffDays <= 7) return `${diffDays - 1} days ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // Format duration
+    const formatDuration = (duration) => {
+      if (!duration) return "00:00:00";
+      const minutes = Math.floor(duration / 60);
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      const seconds = duration % 60;
+      
+      if (hours > 0) {
+        return `${hours}:${remainingMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
+      return `${remainingMinutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    // Get status badge color
+    const getStatusColor = (status) => {
+      switch (status) {
+        case 'live': return 'bg-red-500';
+        case 'scheduled': return 'bg-blue-500';
+        case 'ended': return 'bg-gray-500';
+        default: return 'bg-gray-400';
+      }
+    };
+
+    const isDropdownOpen = openDropdown === live._id;
+
     return (
-      <Link href={`/live/${live.id}`} className="block">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow relative">
+        {/* Three-dot menu */}
+        <div className="absolute top-2 right-2 z-10 dropdown-container">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdown(isDropdownOpen ? null : live._id);
+            }}
+            className="p-1.5 bg-black/70 hover:bg-black/90 text-white rounded-full transition-colors"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          
+          {/* Dropdown menu */}
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-20 dropdown-container">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditStream(live);
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <Edit className="w-4 h-4" />
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteStream(live._id);
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Clickable card content */}
+        <div 
+          onClick={() => handleStreamClick(live._id)}
+          className="cursor-pointer"
+        >
           <div className="relative aspect-video bg-gray-100">
             <img 
               src={live.thumbnail || "https://via.placeholder.com/600x400?text=No+Thumbnail"} 
@@ -312,27 +482,54 @@ export default function ProfilePage() {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
-              <Video className="w-3 h-3" />
-              {live.duration || "00:00:00"}
+            
+            {/* Status Badge */}
+            <div className="absolute top-2 left-2">
+              <span className={`${getStatusColor(live.status)} text-white px-2 py-1 rounded-full text-xs font-medium shadow`}>
+                {live.status}
+              </span>
             </div>
+            
+            {/* Duration */}
+            {live.duration && (
+              <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
+                <Video className="w-3 h-3" />
+                {formatDuration(live.duration)}
+              </div>
+            )}
+            
+            {/* Stats */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
               <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
                 <User className="w-3 h-3" />
-                {(live.views !== undefined && live.views !== null) ? live.views.toLocaleString() : "0"}
+                {(live.viewerCount !== undefined && live.viewerCount !== null) ? live.viewerCount.toLocaleString() : "0"}
               </div>
               <div className="flex items-center gap-1 bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow">
                 <Heart className="w-3 h-3" />
-                {(live.likes !== undefined && live.likes !== null) ? live.likes.toLocaleString() : "0"}
+                {(live.likesCount !== undefined && live.likesCount !== null) ? live.likesCount.toLocaleString() : "0"}
               </div>
             </div>
           </div>
           <div className="p-3">
             <h3 className="text-sm font-medium text-gray-900 truncate">{live.title || "Live"}</h3>
-            <p className="text-xs text-gray-500 mt-1">{live.date || "Unknown date"}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {live.scheduledAt ? formatDate(live.scheduledAt) : formatDate(live.createdAt)}
+            </p>
+            {live.hashtags && live.hashtags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {live.hashtags.slice(0, 3).map((hashtag, index) => (
+                  <span key={index} className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                    #{hashtag}
+                  </span>
+                ))}
+                {live.hashtags.length > 3 && (
+                  <span className="text-xs text-gray-500">+{live.hashtags.length - 3} more</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </Link>
+      </div>
     );
   };
 
@@ -381,6 +578,29 @@ export default function ProfilePage() {
                 />
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {liveStreamSuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mx-4 mt-4 max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-green-800">Live stream created successfully!</p>
+              <p className="text-xs text-green-600">Your stream is now ready to go live.</p>
+            </div>
+            <button
+              onClick={() => setLiveStreamSuccess(false)}
+              className="ml-auto text-green-400 hover:text-green-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -468,14 +688,14 @@ export default function ProfilePage() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 sm:self-start sm:ml-auto">
                 <button 
-                  onClick={handleStartStream}
+                  onClick={() => setShowLiveModal(true)}
                   className="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 flex items-center gap-2"
                 >
                   <Video className="w-4 h-4" />
-                  <span>Start Stream</span>
+                  <span>Go Live</span>
                 </button>
                 <button 
-                  onClick={handleAddProduct}
+                  onClick={() => setShowAddProductModal(true)}
                   className="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
                 >
                   <ShoppingBag className="w-4 h-4" />
@@ -571,17 +791,39 @@ export default function ProfilePage() {
             {activeTab === 'lives' && (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-medium text-gray-900">My Lives ({pastLives.length})</h2>
+                  <h2 className="text-lg font-medium text-gray-900">
+                    My Lives ({userStreams.length})
+                    {loadingStreams && <span className="text-sm text-gray-500 ml-2">Loading...</span>}
+                  </h2>
                   <div className="flex items-center gap-2">
                     {/* Add filters or sorting options here */}
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {pastLives.map(live => (
-                    <LiveCard key={live.id} live={live} />
-                  ))}
-                </div>
+                {loadingStreams ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="w-8 h-8 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                    <span className="ml-2 text-gray-600">Loading streams...</span>
+                  </div>
+                ) : userStreams.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No streams yet</h3>
+                    <p className="text-gray-500 mb-4">Start your first live stream to see it here</p>
+                    <button
+                      onClick={() => setShowLiveModal(true)}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Create Your First Stream
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {userStreams.map(stream => (
+                      <LiveCard key={stream._id} live={stream} />
+                    ))}
+                  </div>
+                )}
               </>
             )}
             
@@ -604,6 +846,18 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Live Model */}
+      <LiveModel
+        isOpen={showLiveModal}
+        onClose={() => {
+          setShowLiveModal(false);
+          setEditingStream(null);
+        }}
+        onSubmit={handleLiveModalSubmit}
+        initialData={editingStream}
+        mode={editingStream ? "edit" : "create"}
+      />
     </div>
   );
 } 

@@ -61,6 +61,36 @@ export const getCoverUploadUrl = async (fileType) => {
 };
 
 /**
+ * Get a presigned URL for uploading a stream thumbnail to S3
+ * @param {string} fileType - MIME type of the file
+ * @returns {Promise<Object>} - Object containing uploadUrl, key, and fileUrl
+ */
+export const getThumbnailUploadUrl = async (fileType) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await fetch(`${API_URL}/api/v1/media/thumbnail-upload-url?fileType=${encodeURIComponent(fileType)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get upload URL: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error getting thumbnail upload URL:', error);
+    throw error;
+  }
+};
+
+/**
  * Upload a file to S3 using a presigned URL
  * @param {string} presignedUrl - Presigned URL for uploading
  * @param {File} file - File to upload
@@ -155,10 +185,45 @@ export const updateUserCover = async (fileUrl, key) => {
   }
 };
 
+/**
+ * Delete an orphaned thumbnail from S3
+ * @param {string} key - S3 key of the thumbnail to delete
+ * @returns {Promise<Object>} - Response from the server
+ */
+export const deleteThumbnail = async (key) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await fetch(`${API_URL}/api/v1/media/thumbnail`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ key })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete thumbnail: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting thumbnail:', error);
+    throw error;
+  }
+};
+
 export default {
   getAvatarUploadUrl,
   getCoverUploadUrl,
+  getThumbnailUploadUrl,
   uploadFileToS3,
   updateUserAvatar,
-  updateUserCover
+  updateUserCover,
+  deleteThumbnail
 }; 

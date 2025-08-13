@@ -9,6 +9,9 @@ import {
   X, ExternalLink, DollarSign, Video
 } from 'lucide-react';
 import Image from 'next/image';
+import { ZegoExpressEngine } from 'zego-express-engine-webrtc';
+import { useAuth } from '@/app/context/AuthContext';
+import { streamService } from '@/app/services/streamService';
 
 // Dummy data for the live stream
 const DUMMY_LIVE_DATA = {
@@ -197,8 +200,12 @@ export default function LiveStreamPage() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
+  const { user } = useAuth();
+  const ZEGO_APP_ID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID || '0', 10);
+  const ZEGO_SERVER = process.env.NEXT_PUBLIC_ZEGO_SERVER;
 
   const [liveData, setLiveData] = useState(DUMMY_LIVE_DATA);
+  const [streamData, setStreamData] = useState(null);
   const [products, setProducts] = useState(DUMMY_PRODUCTS);
   const [chatMessages, setChatMessages] = useState(DUMMY_CHAT_MESSAGES);
   const [newMessage, setNewMessage] = useState('');
@@ -208,10 +215,141 @@ export default function LiveStreamPage() {
   const [showStreamInfo, setShowStreamInfo] = useState(true);
   const [showAboutInfo, setShowAboutInfo] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [zegoClient, setZegoClient] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const chatContainerRef = useRef(null);
   const videoRef = useRef(null);
   const mobileChatContainerRef = useRef(null);
+  const remoteMobileContainerRef = useRef(null);
+  const remoteDesktopContainerRef = useRef(null);
+  const [playError, setPlayError] = useState(null);
+  const isLive = streamData?.status === 'live';
+  const isEnded = streamData?.status === 'ended';
+
+  // Fetch real stream data
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await streamService.getStream(id);
+        setStreamData(res.data);
+        setLiveData(prev => ({
+          ...prev,
+          title: res.data.title || prev.title,
+          description: res.data.description || prev.description,
+          host: {
+            id: res.data.userId?._id || prev.host.id,
+            name: res.data.userId?.fullName || prev.host.name,
+            image: prev.host.image,
+            followers: prev.host.followers,
+            verified: prev.host.verified
+          },
+          stats: {
+            ...prev.stats,
+            viewers: res.data.viewerCount ?? prev.stats.viewers,
+            likes: res.data.likesCount ?? prev.stats.likes
+          },
+          startedAt: res.data.startedAt || prev.startedAt,
+          tags: Array.isArray(res.data.hashtags) && res.data.hashtags.length ? res.data.hashtags : prev.tags,
+          about: res.data.aboutThisStream
+        }));
+      } catch (e) {
+        // ignore for now
+      }
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  const fetchZegoToken = async (loginUserId) => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    if (!authToken) throw new Error('Authentication token not found');
+    const res = await fetch(`${API_BASE_URL}/api/v1/zego/token?userID=${encodeURIComponent(loginUserId)}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch token');
+    return data.token;
+  };
+
+  // Start playing when stream is live and we have data
+  useEffect(() => {
+    const start = async () => {
+      if (!streamData || streamData.status !== 'live') return;
+      if (!ZEGO_APP_ID || !ZEGO_SERVER) return;
+      try {
+        let zg = zegoClient;
+        if (!zg) {
+          zg = new ZegoExpressEngine(ZEGO_APP_ID, ZEGO_SERVER);
+          setZegoClient(zg);
+        }
+        try {
+          const sys = await ZegoExpressEngine.checkSystemRequirements();
+          if (!sys.webRTC) {
+            setPlayError('WebRTC not supported in this browser');
+            return;
+          }
+        } catch(_) {}
+        const roomID = streamData.userId?._id;
+        const loginUserId = user?._id || `viewer_${Math.random().toString(36).slice(2, 8)}`;
+        const userName = user?.fullName || 'Viewer';
+        const token = await fetchZegoToken(loginUserId);
+
+        await zg.loginRoom(roomID, token, { userID: loginUserId, userName }, { userUpdate: true });
+
+        const doPlay = async () => {
+          try {
+            const remoteStream = await zg.startPlayingStream(id);
+            const view = zg.createRemoteStreamView(remoteStream);
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+            const containerId = isMobile ? 'remote-video-mobile' : 'remote-video-desktop';
+            view.play(containerId, { enableAutoplayDialog: true });
+            setIsPlaying(true);
+            setPlayError(null);
+          } catch (e) {
+            setPlayError('Failed to play stream');
+          }
+        };
+
+        await doPlay();
+
+        // Also retry on room stream updates if needed
+        zg.on('roomStreamUpdate', async (rid, updateType, streamList) => {
+          if (rid === roomID && updateType === 'ADD' && !isPlaying) {
+            await doPlay();
+          }
+        });
+      } catch (e) {
+        setPlayError('Unable to start viewer');
+      }
+    };
+    start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streamData, ZEGO_APP_ID, ZEGO_SERVER]);
+
+  // Stop playback if stream ended
+  useEffect(() => {
+    if (isEnded && zegoClient) {
+      try { zegoClient.stopPlayingStream(id); } catch(_) {}
+      try { zegoClient.logoutRoom(streamData?.userId?._id); } catch(_) {}
+      setIsPlaying(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEnded]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      try {
+        if (zegoClient) {
+          try { zegoClient.stopPlayingStream(id); } catch(_) {}
+          try { zegoClient.logoutRoom(streamData?.userId?._id); } catch(_) {}
+        }
+      } catch(_) {}
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zegoClient]);
 
   // Scroll chat to bottom when new messages arrive
   useEffect(() => {
@@ -328,16 +466,31 @@ export default function LiveStreamPage() {
       {/* Sticky Video Player for Mobile */}
       <div className="lg:hidden sticky top-0 z-10 w-full bg-black">
         <div className="relative w-full aspect-video bg-black overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+          {isLive && !isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
+                <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+              </div>
             </div>
-          </div>
+          )}
+          {isEnded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="px-4 py-2 bg-gray-900/70 text-white rounded-full text-sm font-semibold">Stream ended</div>
+            </div>
+          )}
+          <div ref={remoteMobileContainerRef} id="remote-video-mobile" className="absolute inset-0" />
           <div className="absolute bottom-4 left-4 flex items-center gap-2">
-            <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
-              <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              LIVE
-            </div>
+            {isLive && (
+              <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                LIVE
+              </div>
+            )}
+            {isEnded && (
+              <div className="bg-gray-800/80 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+                ENDED
+              </div>
+            )}
             <div className="bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow flex items-center gap-1">
               <Eye className="w-3 h-3" />
               {liveData.stats.viewers.toLocaleString()}
@@ -357,16 +510,31 @@ export default function LiveStreamPage() {
           <div className="lg:col-span-2 lg:overflow-y-auto lg:pr-2" style={{ height: 'auto', maxHeight: 'calc(100vh - 2rem)' }}>
             {/* Video Player - Desktop Only */}
             <div className="hidden lg:block relative w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
-                  <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+              {isLive && !isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-purple-600/80 flex items-center justify-center">
+                    <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+                  </div>
                 </div>
-              </div>
+              )}
+              {isEnded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="px-4 py-2 bg-gray-900/70 text-white rounded-full text-sm font-semibold">Stream ended</div>
+                </div>
+              )}
+              <div ref={remoteDesktopContainerRef} id="remote-video-desktop" className="absolute inset-0" />
               <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  LIVE
-                </div>
+                {isLive && (
+                  <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    LIVE
+                  </div>
+                )}
+                {isEnded && (
+                  <div className="bg-gray-800/80 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+                    ENDED
+                  </div>
+                )}
                 <div className="bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow flex items-center gap-1">
                   <Eye className="w-3 h-3" />
                   {liveData.stats.viewers.toLocaleString()}
@@ -374,8 +542,7 @@ export default function LiveStreamPage() {
               </div>
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover"
-                poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop"
+                className="absolute inset-0 w-full h-full object-cover hidden"
               />
             </div>
 
@@ -633,15 +800,7 @@ export default function LiveStreamPage() {
               {showAboutInfo && (
                 <div className="px-4 pb-4">
                   <p className="text-sm text-gray-700 mb-3">
-                    This live shopping event showcases our latest collection with exclusive discounts for viewers.
-                    Our host will demonstrate each product and answer your questions in real-time.
-                  </p>
-                  <p className="text-sm text-gray-700 mb-3">
-                    Remember to use code SUMMER20 at checkout for 20% off featured items.
-                    Limited quantities available, so don't miss out!
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    All purchases made during the stream will be eligible for free shipping and our extended 30-day return policy.
+                    {liveData.about}
                   </p>
                 </div>
               )}

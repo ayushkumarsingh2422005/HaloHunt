@@ -131,4 +131,61 @@ export const updateCover = asyncHandler(async (req, res, next) => {
     success: true,
     data: user,
   });
+});
+
+// @desc    Generate presigned URL for stream thumbnail upload
+// @route   GET /api/v1/media/thumbnail-upload-url
+// @access  Private
+export const getThumbnailUploadUrl = asyncHandler(async (req, res, next) => {
+  const fileType = req.query.fileType || 'image/jpeg';
+  
+  // Validate file type
+  if (!fileType.startsWith('image/')) {
+    return next(new ErrorResponse('Invalid file type. Only images are allowed for thumbnails.', 400));
+  }
+
+  try {
+    const { uploadUrl, key, fileUrl } = await generateUploadUrl(fileType, 'thumbnails');
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        uploadUrl,
+        key,
+        fileUrl
+      }
+    });
+  } catch (error) {
+    console.error('Error generating thumbnail upload URL:', error);
+    return next(new ErrorResponse('Error generating upload URL', 500));
+  }
+}); 
+
+// @desc    Delete orphaned thumbnail by S3 key
+// @route   DELETE /api/v1/media/thumbnail
+// @access  Private
+export const deleteThumbnail = asyncHandler(async (req, res, next) => {
+  const { key } = req.body;
+
+  if (!key) {
+    return next(new ErrorResponse('Please provide the S3 key of the thumbnail to delete', 400));
+  }
+
+  try {
+    // Validate that the key is for a thumbnail (starts with 'thumbnails/')
+    if (!key.startsWith('thumbnails/')) {
+      return next(new ErrorResponse('Invalid thumbnail key', 400));
+    }
+
+    // Delete the file from S3
+    await deleteFile(key);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Thumbnail deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting thumbnail:', error);
+    return next(new ErrorResponse('Error deleting thumbnail', 500));
+  }
 }); 

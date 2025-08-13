@@ -172,8 +172,9 @@ export const googleAuth = asyncHandler(async (req, res, next) => {
 // @desc    Get current logged in user
 // @route   GET /api/v1/auth/me
 // @access  Private
-export const getMe = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+export const getMe = asyncHandler(async (req, res) => {
+  // console.log(".............................", req.user._id);
+  const user = await User.findById(req.user._id);
 
   res.status(200).json({
     success: true,
