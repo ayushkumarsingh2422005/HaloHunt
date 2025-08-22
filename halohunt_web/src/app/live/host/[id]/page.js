@@ -225,11 +225,10 @@ export default function HostPage() {
 
   // Fetch stream data
   useEffect(() => {
-    if (streamId) {
+    if (streamId && user) {
       fetchStreamData();
     }
-    // eslint-disable-next-line
-  }, [streamId]);
+  }, [streamId, user]);
 
   useEffect(() => {
     console.log('Host page received stream ID:', streamId);
@@ -242,11 +241,21 @@ export default function HostPage() {
       setLoadingStreams(true);
       const result = await streamService.getStream(streamId);
       setStreamData(result.data || []);
+      // Redirect non-owners to viewer page
+      const ownerId = result?.data?.userId?._id || result?.data?.userId;
+      if (ownerId && user?._id && ownerId.toString() !== user._id.toString()) {
+        router.replace(`/live/view/${streamId}`);
+        return;
+      }
       if (result?.data?.status === 'ended') {
         await loadEndedStats();
       }
     } catch (error) {
       console.error('Error fetching stream data:', error);
+      // If backend restricts access for non-owners, redirect to viewer
+      if (error?.message && /Not authorized|Forbidden|401|403/i.test(error.message)) {
+        router.replace(`/live/view/${streamId}`);
+      }
     } finally {
       setLoadingStreams(false);
     }

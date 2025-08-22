@@ -89,12 +89,12 @@ export const getStream = asyncHandler(async (req, res, next) => {
   }
 
   // If stream is not live and requester is not the owner, restrict access
-  const requesterId = req.user?.id;
-  const ownerId = stream.userId?._id?.toString() || stream.userId?.toString();
-  const isOwner = requesterId && ownerId && requesterId.toString() === ownerId.toString();
-  if (!isOwner && (stream.status === 'draft' || stream.status === 'scheduled')) {
-    return next(new ErrorResponse('Not authorized to view this stream', 403));
-  }
+  // const requesterId = req.user?.id;
+  // const ownerId = stream.userId?._id?.toString() || stream.userId?.toString();
+  // const isOwner = requesterId && ownerId && requesterId.toString() === ownerId.toString();
+  // if (!isOwner && (stream.status === 'draft' || stream.status === 'scheduled')) {
+  //   return next(new ErrorResponse('Not authorized to view this stream', 403));
+  // }
 
   res.status(200).json({
     success: true,

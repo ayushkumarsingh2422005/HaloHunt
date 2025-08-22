@@ -218,12 +218,77 @@ export const deleteThumbnail = async (key) => {
   }
 };
 
+/**
+ * Get a presigned URL for uploading a product image to S3
+ * @param {string} fileType - MIME type of the file
+ * @returns {Promise<Object>} - Object containing uploadUrl, key, and fileUrl
+ */
+export const getProductImageUploadUrl = async (fileType) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await fetch(`${API_URL}/api/v1/media/product-image-upload-url?fileType=${encodeURIComponent(fileType)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get upload URL: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error getting product image upload URL:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete an orphaned product image from S3
+ * @param {string} key - S3 key of the product image to delete
+ * @returns {Promise<Object>} - Response from the server
+ */
+export const deleteProductImage = async (key) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await fetch(`${API_URL}/api/v1/media/product-image`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ key })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete product image: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting product image:', error);
+    throw error;
+  }
+};
+
 export default {
   getAvatarUploadUrl,
   getCoverUploadUrl,
   getThumbnailUploadUrl,
+  getProductImageUploadUrl,
   uploadFileToS3,
   updateUserAvatar,
   updateUserCover,
-  deleteThumbnail
+  deleteThumbnail,
+  deleteProductImage
 }; 

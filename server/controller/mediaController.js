@@ -188,4 +188,61 @@ export const deleteThumbnail = asyncHandler(async (req, res, next) => {
     console.error('Error deleting thumbnail:', error);
     return next(new ErrorResponse('Error deleting thumbnail', 500));
   }
+});
+
+// @desc    Generate presigned URL for product image upload
+// @route   GET /api/v1/media/product-image-upload-url
+// @access  Private
+export const getProductImageUploadUrl = asyncHandler(async (req, res, next) => {
+  const fileType = req.query.fileType || 'image/jpeg';
+  
+  // Validate file type
+  if (!fileType.startsWith('image/')) {
+    return next(new ErrorResponse('Invalid file type. Only images are allowed for product images.', 400));
+  }
+
+  try {
+    const { uploadUrl, key, fileUrl } = await generateUploadUrl(fileType, 'products');
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        uploadUrl,
+        key,
+        fileUrl
+      }
+    });
+  } catch (error) {
+    console.error('Error generating product image upload URL:', error);
+    return next(new ErrorResponse('Error generating upload URL', 500));
+  }
+});
+
+// @desc    Delete orphaned product image by S3 key
+// @route   DELETE /api/v1/media/product-image
+// @access  Private
+export const deleteProductImage = asyncHandler(async (req, res, next) => {
+  const { key } = req.body;
+
+  if (!key) {
+    return next(new ErrorResponse('Please provide the S3 key of the product image to delete', 400));
+  }
+
+  try {
+    // Validate that the key is for a product image (starts with 'products/')
+    if (!key.startsWith('products/')) {
+      return next(new ErrorResponse('Invalid product image key', 400));
+    }
+
+    // Delete the file from S3
+    await deleteFile(key);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Product image deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting product image:', error);
+    return next(new ErrorResponse('Error deleting product image', 500));
+  }
 }); 

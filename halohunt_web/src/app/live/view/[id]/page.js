@@ -14,6 +14,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { streamService } from '@/app/services/streamService';
 
 // Dummy data for the live stream
+const DEFAULT_BANNER_URL = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop';
 const DUMMY_LIVE_DATA = {
   id: "123456",
   title: "Summer Fashion Collection Showcase 2024",
@@ -227,6 +228,14 @@ export default function LiveStreamPage() {
   const isLive = streamData?.status === 'live';
   const isEnded = streamData?.status === 'ended';
 
+  // Optimize defaults for mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setShowStreamInfo(false);
+      setShowAboutInfo(false);
+    }
+  }, []);
+
   // Fetch real stream data
   useEffect(() => {
     const load = async () => {
@@ -301,10 +310,23 @@ export default function LiveStreamPage() {
         const doPlay = async () => {
           try {
             const remoteStream = await zg.startPlayingStream(id);
-            const view = zg.createRemoteStreamView(remoteStream);
             const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-            const containerId = isMobile ? 'remote-video-mobile' : 'remote-video-desktop';
-            view.play(containerId, { enableAutoplayDialog: true });
+            if (isMobile && videoRef.current) {
+              // Use native video on mobile for autoplay reliability
+              try {
+                videoRef.current.classList.remove('hidden');
+                const mobileContainer = document.getElementById('remote-video-mobile');
+                if (mobileContainer) mobileContainer.classList.add('hidden');
+                videoRef.current.playsInline = true;
+                videoRef.current.muted = true;
+                videoRef.current.srcObject = remoteStream;
+                await videoRef.current.play();
+              } catch(_) {}
+            } else {
+              const view = zg.createRemoteStreamView(remoteStream);
+              const containerId = 'remote-video-desktop';
+              view.play(containerId, { enableAutoplayDialog: true });
+            }
             setIsPlaying(true);
             setPlayError(null);
           } catch (e) {
@@ -478,28 +500,28 @@ export default function LiveStreamPage() {
               <div className="px-4 py-2 bg-gray-900/70 text-white rounded-full text-sm font-semibold">Stream ended</div>
             </div>
           )}
-          <div ref={remoteMobileContainerRef} id="remote-video-mobile" className="absolute inset-0" />
-          <div className="absolute bottom-4 left-4 flex items-center gap-2">
+          <div ref={remoteMobileContainerRef} id="remote-video-mobile" className={`absolute inset-0 ${isEnded ? 'hidden' : ''}`} />
+          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-[10px] sm:text-xs">
             {isLive && (
-              <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+              <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full font-semibold shadow flex items-center gap-1">
                 <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                 LIVE
               </div>
             )}
             {isEnded && (
-              <div className="bg-gray-800/80 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
+              <div className="bg-gray-800/80 text-white px-2 py-0.5 rounded-full font-semibold shadow flex items-center gap-1">
                 ENDED
               </div>
             )}
-            <div className="bg-black/70 text-white px-2 py-0.5 rounded-full text-xs font-medium shadow flex items-center gap-1">
+            <div className="bg-black/70 text-white px-2 py-0.5 rounded-full font-medium shadow flex items-center gap-1">
               <Eye className="w-3 h-3" />
               {liveData.stats.viewers.toLocaleString()}
             </div>
           </div>
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop"
+            className={`absolute inset-0 w-full h-full object-cover ${isEnded ? '' : 'hidden'}`}
+            poster={DEFAULT_BANNER_URL}
           />
         </div>
       </div>
@@ -522,8 +544,8 @@ export default function LiveStreamPage() {
                   <div className="px-4 py-2 bg-gray-900/70 text-white rounded-full text-sm font-semibold">Stream ended</div>
                 </div>
               )}
-              <div ref={remoteDesktopContainerRef} id="remote-video-desktop" className="absolute inset-0" />
-              <div className="absolute bottom-4 left-4 flex items-center gap-2">
+              <div ref={remoteDesktopContainerRef} id="remote-video-desktop" className={`absolute inset-0 ${isEnded ? 'hidden' : ''}`} />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 text-xs">
                 {isLive && (
                   <div className="bg-red-500/90 text-white px-2 py-0.5 rounded-full text-xs font-semibold shadow flex items-center gap-1">
                     <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -542,14 +564,29 @@ export default function LiveStreamPage() {
               </div>
               <video
                 ref={videoRef}
-                className="absolute inset-0 w-full h-full object-cover hidden"
+                className={`absolute inset-0 w-full h-full object-cover ${isEnded ? '' : 'hidden'}`}
+                poster={DEFAULT_BANNER_URL}
               />
             </div>
 
             {/* Stream Info */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
               <div className="p-4 flex items-center justify-between">
-                <h1 className="text-xl font-bold text-gray-900 truncate">{liveData.title}</h1>
+                <h1 className="text-xl font-bold text-gray-900 truncate flex items-center gap-2">
+                  {liveData.title}
+                  {streamData?.status && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                        streamData.status === 'live' ? 'bg-red-500/90 text-white' :
+                        streamData.status === 'ended' ? 'bg-gray-800/80 text-white' :
+                        streamData.status === 'scheduled' ? 'bg-yellow-500/90 text-white' :
+                        'bg-gray-400/80 text-white'
+                      }`}
+                    >
+                      {streamData.status}
+                    </span>
+                  )}
+                </h1>
                 <button
                   onClick={() => setShowStreamInfo(!showStreamInfo)}
                   className="p-1 text-gray-500 hover:bg-gray-100 rounded-full"

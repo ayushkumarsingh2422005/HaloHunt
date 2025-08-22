@@ -42,8 +42,9 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: [true, 'Please add a product category'],
+      // required: [true, 'Please add a product category'],
       trim: true,
+      default: 'Uncategorized',
       // category of the product
     },
     subcategory: {

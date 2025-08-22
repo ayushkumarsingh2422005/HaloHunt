@@ -7,8 +7,194 @@ import {
   MessageCircle, User, ChevronRight, Minus, Plus, Check
 } from 'lucide-react';
 
-// API base URL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Dummy product data
+const DUMMY_PRODUCTS = [
+  {
+    id: "1",
+    name: "Premium Wireless Headphones",
+    price: 299.99,
+    discountPrice: 249.99,
+    description: "Experience crystal-clear sound with our premium wireless headphones. Featuring active noise cancellation, 30-hour battery life, and ultra-comfortable ear cushions for all-day listening.",
+    rating: 4.8,
+    reviews: 1234,
+    images: [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?w=600&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1524678714210-9917a6c619c2?w=600&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1572536147248-ac59a8abfa4b?w=600&h=600&fit=crop&q=80"
+    ],
+    colors: ["Black", "White", "Blue"],
+    seller: {
+      id: "creator-1",
+      name: "Tech World",
+      username: "@techworld",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces&auto=format",
+      rating: 4.9,
+      sales: 5678,
+      verified: true
+    },
+    category: "Electronics",
+    features: [
+      "Active Noise Cancellation",
+      "30-hour Battery Life",
+      "Bluetooth 5.2",
+      "Voice Assistant Support",
+      "Touch Controls"
+    ],
+    specifications: {
+      "Brand": "SoundMaster",
+      "Model": "WH-1000XM5",
+      "Driver Size": "40mm",
+      "Frequency Response": "4Hz-40,000Hz",
+      "Weight": "250g"
+    },
+    stock: 45,
+    relatedProducts: [2, 5, 7, 8]
+  },
+  {
+    id: "2",
+    name: "Smart Watch Series 5",
+    price: 399.99,
+    discountPrice: null,
+    description: "Stay connected and track your fitness with our latest smartwatch. Features include heart rate monitoring, GPS, water resistance, and a beautiful always-on display.",
+    rating: 4.9,
+    reviews: 856,
+    images: [
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=600&h=600&fit=crop&q=80"
+    ],
+    colors: ["Silver", "Black", "Gold"],
+    seller: {
+      id: "creator-2",
+      name: "Smart Gear",
+      username: "@smartgear",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces&auto=format",
+      rating: 4.7,
+      sales: 3421,
+      verified: true
+    },
+    category: "Electronics",
+    features: [
+      "Heart Rate Monitoring",
+      "GPS Tracking",
+      "Water Resistant (50m)",
+      "Always-on Display",
+      "5-day Battery Life"
+    ],
+    specifications: {
+      "Brand": "TechFit",
+      "Model": "Watch Pro 5",
+      "Display": "1.4 inch AMOLED",
+      "Battery": "420mAh",
+      "Weight": "45g"
+    },
+    stock: 32,
+    relatedProducts: [1, 5, 7]
+  }
+];
+
+// Related products
+const RELATED_PRODUCTS = [
+  {
+    id: "5",
+    name: "4K Ultra HD Camera",
+    price: 899.99,
+    discountPrice: 799.99,
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop&q=80",
+    rating: 4.9,
+    reviews: 432
+  },
+  {
+    id: "7",
+    name: "Wireless Gaming Mouse",
+    price: 79.99,
+    discountPrice: null,
+    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop&q=80",
+    rating: 4.7,
+    reviews: 345
+  },
+  {
+    id: "8",
+    name: "Mechanical Keyboard",
+    price: 149.99,
+    discountPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=400&h=400&fit=crop&q=80",
+    rating: 4.8,
+    reviews: 567
+  }
+];
+
+// Popular products
+const POPULAR_PRODUCTS = [
+  {
+    id: "10",
+    name: "Smartphone Pro Max",
+    price: 1299.99,
+    discountPrice: 1199.99,
+    image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=400&fit=crop&q=80",
+    rating: 4.9,
+    reviews: 2543,
+    discount: "15%"
+  },
+  {
+    id: "11",
+    name: "Smart Home Speaker",
+    price: 199.99,
+    discountPrice: 149.99,
+    image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=400&fit=crop&q=80",
+    rating: 4.6,
+    reviews: 1876,
+    discount: "25%"
+  },
+  {
+    id: "12",
+    name: "Fitness Tracker Pro",
+    price: 129.99,
+    discountPrice: null,
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=400&h=400&fit=crop&q=80",
+    rating: 4.7,
+    reviews: 1243
+  },
+  {
+    id: "13",
+    name: "Wireless Earbuds",
+    price: 159.99,
+    discountPrice: 129.99,
+    image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=400&h=400&fit=crop&q=80",
+    rating: 4.8,
+    reviews: 2156,
+    discount: "20%"
+  }
+];
+
+// Hot deals data
+const HOT_DEALS = [
+  {
+    id: "d1",
+    name: "Smart Watches",
+    startingPrice: "$199",
+    discount: "40%",
+    image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#e3f2fd" // Light blue
+  },
+  {
+    id: "d2",
+    name: "Premium Headphones",
+    startingPrice: "$249",
+    discount: "35%",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#f3e5f5" // Light purple
+  },
+  {
+    id: "d3",
+    name: "Fitness Trackers",
+    startingPrice: "$129",
+    discount: "50%",
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=400&h=300&fit=crop&crop=center",
+    bgColor: "#e8f5e9" // Light green
+  }
+];
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -25,115 +211,56 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState(null);
   const [activeTab, setActiveTab] = useState('description');
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   
-  // Fetch product data from backend
+  // In a real app, you would fetch the product data based on the ID
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Fetch the main product
-        const productResponse = await fetch(`${API_BASE_URL}/api/v1/products/public/${id}`);
-        if (!productResponse.ok) {
-          throw new Error('Product not found');
-        }
-        const productData = await productResponse.json();
-        const foundProduct = productData.data;
-        
-                 console.log('Product data received:', foundProduct);
-         setProduct(foundProduct);
-        
-        // Set selected color if available
-        if (foundProduct.variants && foundProduct.variants.length > 0) {
-          const colorVariant = foundProduct.variants.find(v => v.name.toLowerCase().includes('color'));
-          if (colorVariant && colorVariant.value) {
-            setSelectedColor(colorVariant.value);
-          }
-        }
-        
-                 // Fetch related products (products from same category)
-         if (foundProduct.category) {
-           try {
-             const relatedResponse = await fetch(`${API_BASE_URL}/api/v1/products/public?category=${encodeURIComponent(foundProduct.category)}&limit=4`);
-             if (relatedResponse.ok) {
-               const relatedData = await relatedResponse.json();
-               setRelatedProducts(relatedData.data.filter(p => p._id !== foundProduct._id));
-             }
-           } catch (error) {
-             console.error('Error fetching related products:', error);
-           }
-         } else {
-           // If no category, try to get some random products as related
-           try {
-             const relatedResponse = await fetch(`${API_BASE_URL}/api/v1/products/public?limit=4`);
-             if (relatedResponse.ok) {
-               const relatedData = await relatedResponse.json();
-               setRelatedProducts(relatedData.data.filter(p => p._id !== foundProduct._id));
-             }
-           } catch (error) {
-             console.error('Error fetching fallback related products:', error);
-           }
-         }
-        
-                 // Fetch featured/popular products
-         try {
-           const featuredResponse = await fetch(`${API_BASE_URL}/api/v1/products/featured?limit=4`);
-           if (featuredResponse.ok) {
-             const featuredData = await featuredResponse.json();
-             setPopularProducts(featuredData.data);
-           }
-         } catch (error) {
-           console.error('Error fetching featured products:', error);
-         }
-        
-        // Store in recently viewed (localStorage)
-        addToRecentlyViewed(foundProduct);
-        
-      } catch (error) {
-        console.error('Error fetching product:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Simulate API call
+    const foundProduct = DUMMY_PRODUCTS.find(p => p.id === id);
     
-    if (id) {
-      fetchProduct();
+    if (foundProduct) {
+      setProduct(foundProduct);
+      setSelectedColor(foundProduct.colors[0]);
+      
+      // Get related products
+      const related = RELATED_PRODUCTS.filter(p => 
+        foundProduct.relatedProducts.includes(parseInt(p.id))
+      );
+      setRelatedProducts(related);
+      
+      // Set popular products (would be from API in real app)
+      setPopularProducts(POPULAR_PRODUCTS);
+      
+      // Set hot deals
+      setHotDeals(HOT_DEALS);
+      
+      // Store in recently viewed (localStorage)
+      addToRecentlyViewed(foundProduct);
     }
   }, [id]);
   
   // Load and manage recently viewed products
   useEffect(() => {
-    // Only run on client side to prevent hydration mismatch
-    if (typeof window !== 'undefined') {
-      loadRecentlyViewed();
-    }
+    loadRecentlyViewed();
   }, []);
   
   const addToRecentlyViewed = (product) => {
-    // Only run on client side to prevent hydration mismatch
-    if (typeof window === 'undefined') return;
-    
     try {
       // Get existing recently viewed from localStorage
       const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
       
       // Remove if already exists (to move to top)
-      const filteredRecent = recentlyViewed.filter(item => item._id !== product._id);
+      const filteredRecent = recentlyViewed.filter(item => item.id !== product.id);
       
       // Add to beginning of array
       const updatedRecent = [
         {
-          _id: product._id,
+          id: product.id,
           name: product.name,
           price: product.price,
-          originalPrice: product.originalPrice,
-          images: product.images,
-          rating: product.rating || 0,
-          reviews: product.reviews || 0
+          discountPrice: product.discountPrice,
+          image: product.images[0],
+          rating: product.rating,
+          reviews: product.reviews
         },
         ...filteredRecent
       ].slice(0, 4); // Keep only 4 items
@@ -149,9 +276,6 @@ export default function ProductDetailPage() {
   };
   
   const loadRecentlyViewed = () => {
-    // Only run on client side to prevent hydration mismatch
-    if (typeof window === 'undefined') return;
-    
     try {
       const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
       setRecentlyViewedProducts(recentlyViewed);
@@ -160,49 +284,17 @@ export default function ProductDetailPage() {
     }
   };
   
-  if (loading) {
+  if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-purple-600">Loading product...</div>
       </div>
     );
   }
-  
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 text-xl mb-4">Error: {error}</div>
-          <button 
-            onClick={() => router.back()}
-            className="text-purple-600 hover:text-purple-700"
-          >
-            Go back
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
-  if (!product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-gray-600 text-xl mb-4">Product not found</div>
-          <button 
-            onClick={() => router.back()}
-            className="text-purple-600 hover:text-purple-700"
-          >
-            Go back
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
-    if (newQuantity >= 1 && newQuantity <= product.stockQuantity) {
+    if (newQuantity >= 1 && newQuantity <= product.stock) {
       setQuantity(newQuantity);
     }
   };
@@ -210,7 +302,7 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     // In a real app, this would add the product to the cart
     console.log('Added to cart:', {
-      productId: product._id,
+      productId: product.id,
       quantity,
       color: selectedColor
     });
@@ -220,7 +312,7 @@ export default function ProductDetailPage() {
   const handleBuyNow = () => {
     // In a real app, this would add the product to the cart and redirect to checkout
     console.log('Buy now:', {
-      productId: product._id,
+      productId: product.id,
       quantity,
       color: selectedColor
     });
@@ -230,29 +322,6 @@ export default function ProductDetailPage() {
   const handleToggleWishlist = () => {
     setIsWishlisted(!isWishlisted);
   };
-
-     // Get product images, fallback to thumbnail if no images
-   const productImages = product.images && product.images.length > 0 
-     ? product.images.map(img => {
-         // Handle both object format {url, key, alt} and direct string format
-         if (typeof img === 'string') return img;
-         if (img && typeof img === 'object') return img.url || img.key || img;
-         return null;
-       }).filter(Boolean) // Remove any null values
-     : product.thumbnail 
-       ? [product.thumbnail.url || product.thumbnail.key || product.thumbnail]
-       : [];
-
-   console.log('Product images processed:', productImages);
-
-
-
-  // Get product colors from variants
-  const productColors = product.variants 
-    ? product.variants
-        .filter(v => v.name.toLowerCase().includes('color'))
-        .map(v => v.value)
-    : [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
@@ -276,46 +345,29 @@ export default function ProductDetailPage() {
             {/* Product Images */}
             <div className="md:w-1/2 p-4">
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
-                {productImages.length > 0 ? (
-                  <img 
-                    src={productImages[selectedImage]} 
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-2">
-                        <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <p className="text-sm">No images available</p>
-                    </div>
-                  </div>
-                )}
+                <img 
+                  src={product.images[selectedImage]} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              
-              {/* Image thumbnails */}
-              {productImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {productImages.map((image, index) => (
-                    <button 
-                      key={index}
-                      onClick={() => setSelectedImage(index)}
-                      className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border-2 ${
-                        selectedImage === index ? 'border-purple-600' : 'border-transparent'
-                      }`}
-                    >
-                      <img 
-                        src={image} 
-                        alt={`${product.name} view ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {product.images.map((image, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border-2 ${
+                      selectedImage === index ? 'border-purple-600' : 'border-transparent'
+                    }`}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${product.name} view ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Product Details */}
@@ -328,64 +380,64 @@ export default function ProductDetailPage() {
                   {Array(5).fill(0).map((_, i) => (
                     <Star 
                       key={i} 
-                      className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">
-                  {product.rating || 0} ({product.reviews || 0} reviews)
-                </span>
+                <span className="text-sm text-gray-600">{product.rating} ({product.reviews} reviews)</span>
               </div>
               
               {/* Price */}
               <div className="mb-6">
-                {product.originalPrice && product.originalPrice > product.price ? (
+                {product.discountPrice ? (
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-purple-600">${product.price}</span>
-                    <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
+                    <span className="text-2xl font-bold text-purple-600">${product.discountPrice}</span>
+                    <span className="text-lg text-gray-500 line-through">${product.price}</span>
                     <span className="text-sm font-medium text-green-600">
-                      {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                      {Math.round((1 - product.discountPrice / product.price) * 100)}% OFF
                     </span>
                   </div>
                 ) : (
                   <span className="text-2xl font-bold text-gray-900">${product.price}</span>
                 )}
-                <p className="text-sm text-gray-500 mt-1">
-                  In stock: {product.stockQuantity || 0} units
-                </p>
+                <p className="text-sm text-gray-500 mt-1">In stock: {product.stock} units</p>
               </div>
               
-                             {/* Seller */}
-               {product.sellerId && (
-                 <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                   <Link href={`/profile/${product.sellerId._id || product.sellerId}`} className="flex items-center gap-3 group">
-                     <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                       {product.sellerId.avatar ? (
-                         <img 
-                           src={product.sellerId.avatar} 
-                           alt={product.sellerId.fullName || 'Seller'} 
-                           className="w-full h-full object-cover rounded-full"
-                         />
-                       ) : (
-                         <User className="w-6 h-6 text-gray-500" />
-                       )}
-                     </div>
-                     <div>
-                       <h3 className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
-                         {product.sellerId.fullName || 'Seller'}
-                       </h3>
-                       <p className="text-sm text-gray-500">View seller profile</p>
-                     </div>
-                   </Link>
-                 </div>
-               )}
+              {/* Seller */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <Link href={`/profile/${product.seller.id}`} className="flex items-center gap-3 group">
+                  <img 
+                    src={product.seller.avatar} 
+                    alt={product.seller.name}
+                    className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                  />
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <h3 className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                        {product.seller.name}
+                      </h3>
+                      {product.seller.verified && (
+                        <Check className="w-4 h-4 text-blue-500" />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500">{product.seller.username}</p>
+                  </div>
+                  <div className="ml-auto text-right">
+                    <div className="flex items-center justify-end gap-1 text-yellow-400">
+                      <Star className="w-4 h-4 fill-current" />
+                      <span className="text-gray-700">{product.seller.rating}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">{product.seller.sales.toLocaleString()} sales</p>
+                  </div>
+                </Link>
+              </div>
               
               {/* Color Selection */}
-              {productColors.length > 0 && (
+              {product.colors && product.colors.length > 0 && (
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-900 mb-3">Color</h3>
                   <div className="flex flex-wrap gap-3">
-                    {productColors.map((color) => (
+                    {product.colors.map((color) => (
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
@@ -420,9 +472,9 @@ export default function ProductDetailPage() {
                   </div>
                   <button
                     onClick={() => handleQuantityChange(1)}
-                    disabled={quantity >= (product.stockQuantity || 0)}
+                    disabled={quantity >= product.stock}
                     className={`w-10 h-10 flex items-center justify-center rounded-r-lg border border-gray-300 ${
-                      quantity >= (product.stockQuantity || 0) ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-50'
+                      quantity >= product.stock ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-50'
                     }`}
                   >
                     <Plus className="w-4 h-4" />
@@ -504,40 +556,26 @@ export default function ProductDetailPage() {
                 <div>
                   <p className="text-gray-700 mb-4">{product.description}</p>
                   
-                  {product.shortDescription && (
-                    <p className="text-gray-600 mb-4">{product.shortDescription}</p>
-                  )}
-                  
-                  {product.features && product.features.length > 0 && (
-                    <>
-                      <h3 className="font-medium text-gray-900 mt-6 mb-3">Key Features</h3>
-                      <ul className="space-y-2">
-                        {product.features.map((feature, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <Check className="w-5 h-5 text-green-500" />
-                            <span className="text-gray-700">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                  <h3 className="font-medium text-gray-900 mt-6 mb-3">Key Features</h3>
+                  <ul className="space-y-2">
+                    {product.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <Check className="w-5 h-5 text-green-500" />
+                        <span className="text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
               
               {activeTab === 'specifications' && (
                 <div className="divide-y divide-gray-200">
-                  {product.specifications && product.specifications.length > 0 ? (
-                    product.specifications.map((spec, index) => (
-                      <div key={index} className="flex py-3">
-                        <span className="w-1/3 text-gray-500">{spec.name}</span>
-                        <span className="w-2/3 text-gray-900">{spec.value}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500">No specifications available</p>
+                  {Object.entries(product.specifications).map(([key, value], index) => (
+                    <div key={index} className="flex py-3">
+                      <span className="w-1/3 text-gray-500">{key}</span>
+                      <span className="w-2/3 text-gray-900">{value}</span>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
               
@@ -551,6 +589,50 @@ export default function ProductDetailPage() {
           </div>
         </div>
         
+        {/* Hot Deals Section */}
+        {hotDeals.length > 0 && (
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-gray-900">Hot Deals</h2>
+              <Link href="/search?category=deals" className="flex items-center gap-1.5 text-purple-600 hover:text-purple-700 text-sm font-medium">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {hotDeals.map((deal) => (
+                <Link key={deal.id} href={`/search?deal=${deal.id}`} className="block">
+                  <div 
+                    className="rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow h-28 sm:h-36 relative"
+                    style={{ backgroundColor: deal.bgColor }}
+                  >
+                    <div className="absolute inset-0 flex">
+                      <div className="w-1/2 p-3 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-gray-800 font-bold text-sm sm:text-lg">{deal.name}</h3>
+                          <div className="mt-1 bg-purple-600 text-white px-2 py-0.5 rounded text-xs inline-block font-semibold">
+                            Up to {deal.discount} OFF
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-xs">
+                          From <span className="font-bold">{deal.startingPrice}</span>
+                        </p>
+                      </div>
+                      <div className="w-1/2 flex items-center justify-center relative">
+                        <img 
+                          src={deal.image} 
+                          alt={deal.name}
+                          className="h-20 sm:h-28 w-auto object-contain"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-8">
@@ -563,26 +645,17 @@ export default function ProductDetailPage() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
               {relatedProducts.map((product) => (
-                <Link key={product._id} href={`/search/${product._id}`} className="block">
+                <Link key={product.id} href={`/search/${product.id}`} className="block">
                   <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
                     <div className="aspect-[4/3] relative">
                       <img 
-                        src={(() => {
-                          if (product.images && product.images.length > 0) {
-                            const firstImg = product.images[0];
-                            return typeof firstImg === 'string' ? firstImg : (firstImg.url || firstImg.key || firstImg);
-                          }
-                          if (product.thumbnail) {
-                            return typeof product.thumbnail === 'string' ? product.thumbnail : (product.thumbnail.url || product.thumbnail.key || product.thumbnail);
-                          }
-                          return "https://via.placeholder.com/400x300?text=No+Image";
-                        })()} 
+                        src={product.image} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.discountPrice && (
                         <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
-                          -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                          -{Math.round((1 - product.discountPrice / product.price) * 100)}%
                         </div>
                       )}
                     </div>
@@ -590,10 +663,10 @@ export default function ProductDetailPage() {
                       <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
                       <div className="mt-1 flex items-center justify-between">
                         <div className="flex flex-col">
-                          {product.originalPrice && product.originalPrice > product.price ? (
+                          {product.discountPrice ? (
                             <>
-                              <span className="text-xs font-bold text-purple-600">${product.price}</span>
-                              <span className="text-[10px] text-gray-500 line-through">${product.originalPrice}</span>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
                             </>
                           ) : (
                             <span className="text-xs font-bold text-gray-900">${product.price}</span>
@@ -601,7 +674,7 @@ export default function ProductDetailPage() {
                         </div>
                         <div className="flex items-center text-xs text-gray-500">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-                          {product.rating || 0}
+                          {product.rating}
                         </div>
                       </div>
                     </div>
@@ -624,26 +697,17 @@ export default function ProductDetailPage() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
               {popularProducts.map((product) => (
-                <Link key={product._id} href={`/search/${product._id}`} className="block">
+                <Link key={product.id} href={`/search/${product.id}`} className="block">
                   <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
                     <div className="aspect-[4/3] relative">
                       <img 
-                        src={(() => {
-                          if (product.images && product.images.length > 0) {
-                            const firstImg = product.images[0];
-                            return typeof firstImg === 'string' ? firstImg : (firstImg.url || firstImg.key || firstImg);
-                          }
-                          if (product.thumbnail) {
-                            return typeof product.thumbnail === 'string' ? product.thumbnail : (product.thumbnail.url || product.thumbnail.key || product.thumbnail);
-                          }
-                          return "https://via.placeholder.com/400x300?text=No+Image";
-                        })()} 
+                        src={product.image} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.discount && (
                         <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
-                          -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                          -{product.discount}
                         </div>
                       )}
                     </div>
@@ -651,10 +715,10 @@ export default function ProductDetailPage() {
                       <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
                       <div className="mt-1 flex items-center justify-between">
                         <div className="flex flex-col">
-                          {product.originalPrice && product.originalPrice > product.price ? (
+                          {product.discountPrice ? (
                             <>
-                              <span className="text-xs font-bold text-purple-600">${product.price}</span>
-                              <span className="text-[10px] text-gray-500 line-through">${product.originalPrice}</span>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
                             </>
                           ) : (
                             <span className="text-xs font-bold text-gray-900">${product.price}</span>
@@ -662,7 +726,7 @@ export default function ProductDetailPage() {
                         </div>
                         <div className="flex items-center text-xs text-gray-500">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-                          {product.rating || 0}
+                          {product.rating}
                         </div>
                       </div>
                     </div>
@@ -685,26 +749,17 @@ export default function ProductDetailPage() {
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
               {recentlyViewedProducts.map((product) => (
-                <Link key={product._id} href={`/search/${product._id}`} className="block flex-shrink-0 w-[160px]">
+                <Link key={product.id} href={`/search/${product.id}`} className="block flex-shrink-0 w-[160px]">
                   <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full">
                     <div className="aspect-[4/3] relative">
                       <img 
-                        src={(() => {
-                          if (product.images && product.images.length > 0) {
-                            const firstImg = product.images[0];
-                            return typeof firstImg === 'string' ? firstImg : (firstImg.url || firstImg.key || firstImg);
-                          }
-                          if (product.thumbnail) {
-                            return typeof product.thumbnail === 'string' ? product.thumbnail : (product.thumbnail.url || product.thumbnail.key || product.thumbnail);
-                          }
-                          return "https://via.placeholder.com/400x300?text=No+Image";
-                        })()} 
+                        src={product.image} 
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.discountPrice && (
                         <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-md text-xs font-semibold shadow-sm">
-                          -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                          -{Math.round((1 - product.discountPrice / product.price) * 100)}%
                         </div>
                       )}
                     </div>
@@ -712,10 +767,10 @@ export default function ProductDetailPage() {
                       <h3 className="text-xs font-medium text-gray-900 truncate">{product.name}</h3>
                       <div className="mt-1 flex items-center justify-between">
                         <div className="flex flex-col">
-                          {product.originalPrice && product.originalPrice > product.price ? (
+                          {product.discountPrice ? (
                             <>
-                              <span className="text-xs font-bold text-purple-600">${product.price}</span>
-                              <span className="text-[10px] text-gray-500 line-through">${product.originalPrice}</span>
+                              <span className="text-xs font-bold text-purple-600">${product.discountPrice}</span>
+                              <span className="text-[10px] text-gray-500 line-through">${product.price}</span>
                             </>
                           ) : (
                             <span className="text-xs font-bold text-gray-900">${product.price}</span>
@@ -723,7 +778,7 @@ export default function ProductDetailPage() {
                         </div>
                         <div className="flex items-center text-xs text-gray-500">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-                          {product.rating || 0}
+                          {product.rating}
                         </div>
                       </div>
                     </div>
