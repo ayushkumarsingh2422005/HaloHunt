@@ -7,10 +7,10 @@ import { BsArrowRight } from 'react-icons/bs';
 
 // Minimal country code list for demonstration; expand as needed
 const COUNTRY_CODES = [
+  { code: '+91', label: 'IN' },
   { code: '+1', label: 'US' },
   { code: '+44', label: 'UK' },
   { code: '+61', label: 'AU' },
-  { code: '+91', label: 'IN' },
   { code: '+81', label: 'JP' },
   { code: '+49', label: 'DE' },
   { code: '+33', label: 'FR' },
@@ -141,7 +141,7 @@ export default function Newsletter() {
           </motion.p>
           
           {/* Benefits Grid */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
@@ -173,7 +173,7 @@ export default function Newsletter() {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </motion.div> */}
           
           {/* Signup Form */}
           <motion.div
@@ -317,7 +317,7 @@ export default function Newsletter() {
           </motion.div>
           
           {/* Stats */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.8 }}
@@ -342,7 +342,7 @@ export default function Newsletter() {
                 <div className="text-gray-600 text-sm">{stat.label}</div>
               </motion.div>
             ))}
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </section>

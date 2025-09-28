@@ -29,12 +29,12 @@ export default function Footer() {
       { name: 'Press Kit', href: '#' },
       { name: 'Contact', href: '#' },
     ],
-    legal: [
-      { name: 'Privacy Policy', href: '#' },
-      { name: 'Terms of Service', href: '#' },
-      { name: 'Cookie Policy', href: '#' },
-      { name: 'GDPR', href: '#' },
-    ],
+    // legal: [
+    //   { name: 'Privacy Policy', href: '#' },
+    //   { name: 'Terms of Service', href: '#' },
+    //   { name: 'Cookie Policy', href: '#' },
+    //   { name: 'GDPR', href: '#' },
+    // ],
   };
 
   const socialLinks = [
@@ -127,37 +127,6 @@ export default function Footer() {
             </motion.div>
           ))}
         </div>
-        
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-t border-gray-200 mb-8"
-        >
-          {[
-            { icon: FaVideo, number: "50K+", label: "Early Adopters" },
-            { icon: FaUsers, number: "1M+", label: "Expected Users" },
-            { icon: FaShoppingCart, number: "5M+", label: "Expected Sales" },
-            { icon: FaHeart, number: "Q1 2024", label: "Launch Date" }
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 + index * 0.1, duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center border border-purple-200">
-                <stat.icon className="text-purple-600 text-xl" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">{stat.number}</div>
-              <div className="text-gray-600 text-sm">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
         
         {/* Bottom Section */}
         <motion.div

@@ -1,15 +1,13 @@
 "use client"
 
-import { FaPlay, FaHeart, FaShoppingCart, FaUsers, FaStar, FaBell, FaSearch } from 'react-icons/fa';
-import { BsGlobe, BsArrowRight } from 'react-icons/bs';
+import { FaPlay, FaHeart, FaUsers, FaStar, FaBell, FaSearch } from 'react-icons/fa';
+import { BsArrowRight } from 'react-icons/bs';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 export default function Hero() {
-  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <section id="home" className="relative overflow-hidden bg-white min-h-screen">
+    <section id="home" className="relative overflow-hidden bg-white mix-h-screen">
       {/* Subtle background elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-purple-50 blur-3xl animate-float" />
@@ -17,7 +15,7 @@ export default function Hero() {
         <div className="absolute bottom-20 left-1/3 h-64 w-64 rounded-full bg-blue-50 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 pt-20 pb-16">
+      <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 pt-8 pb-16">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center min-h-[80vh]">
           {/* Left Content */}
           <motion.div
@@ -44,9 +42,9 @@ export default function Hero() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="mb-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl md:text-6xl"
             >
-              <span className="block">Shop, Sell, and Connect</span>
+              <span className="block">Shopping</span>
               <span className="block bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
-                LIVE with HaloHunt
+                Reinvented
               </span>
             </motion.h1>
 
@@ -56,7 +54,7 @@ export default function Hero() {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="mb-8 text-xl text-gray-600 sm:text-2xl leading-relaxed"
             >
-              HaloHunt is transforming online shopping into a live show for everyone! Buyers can watch, engage, and buy as sellers showcase products in real time. Instantly connect, discover, and grow-on India’s most innovative live commerce platform.
+              HaloHunt brings live, interactive shopping to India. Watch. Chat. Buy - in real time
             </motion.p>
 
             <motion.div
@@ -91,7 +89,7 @@ export default function Hero() {
               </button>
             </motion.div>
 
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.8 }}
@@ -109,7 +107,7 @@ export default function Hero() {
                 <FaHeart className="h-5 w-5 text-red-500" />
                 <span>Free Beta Access</span>
               </div>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
 
           {/* Right Content - Platform Preview */}

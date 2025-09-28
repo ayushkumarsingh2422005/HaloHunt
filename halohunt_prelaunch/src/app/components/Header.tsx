@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaVideo, FaShoppingCart, FaUser, FaBars, FaTimes } from 'react-icons/fa';
-import { BsGlobe } from 'react-icons/bs';
+import { FaVideo, FaUser, FaBars, FaTimes } from 'react-icons/fa';
 import Image from 'next/image';
 
 export default function Header() {
@@ -91,7 +90,7 @@ export default function Header() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => scrollToSection('newsletter')}
+              onClick={() => scrollToSection('demo-preview')}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-halo-purple transition-colors"
             >
               <FaVideo className="text-lg" />
@@ -158,7 +157,7 @@ export default function Header() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => scrollToSection('newsletter')}
+                  onClick={() => scrollToSection('demo-preview')}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 text-gray-600 hover:text-halo-purple transition-colors bg-gray-50 rounded-lg"
                 >
                   <FaVideo className="text-lg" />

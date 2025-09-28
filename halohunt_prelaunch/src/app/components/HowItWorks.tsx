@@ -1,6 +1,6 @@
 "use client"
 
-import { FaVideo, FaTag, FaShoppingCart, FaUsers, FaChartLine, FaPlay } from 'react-icons/fa';
+import { FaVideo, FaTag, FaShoppingCart, FaUsers, FaChartLine, FaPlay, FaHeart } from 'react-icons/fa';
 import { BsArrowRight, BsGlobe } from 'react-icons/bs';
 import { motion } from 'framer-motion';
 
@@ -41,13 +41,13 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-20 bg-white overflow-hidden">
+    <section id="how-it-works" className="relative pt-10 bg-white overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 right-1/4 h-80 w-80 rounded-full bg-purple-50 blur-3xl" />
         <div className="absolute bottom-1/4 left-1/4 h-96 w-96 rounded-full bg-pink-50 blur-3xl" />
       </div>
-      
+
       <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,7 +68,7 @@ export default function HowItWorks() {
               Simple 4-Step Process
             </span>
           </motion.div>
-          
+
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -81,7 +81,7 @@ export default function HowItWorks() {
               Successful Sales
             </span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -89,150 +89,73 @@ export default function HowItWorks() {
             viewport={{ once: true }}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Our streamlined process makes live commerce effortless. 
+            Our streamlined process makes live commerce effortless.
             Go from concept to conversion in minutes, not hours.
           </motion.p>
         </motion.div>
-        
-        {/* Steps */}
-        <div className="space-y-16">
-          {steps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.2, duration: 0.8 }}
-              viewport={{ once: true }}
-              className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}
-            >
-              {/* Content */}
-              <div className="flex-1 text-center lg:text-left">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.2 + 0.3, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="mb-6 inline-flex items-center gap-3"
-                >
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${step.gradient} flex items-center justify-center text-white font-bold text-lg`}>
-                    {step.step}
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">{step.title}</h3>
-                </motion.div>
-                
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 + 0.4, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="text-lg text-gray-600 mb-6 leading-relaxed"
-                >
-                  {step.description}
-                </motion.p>
-                
-                <motion.ul
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 + 0.5, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="space-y-2"
-                >
-                  {step.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-3 text-gray-600">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full" />
-                      {feature}
-                    </li>
-                  ))}
-                </motion.ul>
-              </div>
-              
-              {/* Visual */}
-              <div className="flex-1">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.2 + 0.6, duration: 0.8 }}
-                  viewport={{ once: true }}
-                  className="relative"
-                >
-                  <div className="relative pb-[56.25%] rounded-2xl overflow-hidden shadow-lg border border-gray-200">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-10`} />
-                    <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
-                      <div className="text-center p-8">
-                        <motion.div
-                          whileHover={{ scale: 1.1 }}
-                          className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r ${step.gradient} flex items-center justify-center shadow-lg`}
-                        >
-                          <step.icon className="text-white text-3xl" />
-                        </motion.div>
-                        <h4 className="text-gray-900 text-xl font-semibold mb-2">{step.title}</h4>
-                        <p className="text-gray-600 text-sm">Step {step.step}</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Floating elements based on step */}
-                  {index === 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1, duration: 0.6 }}
-                      viewport={{ once: true }}
-                      className="absolute -right-4 -top-4 h-16 w-16 rounded-xl bg-purple-50 border border-purple-200 p-2"
-                    >
-                      <div className="h-full w-full rounded-lg bg-white flex items-center justify-center">
-                        <span className="text-purple-600 text-xs font-medium">LIVE</span>
-                      </div>
-                    </motion.div>
-                  )}
-                  
-                  {index === 1 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1, duration: 0.6 }}
-                      viewport={{ once: true }}
-                      className="absolute -left-4 -bottom-4 h-16 w-16 rounded-xl bg-blue-50 border border-blue-200 p-2"
-                    >
-                      <div className="h-full w-full rounded-lg bg-white flex items-center justify-center">
-                        <span className="text-blue-600 text-xs font-medium">TAGGED</span>
-                      </div>
-                    </motion.div>
-                  )}
-                  
-                  {index === 2 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1, duration: 0.6 }}
-                      viewport={{ once: true }}
-                      className="absolute -right-4 -bottom-4 h-16 w-16 rounded-xl bg-green-50 border border-green-200 p-2"
-                    >
-                      <div className="h-full w-full rounded-lg bg-white flex items-center justify-center">
-                        <span className="text-green-600 text-xs font-medium">CHAT</span>
-                      </div>
-                    </motion.div>
-                  )}
-                  
-                  {index === 3 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1, duration: 0.6 }}
-                      viewport={{ once: true }}
-                      className="absolute -left-4 -top-4 h-16 w-16 rounded-xl bg-orange-50 border border-orange-200 p-2"
-                    >
-                      <div className="h-full w-full rounded-lg bg-white flex items-center justify-center">
-                        <span className="text-orange-600 text-xs font-medium">SOLD</span>
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              </div>
-            </motion.div>
-          ))}
+
+        {/* Demo Preview Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">See Halohunt in Action</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            Watch how sellers connect with buyers through live streaming, creating an engaging shopping experience that drives real results.
+          </p>
+          <div className="flex justify-center mb-6">
+            <div className="relative w-[75vw] aspect-video rounded-2xl bg-white border border-purple-200 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 opacity-60" />
+              <FaPlay className="relative z-10 text-halo-purple text-5xl mx-auto mt-20" />
+              <span className="relative z-10 mt-8 text-halo-purple-dark text-base font-medium">30 sec preview of live commerce magic</span>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button className="group mt-2 flex items-center gap-2 px-8 py-4 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:shadow-purple-500/25">
+              watch Full Demo <BsArrowRight className="group-hover:translate-x-1 transition-transform text-lg" />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Steps Section - 2x2 Grid, themed */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto mb-20">
+          {/* Step 1 */}
+          <div className="flex flex-col items-center text-center p-8 bg-white border border-purple-100 rounded-2xl shadow-lg">
+            <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-pink-500 mb-4 shadow">
+              <FaVideo className="text-white text-3xl" />
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Go Live</h3>
+            <p className="text-gray-600 text-base">Start streaming your product instantly</p>
+          </div>
+          {/* Step 2 */}
+          <div className="flex flex-col items-center text-center p-8 bg-white border border-blue-100 rounded-2xl shadow-lg">
+            <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 mb-4 shadow">
+              <FaTag className="text-white text-3xl" />
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Tag Product</h3>
+            <p className="text-gray-600 text-base">Add clickable product tags to your stream</p>
+          </div>
+          {/* Step 3 */}
+          <div className="flex flex-col items-center text-center p-8 bg-white border border-green-100 rounded-2xl shadow-lg">
+            <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 mb-4 shadow">
+              <FaUsers className="text-white text-3xl" />
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Engage Viewers</h3>
+            <p className="text-gray-600 text-base">Chat Live & Answer questions in real time</p>
+          </div>
+          {/* Step 4 */}
+          <div className="flex flex-col items-center text-center p-8 bg-white border border-orange-100 rounded-2xl shadow-lg">
+            <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 mb-4 shadow">
+              <FaShoppingCart className="text-white text-3xl" />
+            </div>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Close Sells</h3>
+            <p className="text-gray-600 text-base">Convert viewers to customers</p>
+          </div>
         </div>
-        
+
         {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -241,35 +164,36 @@ export default function HowItWorks() {
           viewport={{ once: true }}
           className="mt-20 text-center"
         >
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Ready to Start Your Live Commerce Journey?
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Join thousands of early adopters who are already signed up for HaloHunt's 
-              revolutionary live commerce platform.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => {
-                  const element = document.getElementById('newsletter');
-                  if (element) element.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="px-8 py-4 bg-halo-purple hover:bg-halo-purple-dark text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+          {/* Stats Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-t border-gray-200 mb-0"
+          >
+            {[
+              { icon: FaVideo, number: "50K+", label: "Early Adopters" },
+              { icon: FaUsers, number: "1M+", label: "Expected Users" },
+              { icon: FaShoppingCart, number: "5M+", label: "Expected Sales" },
+              { icon: FaHeart, number: "Q1 2024", label: "Launch Date" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center"
               >
-                Join Waitlist
-              </button>
-              <button 
-                onClick={() => {
-                  const element = document.getElementById('newsletter');
-                  if (element) element.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="px-8 py-4 bg-white border-2 border-halo-purple text-halo-purple font-semibold rounded-full hover:bg-purple-50 transition-all duration-300"
-              >
-                Watch Demo
-              </button>
-            </div>
-          </div>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center border border-purple-200">
+                  <stat.icon className="text-purple-600 text-xl" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">{stat.number}</div>
+                <div className="text-gray-600 text-sm">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
       </div>
     </section>
