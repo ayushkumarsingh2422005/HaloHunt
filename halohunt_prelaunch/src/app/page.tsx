@@ -3,6 +3,7 @@ import Hero from './components/Hero';
 import Features from './components/Features';
 import HowItWorks from './components/HowItWorks';
 import Newsletter from './components/Newsletter';
+import DidYouKnow from './components/DidYouKnow';
 import Footer from './components/Footer';
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
         <Features />
         <HowItWorks />
         <Newsletter />
+        <DidYouKnow />
         <Footer />
       </div>
     </div>

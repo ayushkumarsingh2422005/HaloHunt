@@ -94,32 +94,6 @@ export default function HowItWorks() {
           </motion.p>
         </motion.div>
 
-        {/* Demo Preview Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">See Halohunt in Action</h2>
-          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-            Watch how sellers connect with buyers through live streaming, creating an engaging shopping experience that drives real results.
-          </p>
-          <div className="flex justify-center mb-6">
-            <div className="relative w-[75vw] aspect-video rounded-2xl bg-white border border-purple-200 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 opacity-60" />
-              <FaPlay className="relative z-10 text-halo-purple text-5xl mx-auto mt-20" />
-              <span className="relative z-10 mt-8 text-halo-purple-dark text-base font-medium">30 sec preview of live commerce magic</span>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <button className="group mt-2 flex items-center gap-2 px-8 py-4 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:shadow-purple-500/25">
-              watch Full Demo <BsArrowRight className="group-hover:translate-x-1 transition-transform text-lg" />
-            </button>
-          </div>
-        </motion.div>
-
         {/* Steps Section - 2x2 Grid, themed */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto mb-20">
           {/* Step 1 */}
@@ -155,47 +129,32 @@ export default function HowItWorks() {
             <p className="text-gray-600 text-base">Convert viewers to customers</p>
           </div>
         </div>
-
-        {/* CTA Section */}
+        {/* Demo Preview Section */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mt-20 text-center"
+          className="mb-20"
         >
-          {/* Stats Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-t border-gray-200 mb-0"
-          >
-            {[
-              { icon: FaVideo, number: "50K+", label: "Early Adopters" },
-              { icon: FaUsers, number: "1M+", label: "Expected Users" },
-              { icon: FaShoppingCart, number: "5M+", label: "Expected Sales" },
-              { icon: FaHeart, number: "Q1 2024", label: "Launch Date" }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 + index * 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center border border-purple-200">
-                  <stat.icon className="text-purple-600 text-xl" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">{stat.number}</div>
-                <div className="text-gray-600 text-sm">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">See Halohunt in Action</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            Watch how sellers connect with buyers through live streaming, creating an engaging shopping experience that drives real results.
+          </p>
+          <div className="flex justify-center mb-6">
+            <div className="relative w-[60vw] aspect-video rounded-2xl bg-white border border-purple-200 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 opacity-60" />
+              <FaPlay className="relative z-10 text-halo-purple text-5xl mx-auto mt-20" />
+              <span className="relative z-10 mt-8 text-halo-purple-dark text-base font-medium">30 sec preview of live commerce magic</span>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <button className="group mt-2 flex items-center gap-2 px-8 py-4 text-white font-semibold rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:shadow-purple-500/25">
+              watch Full Demo <BsArrowRight className="group-hover:translate-x-1 transition-transform text-lg" />
+            </button>
+          </div>
         </motion.div>
       </div>
     </section>
   );
-} 
+}

@@ -105,14 +105,6 @@ export default function Header() {
             >
               Join Waitlist
             </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all duration-300"
-            >
-              <FaUser className="text-lg" />
-            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}

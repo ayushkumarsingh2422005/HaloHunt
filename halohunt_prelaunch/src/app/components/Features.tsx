@@ -51,12 +51,13 @@ export default function Features() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-20"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
         >
           {[
-            { number: "50K+", label: "Early Adopters", icon: FaUsers },
-            { number: "1M+", label: "Expected Users", icon: FaShoppingCart },
-            { number: "Q1 2024", label: "Launch Date", icon: FaHeart }
+            { number: "50K+", label: "Early Adopters", icon: FaVideo },
+            { number: "1M+", label: "Expected Users", icon: FaUsers },
+            { number: "5M+", label: "Expected Sales", icon: FaShoppingCart },
+            { number: "2025", label: "Launch Year", icon: FaHeart }
           ].map((stat, index) => (
             <motion.div
               key={index}
