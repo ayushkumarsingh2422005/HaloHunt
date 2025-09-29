@@ -123,9 +123,9 @@ export default function Newsletter() {
             viewport={{ once: true }}
             className="text-4xl font-bold text-gray-900 mb-6 sm:text-5xl"
           >
-            Join the Live Commerce
+            Be the first to experience live  
             <span className="block bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Revolution
+            commerce in india
             </span>
           </motion.h2>
           
