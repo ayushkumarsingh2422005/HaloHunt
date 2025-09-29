@@ -123,8 +123,7 @@ export default function Hero() {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="relative"
           >
-            <div className="relative w-full max-w-[500px] mx-auto lg:rounded-2xl lg:overflow-hidden lg:shadow-2xl lg:border lg:border-gray-200 lg:bg-white"
-                 style={{height: '100%', minHeight: 240}}>
+            <div className="relative w-full max-w-[800px] mx-auto lg:rounded-2xl lg:overflow-hidden">
               {/* Carousel for Screenshots */}
               <Swiper
                 spaceBetween={12}
@@ -149,13 +148,32 @@ export default function Hero() {
                 }}
               >
                 <SwiperSlide>
-                  <img src="/full_purple.png" alt="Screenshot 1" className="w-full h-48 sm:h-64 md:h-72 lg:h-80 object-contain rounded-xl bg-white" />
+                  <img
+                    src="/ss/ss1.png"
+                    alt="Screenshot 1"
+                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
+                  />
                 </SwiperSlide>
                 <SwiperSlide>
-                  <img src="/h_purple.png" alt="Screenshot 2" className="w-full h-48 sm:h-64 md:h-72 lg:h-80 object-contain rounded-xl bg-white" />
+                  <img
+                    src="/ss/ss2.png"
+                    alt="Screenshot 2"
+                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
+                  />
                 </SwiperSlide>
                 <SwiperSlide>
-                  <img src="/window.svg" alt="Screenshot 3" className="w-full h-48 sm:h-64 md:h-72 lg:h-80 object-contain rounded-xl bg-white" />
+                  <img
+                    src="/ss/ss3.png"
+                    alt="Screenshot 3"
+                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
+                  />
+                </SwiperSlide>
+                <SwiperSlide>
+                  <img
+                    src="/ss/ss4.png"
+                    alt="Screenshot 3"
+                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
+                  />
                 </SwiperSlide>
               </Swiper>
             </div>
