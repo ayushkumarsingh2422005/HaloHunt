@@ -142,7 +142,7 @@ export default function HowItWorks() {
             Watch how sellers connect with buyers through live streaming, creating an engaging shopping experience that drives real results.
           </p>
           <div className="flex justify-center mb-6">
-            <div className="relative w-[60vw] aspect-video rounded-2xl bg-white border border-purple-200 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+            <div className="relative w-full sm:w-full md:w-full lg:w-[60vw] aspect-video rounded-2xl bg-white border border-purple-200 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 opacity-60" />
               <FaPlay className="relative z-10 text-halo-purple text-5xl mx-auto mt-20" />
               <span className="relative z-10 mt-8 text-halo-purple-dark text-base font-medium">30 sec preview of live commerce magic</span>

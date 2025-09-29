@@ -22,13 +22,13 @@ export default function Hero() {
       </div>
 
       <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 pt-8 pb-16">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center min-h-[80vh]">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-center lg:min-h-[80vh]">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
+            className="w-full lg:w-1/2 text-center lg:text-left"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -67,7 +67,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 mb-8"
+              className="flex flex-col sm:flex-row gap-4 mb-8 sm:justify-center sm:items-center lg:justify-start lg:items-start"
             >
               <button
                 onClick={() => {
@@ -94,26 +94,6 @@ export default function Hero() {
                 </span>
               </button>
             </motion.div>
-
-            {/* <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.8 }}
-              className="flex flex-wrap justify-center lg:justify-start gap-6 text-gray-500"
-            >
-              <div className="flex items-center gap-2">
-                <FaUsers className="h-5 w-5 text-halo-purple" />
-                <span>50K+ Early Adopters</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaStar className="h-5 w-5 text-yellow-500" />
-                <span>Launch Q1 2024</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FaHeart className="h-5 w-5 text-red-500" />
-                <span>Free Beta Access</span>
-              </div>
-            </motion.div> */}
           </motion.div>
 
           {/* Right Content - Platform Preview */}
@@ -121,18 +101,18 @@ export default function Hero() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="relative"
+            className="relative w-full lg:w-1/2"
           >
-            <div className="relative w-full max-w-[800px] mx-auto lg:rounded-2xl lg:overflow-hidden">
+            <div className="relative w-full h-full max-w-[800px] mx-auto rounded-xl overflow-hidden sm:rounded-2xl sm:overflow-hidden">
               {/* Carousel for Screenshots */}
               <Swiper
-                spaceBetween={12}
-                slidesPerView={2}
+                spaceBetween={8}
+                slidesPerView={1}
                 loop={true}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 className="w-full h-full"
                 style={{
-                  borderRadius: '1.5rem',
+                  borderRadius: '1rem',
                   width: '100%',
                   height: '100%',
                   background: 'transparent',
@@ -142,38 +122,49 @@ export default function Hero() {
                 }}
                 modules={[Autoplay]}
                 breakpoints={{
-                  0: { slidesPerView: 1, spaceBetween: 8 },
-                  640: { slidesPerView: 1.2, spaceBetween: 12 },
-                  768: { slidesPerView: 2, spaceBetween: 16 },
+                  0: { slidesPerView: 2, spaceBetween: 8 }, // phones
+                  1024: { slidesPerView: 2, spaceBetween: 20 }, // desktop
                 }}
               >
                 <SwiperSlide>
-                  <img
-                    src="/ss/ss1.png"
-                    alt="Screenshot 1"
-                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
-                  />
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss1.png"
+                      alt="Screenshot 1"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <img
-                    src="/ss/ss2.png"
-                    alt="Screenshot 2"
-                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
-                  />
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss2.png"
+                      alt="Screenshot 2"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <img
-                    src="/ss/ss3.png"
-                    alt="Screenshot 3"
-                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
-                  />
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss3.png"
+                      alt="Screenshot 3"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
                 </SwiperSlide>
                 <SwiperSlide>
-                  <img
-                    src="/ss/ss4.png"
-                    alt="Screenshot 3"
-                    className="w-full h-48 sm:h-64 md:h-72 lg:h-[70vh] object-contain rounded-xl bg-white"
-                  />
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss4.png"
+                      alt="Screenshot 4"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
                 </SwiperSlide>
               </Swiper>
             </div>

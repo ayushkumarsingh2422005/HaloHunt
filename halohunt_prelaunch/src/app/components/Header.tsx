@@ -69,7 +69,7 @@ export default function Header() {
           </motion.button>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <motion.button
                 key={item.name}
@@ -86,7 +86,7 @@ export default function Header() {
           </nav>
 
           {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -107,18 +107,18 @@ export default function Header() {
             </motion.button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Hamburger Menu Button for md and below */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600"
+            className="lg:hidden w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600"
           >
             {isMenuOpen ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
           </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile/Tablet Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -126,7 +126,7 @@ export default function Header() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-200 shadow-lg"
+            className="lg:hidden bg-white border-t border-gray-200 shadow-lg"
           >
             <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6">
               <nav className="space-y-4">
