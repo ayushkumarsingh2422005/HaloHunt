@@ -12,6 +12,8 @@ import Image from 'next/image';
 import { ZegoExpressEngine } from 'zego-express-engine-webrtc';
 import { useAuth } from '@/app/context/AuthContext';
 import { streamService } from '@/app/services/streamService';
+import { productService } from '@/app/services/productService';
+import { io } from 'socket.io-client';
 
 // Dummy data for the live stream
 const DEFAULT_BANNER_URL = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&h=675&fit=crop';
@@ -35,46 +37,6 @@ const DUMMY_LIVE_DATA = {
   duration: "01:23:45",
   tags: ["fashion", "summer", "new collection", "exclusive"]
 };
-
-// Dummy data for products
-const DUMMY_PRODUCTS = [
-  {
-    id: "p1",
-    name: "Summer Breeze Dress",
-    price: 79.99,
-    discountPrice: 59.99,
-    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=400&fit=crop",
-    featured: true
-  },
-  {
-    id: "p2",
-    name: "Ocean Wave Sunglasses",
-    price: 45.00,
-    discountPrice: null,
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300&h=400&fit=crop"
-  },
-  {
-    id: "p3",
-    name: "Tropical Paradise Shirt",
-    price: 65.00,
-    discountPrice: 49.99,
-    image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300&h=400&fit=crop"
-  },
-  {
-    id: "p4",
-    name: "Beach Day Sandals",
-    price: 35.99,
-    discountPrice: null,
-    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=300&h=400&fit=crop"
-  },
-  {
-    id: "p5",
-    name: "Sunset Tote Bag",
-    price: 49.99,
-    discountPrice: 39.99,
-    image: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=300&h=400&fit=crop"
-  }
-];
 
 // Dummy data for chat messages
 const DUMMY_CHAT_MESSAGES = [
@@ -207,7 +169,6 @@ export default function LiveStreamPage() {
 
   const [liveData, setLiveData] = useState(DUMMY_LIVE_DATA);
   const [streamData, setStreamData] = useState(null);
-  const [products, setProducts] = useState(DUMMY_PRODUCTS);
   const [chatMessages, setChatMessages] = useState(DUMMY_CHAT_MESSAGES);
   const [newMessage, setNewMessage] = useState('');
   const [showProducts, setShowProducts] = useState(true);
@@ -218,6 +179,11 @@ export default function LiveStreamPage() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [zegoClient, setZegoClient] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Socket.IO state
+  const [socket, setSocket] = useState(null);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [taggedProducts, setTaggedProducts] = useState([]);
 
   const chatContainerRef = useRef(null);
   const videoRef = useRef(null);
@@ -262,6 +228,9 @@ export default function LiveStreamPage() {
           tags: Array.isArray(res.data.hashtags) && res.data.hashtags.length ? res.data.hashtags : prev.tags,
           about: res.data.aboutThisStream
         }));
+        
+        // Load existing tagged products
+        await loadTaggedProducts();
       } catch (e) {
         // ignore for now
       }
@@ -269,6 +238,73 @@ export default function LiveStreamPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // Socket.IO connection
+  useEffect(() => {
+    if (id && streamData?.status === 'live') {
+      // Connect to Socket.IO server
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const newSocket = io(`${API_BASE_URL}/products`, {
+        auth: {
+          token: typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+        }
+      });
+
+      newSocket.on('connect', () => {
+        console.log('Connected to Socket.IO server as viewer');
+        setIsSocketConnected(true);
+        
+        // Join the stream room
+        newSocket.emit('join-stream', id);
+      });
+
+      newSocket.on('disconnect', () => {
+        console.log('Disconnected from Socket.IO server');
+        setIsSocketConnected(false);
+      });
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Socket.IO connection error:', error);
+        setIsSocketConnected(false);
+      });
+
+      // Listen for product tagging updates
+      newSocket.on('product-tagged', (data) => {
+        console.log('Product tagged update received:', data);
+        
+        if (data.action === 'add') {
+          setTaggedProducts(prev => {
+            // Check if product already exists
+            if (!prev.some(p => (p._id || p.id) === (data.product._id || data.product.id))) {
+              return [...prev, data.product];
+            }
+            return prev;
+          });
+        } else if (data.action === 'remove') {
+          setTaggedProducts(prev => prev.filter(p => (p._id || p.id) !== (data.product._id || data.product.id)));
+        }
+      });
+
+      setSocket(newSocket);
+
+      // Cleanup on unmount
+      return () => {
+        if (newSocket) {
+          newSocket.emit('leave-stream', id);
+          newSocket.disconnect();
+        }
+      };
+    }
+  }, [id, streamData?.status]);
+
+  const loadTaggedProducts = async () => {
+    try {
+      const result = await productService.getTaggedProducts(id);
+      setTaggedProducts(result.data || []);
+    } catch (error) {
+      console.error('Error loading tagged products:', error);
+    }
+  };
 
   const fetchZegoToken = async (loginUserId) => {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -518,6 +554,43 @@ export default function LiveStreamPage() {
               {liveData.stats.viewers.toLocaleString()}
             </div>
           </div>
+
+          {/* Tagged Products Overlay */}
+          {isLive && taggedProducts.length > 0 && (
+            <div className="absolute bottom-16 left-2 right-2 flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
+              {taggedProducts.map(product => {
+                // Get primary image or first image
+                const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                
+                // Calculate discounted price
+                const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                  ? product.price - (product.price * product.discountPercentage / 100)
+                  : null;
+
+                return (
+                  <div
+                    key={product._id || product.id}
+                    className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
+                  >
+                    <div className="w-10 h-10 rounded-md overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-white text-xs font-medium">{product.name}</p>
+                      <p className="text-purple-300 text-xs font-bold">
+                        ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <video
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-cover ${isEnded ? '' : 'hidden'}`}
@@ -562,6 +635,43 @@ export default function LiveStreamPage() {
                   {liveData.stats.viewers.toLocaleString()}
                 </div>
               </div>
+
+              {/* Tagged Products Overlay */}
+              {isLive && taggedProducts.length > 0 && (
+                <div className="absolute bottom-16 left-4 right-4 flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
+                  {taggedProducts.map(product => {
+                    // Get primary image or first image
+                    const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                    const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                    
+                    // Calculate discounted price
+                    const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                      ? product.price - (product.price * product.discountPercentage / 100)
+                      : null;
+
+                    return (
+                      <div
+                        key={product._id || product.id}
+                        className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
+                      >
+                        <div className="w-10 h-10 rounded-md overflow-hidden">
+                          <img
+                            src={imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-white text-xs font-medium">{product.name}</p>
+                          <p className="text-purple-300 text-xs font-bold">
+                            ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <video
                 ref={videoRef}
                 className={`absolute inset-0 w-full h-full object-cover ${isEnded ? '' : 'hidden'}`}
@@ -660,6 +770,16 @@ export default function LiveStreamPage() {
                       <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full">
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
+                      
+                      {/* Socket Connection Indicator */}
+                      {isLive && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-gray-100">
+                          <div className={`w-2 h-2 rounded-full ${isSocketConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <span className={isSocketConnected ? 'text-green-600' : 'text-red-600'}>
+                            {isSocketConnected ? 'Live Updates' : 'Offline'}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <p className="text-sm text-gray-700">{liveData.description}</p>
@@ -699,9 +819,59 @@ export default function LiveStreamPage() {
 
               {showProducts ? (
                 <div className="p-4 space-y-3">
-                  {products.slice(0, 3).map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+                  {/* Tagged Products Section */}
+                  {taggedProducts.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Currently Tagged</h3>
+                      <div className="space-y-2">
+                        {taggedProducts.map(product => (
+                          <div key={product._id || product.id} className="flex items-center gap-3 p-2 bg-purple-50 rounded-lg border border-purple-200">
+                            <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                              <img
+                                src={(() => {
+                                  const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                                  return primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                                })()}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                {(() => {
+                                  const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                                    ? product.price - (product.price * product.discountPercentage / 100)
+                                    : null;
+                                  return discountedPrice ? (
+                                    <>
+                                      <span className="text-sm font-bold text-purple-600">${discountedPrice.toFixed(2)}</span>
+                                      <span className="text-xs text-gray-500 line-through">${product.price?.toFixed(2)}</span>
+                                    </>
+                                  ) : (
+                                    <span className="text-sm font-bold text-gray-900">${product.price?.toFixed(2) || '0.00'}</span>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                            <button className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
+                              <ShoppingBag className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show message when no tagged products */}
+                  {taggedProducts.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <ShoppingBag className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                      <p className="text-sm">No products tagged yet</p>
+                      <p className="text-xs text-gray-400">Products will appear here when the host tags them</p>
+                    </div>
+                  )}
+
                   <Link
                     href="#"
                     className="block text-center py-2 text-sm text-purple-600 font-medium hover:underline"
@@ -907,11 +1077,59 @@ export default function LiveStreamPage() {
                     <ExternalLink className="w-3 h-3" />
                   </Link>
                 </div>
-                <div className="space-y-3">
-                  {products.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
+
+                {/* Tagged Products Section */}
+                {taggedProducts.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Currently Tagged</h3>
+                    <div className="space-y-2">
+                      {taggedProducts.map(product => (
+                        <div key={product._id || product.id} className="flex items-center gap-3 p-2 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                            <img
+                              src={(() => {
+                                const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                                return primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                              })()}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              {(() => {
+                                const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                                  ? product.price - (product.price * product.discountPercentage / 100)
+                                  : null;
+                                return discountedPrice ? (
+                                  <>
+                                    <span className="text-sm font-bold text-purple-600">${discountedPrice.toFixed(2)}</span>
+                                    <span className="text-xs text-gray-500 line-through">${product.price?.toFixed(2)}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-sm font-bold text-gray-900">${product.price?.toFixed(2) || '0.00'}</span>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                          <button className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors">
+                            <ShoppingBag className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Show message when no tagged products */}
+                {taggedProducts.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <ShoppingBag className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">No products tagged yet</p>
+                    <p className="text-xs text-gray-400">Products will appear here when the host tags them</p>
+                  </div>
+                )}
               </div>
             )}
 

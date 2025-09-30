@@ -161,7 +161,7 @@ const LiveShoppingUI = () => {
       id: 1,
       host: "Sarah Johnson",
       viewers: "2.4K watching",
-      image: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600&h=300&fit=crop&crop=center",
+      image: "/banners/b2.png",
       isLive: true,
       type: "sale",
       overlay: "SALE 50%"
@@ -170,7 +170,7 @@ const LiveShoppingUI = () => {
       id: 2,
       host: "Sarah Johnson",
       viewers: "2.4K watching",
-      image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&h=300&fit=crop&crop=center",
+      image: "/banners/b2.png",
       isLive: true,
       type: "normal"
     },
@@ -178,7 +178,7 @@ const LiveShoppingUI = () => {
       id: 3,
       host: "Sarah Johnson",
       viewers: "2.4K watching",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&h=300&fit=crop&crop=center",
+      image: "/banners/b3.png",
       isLive: true,
       type: "normal"
     }
@@ -241,7 +241,7 @@ const LiveShoppingUI = () => {
       title: "Summer Fashion Collection Launch",
       host: "Emma Davis",
       time: "Tomorrow, 2:00 PM",
-      image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=200&h=200&fit=crop&crop=center",
+      image: "/banners/b1.png",
       category: "Fashion"
     },
     {
@@ -249,7 +249,7 @@ const LiveShoppingUI = () => {
       title: "Tech Gadgets Mega Sale",
       host: "Alex Chen",
       time: "Today, 8:00 PM",
-      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=200&h=200&fit=crop&crop=center",
+      image: "/banners/b2.png",
       category: "Electronics"
     },
     {
@@ -257,7 +257,7 @@ const LiveShoppingUI = () => {
       title: "Luxury Watches Showcase",
       host: "Michael Brown",
       time: "Tomorrow, 4:30 PM",
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop&crop=center",
+      image: "/banners/b3.png",
       category: "Accessories"
     },
     {
@@ -265,7 +265,7 @@ const LiveShoppingUI = () => {
       title: "Beauty Products Flash Sale",
       host: "Sophie Wang",
       time: "Today, 9:00 PM",
-      image: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=200&h=200&fit=crop&crop=center",
+      image: "/banners/b4.png",
       category: "Beauty"
     },
     {
@@ -273,7 +273,7 @@ const LiveShoppingUI = () => {
       title: "Home Decor Special Event",
       host: "Laura Smith",
       time: "Tomorrow, 1:00 PM",
-      image: "https://images.unsplash.com/photo-1513161455079-7dc1de15ef3e?w=200&h=200&fit=crop&crop=center",
+      image: "/banners/b5.png",
       category: "Home & Living"
     }
   ];
@@ -366,13 +366,15 @@ const LiveShoppingUI = () => {
       {/* Trending Banner Carousel */}
       <div className="px-4 py-4">
         <div className="relative">
-          <div className="overflow-hidden rounded-lg">
+          <div className="overflow-hidden rounded-lg w-full">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((item) => (
                 <div key={item} className="flex-none w-full">
-                  <div className="bg-purple-700 h-32 rounded-lg flex items-center justify-center text-white text-xl">
-                    Trending Banner {item}
-                  </div>
+                  <img
+                    src={`/banners/b${item}.png`}
+                    alt={`Trending Banner ${item}`}
+                    className="w-full object-cover rounded-lg"
+                  />
                 </div>
               ))}
             </div>

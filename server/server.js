@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import { PORT, NODE_ENV } from './config/config.js';
 import connectDB from './config/db.js';
 import routes from './routes/index.js';
@@ -24,6 +26,58 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = createServer(app);
+
+// Socket.IO setup
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Product tagging namespace
+const productNamespace = io.of('/products');
+
+// Socket.IO connection handling
+productNamespace.on('connection', (socket) => {
+  console.log('User connected to products namespace:', socket.id);
+
+  // Join stream room
+  socket.on('join-stream', (streamId) => {
+    socket.join(streamId);
+    console.log(`User ${socket.id} joined stream room: ${streamId}`);
+  });
+
+  // Leave stream room
+  socket.on('leave-stream', (streamId) => {
+    socket.leave(streamId);
+    console.log(`User ${socket.id} left stream room: ${streamId}`);
+  });
+
+  // Handle product tagging
+  socket.on('tag-product', async (data) => {
+    const { streamId, product, action } = data;
+    
+    try {
+      // Broadcast to all users in the stream room
+      socket.to(streamId).emit('product-tagged', {
+        product,
+        action, // 'add' or 'remove'
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log(`Product ${action} broadcasted in stream ${streamId}:`, product.name);
+    } catch (error) {
+      console.error('Error broadcasting product tag:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected from products namespace:', socket.id);
+  });
+});
 
 // Body parser
 app.use(express.json());
@@ -81,7 +135,7 @@ app.use(routes);
 // Error handler middleware
 app.use(errorHandler);
 
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   if (isDev && chalk) {
     console.log(
       chalk.bgBlue.white.bold(

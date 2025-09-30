@@ -13,8 +13,13 @@ const makeAuthenticatedRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
 
   if (!token) {
+    console.error('No auth token found for endpoint:', endpoint);
     throw new Error('Authentication token not found');
   }
+
+  console.log('Making authenticated request to:', endpoint);
+  console.log('Token exists:', !!token);
+  console.log('Token length:', token.length);
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
@@ -25,9 +30,13 @@ const makeAuthenticatedRequest = async (endpoint, options = {}) => {
     },
   });
 
+  console.log('Response status:', response.status);
+  console.log('Response headers:', response.headers);
+
   const data = await response.json();
 
   if (!response.ok) {
+    console.error('Request failed:', response.status, data);
     throw new Error(data.message || 'Request failed');
   }
 
@@ -205,6 +214,32 @@ export const productService = {
     const endpoint = `/api/v1/products/featured${queryParams ? `?${queryParams}` : ''}`;
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Request failed');
+    }
+
+    return data;
+  },
+
+  // Product tagging functions for streams
+  addTaggedProduct: async (streamId, productId) => {
+    return makeAuthenticatedRequest(`/api/v1/streams/${streamId}/tagged-products`, {
+      method: 'POST',
+      body: JSON.stringify({ productId })
+    });
+  },
+
+  removeTaggedProduct: async (streamId, productId) => {
+    return makeAuthenticatedRequest(`/api/v1/streams/${streamId}/tagged-products/${productId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  getTaggedProducts: async (streamId) => {
+    // This endpoint is public, so we don't need authentication
+    const response = await fetch(`${API_BASE_URL}/api/v1/streams/${streamId}/tagged-products`);
     const data = await response.json();
 
     if (!response.ok) {

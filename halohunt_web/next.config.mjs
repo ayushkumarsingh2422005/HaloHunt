@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   images: {
     // Allow any type of image to be displayed from any domain
     remotePatterns: [

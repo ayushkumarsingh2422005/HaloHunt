@@ -30,8 +30,9 @@ const streamSchema = new mongoose.Schema(
       min: [0, 'Likes count cannot be negative'],
     },
     taggedProductId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: [mongoose.Schema.Types.ObjectId],
       ref: 'Product',
+      default: [],
       // Not required as streams might not always have tagged products
     },
     userId: {
@@ -104,6 +105,14 @@ streamSchema.virtual('duration').get(function() {
 streamSchema.set('toJSON', { virtuals: true });
 streamSchema.set('toObject', { virtuals: true });
 
+// Pre-save middleware to ensure taggedProductId is always an array
+streamSchema.pre('save', function(next) {
+  if (!this.taggedProductId) {
+    this.taggedProductId = [];
+  }
+  next();
+});
+
 // Method to increment likes count
 streamSchema.methods.incrementLikes = function() {
   this.likesCount += 1;
@@ -132,6 +141,39 @@ streamSchema.methods.endStream = function() {
   this.status = 'ended';
   this.endedAt = new Date();
   return this.save();
+};
+
+// Method to add tagged product
+streamSchema.methods.addTaggedProduct = function(productId) {
+  // Ensure taggedProductId is initialized as an array
+  if (!this.taggedProductId) {
+    this.taggedProductId = [];
+  }
+  
+  if (!this.taggedProductId.includes(productId)) {
+    this.taggedProductId.push(productId);
+  }
+  return this.save();
+};
+
+// Method to remove tagged product
+streamSchema.methods.removeTaggedProduct = function(productId) {
+  // Ensure taggedProductId is initialized as an array
+  if (!this.taggedProductId) {
+    this.taggedProductId = [];
+  }
+  
+  this.taggedProductId = this.taggedProductId.filter(id => id.toString() !== productId.toString());
+  return this.save();
+};
+
+// Method to get tagged products
+streamSchema.methods.getTaggedProducts = function() {
+  // Ensure taggedProductId is initialized as an array
+  if (!this.taggedProductId) {
+    this.taggedProductId = [];
+  }
+  return this.taggedProductId;
 };
 
 const Stream = mongoose.model('Stream', streamSchema);

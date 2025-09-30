@@ -345,3 +345,122 @@ export const searchStreams = asyncHandler(async (req, res, next) => {
     data: streams
   });
 });
+
+// @desc    Add tagged product to stream
+// @route   POST /api/v1/streams/:id/tagged-products
+// @access  Private
+export const addTaggedProduct = asyncHandler(async (req, res, next) => {
+  try {
+    console.log('Adding tagged product to stream:', req.params.id);
+    console.log('Product ID:', req.body.productId);
+    console.log('User ID:', req.user.id);
+    
+    const stream = await Stream.findById(req.params.id);
+
+    if (!stream) {
+      console.log('Stream not found:', req.params.id);
+      return next(new ErrorResponse(`Stream not found with id of ${req.params.id}`, 404));
+    }
+
+    console.log('Stream found:', stream._id);
+    console.log('Stream owner:', stream.userId);
+    console.log('Current taggedProductId:', stream.taggedProductId);
+
+    // Make sure user owns the stream
+    if (stream.userId.toString() !== req.user.id) {
+      console.log('User not authorized. Stream owner:', stream.userId, 'Requesting user:', req.user.id);
+      return next(new ErrorResponse(`User ${req.user.id} is not authorized to modify this stream`, 401));
+    }
+
+    const { productId } = req.body;
+
+    if (!productId) {
+      return next(new ErrorResponse('Product ID is required', 400));
+    }
+
+    // Add product to tagged products
+    await stream.addTaggedProduct(productId);
+    
+    console.log('Product added successfully. Updated taggedProductId:', stream.taggedProductId);
+
+    res.status(200).json({
+      success: true,
+      data: stream,
+      message: 'Product tagged successfully'
+    });
+  } catch (error) {
+    console.error('Error in addTaggedProduct:', error);
+    return next(new ErrorResponse(`Internal server error: ${error.message}`, 500));
+  }
+});
+
+// @desc    Remove tagged product from stream
+// @route   DELETE /api/v1/streams/:id/tagged-products/:productId
+// @access  Private
+export const removeTaggedProduct = asyncHandler(async (req, res, next) => {
+  try {
+    console.log('Removing tagged product from stream:', req.params.id);
+    console.log('Product ID to remove:', req.params.productId);
+    console.log('User ID:', req.user.id);
+    
+    const stream = await Stream.findById(req.params.id);
+
+    if (!stream) {
+      console.log('Stream not found:', req.params.id);
+      return next(new ErrorResponse(`Stream not found with id of ${req.params.id}`, 404));
+    }
+
+    console.log('Stream found:', stream._id);
+    console.log('Stream owner:', stream.userId);
+    console.log('Current taggedProductId:', stream.taggedProductId);
+
+    // Make sure user owns the stream
+    if (stream.userId.toString() !== req.user.id) {
+      console.log('User not authorized. Stream owner:', stream.userId, 'Requesting user:', req.user.id);
+      return next(new ErrorResponse(`User ${req.user.id} is not authorized to modify this stream`, 401));
+    }
+
+    const { productId } = req.params;
+
+    // Remove product from tagged products
+    await stream.removeTaggedProduct(productId);
+    
+    console.log('Product removed successfully. Updated taggedProductId:', stream.taggedProductId);
+
+    res.status(200).json({
+      success: true,
+      data: stream,
+      message: 'Product untagged successfully'
+    });
+  } catch (error) {
+    console.error('Error in removeTaggedProduct:', error);
+    return next(new ErrorResponse(`Internal server error: ${error.message}`, 500));
+  }
+});
+
+// @desc    Get tagged products for a stream
+// @route   GET /api/v1/streams/:id/tagged-products
+// @access  Public
+export const getTaggedProducts = asyncHandler(async (req, res, next) => {
+  try {
+    console.log('Getting tagged products for stream:', req.params.id);
+    
+    const stream = await Stream.findById(req.params.id)
+      .populate('taggedProductId', 'name price images discountPercentage isInStock');
+
+    if (!stream) {
+      console.log('Stream not found:', req.params.id);
+      return next(new ErrorResponse(`Stream not found with id of ${req.params.id}`, 404));
+    }
+
+    console.log('Stream found, tagged products:', stream.taggedProductId);
+
+    res.status(200).json({
+      success: true,
+      data: stream.taggedProductId || []
+    });
+  } catch (error) {
+    console.error('Error in getTaggedProducts:', error);
+    return next(new ErrorResponse('Internal server error', 500));
+  }
+});

@@ -11,53 +11,11 @@ import {
 } from 'lucide-react';
 import { streamService } from '@/app/services/streamService';
 import { useAuth } from '@/app/context/AuthContext';
+import { productService } from '@/app/services/productService';
+import { io } from 'socket.io-client';
 
 // Zego Express Engine import (assume it's available globally or via npm)
 import { ZegoExpressEngine } from 'zego-express-engine-webrtc';
-
-// Sample product data for tagging
-const SAMPLE_PRODUCTS = [
-  {
-    id: "p1",
-    name: "Modern Desk Lamp",
-    price: 59.99,
-    discountPrice: 49.99,
-    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=300&h=400&fit=crop",
-    inStock: true
-  },
-  {
-    id: "p2",
-    name: "Minimalist Watch",
-    price: 129.99,
-    discountPrice: null,
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=400&fit=crop",
-    inStock: true
-  },
-  {
-    id: "p3",
-    name: "Wireless Earbuds",
-    price: 89.99,
-    discountPrice: 69.99,
-    image: "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=300&h=400&fit=crop",
-    inStock: true
-  },
-  {
-    id: "p4",
-    name: "Leather Wallet",
-    price: 45.00,
-    discountPrice: null,
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=300&h=400&fit=crop",
-    inStock: false
-  },
-  {
-    id: "p5",
-    name: "Smart Speaker",
-    price: 79.99,
-    discountPrice: 59.99,
-    image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=300&h=400&fit=crop",
-    inStock: true
-  }
-];
 
 // Sample chat messages
 const SAMPLE_CHAT_MESSAGES = [
@@ -91,11 +49,20 @@ const SAMPLE_CHAT_MESSAGES = [
 ];
 
 const TaggedProduct = ({ product, onRemove }) => {
+  // Get primary image or first image
+  const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+  const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+
+  // Calculate discounted price
+  const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+    ? product.price - (product.price * product.discountPercentage / 100)
+    : null;
+
   return (
     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 mb-2 group">
       <div className="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
         <img
-          src={product.image}
+          src={imageUrl}
           alt={product.name}
           className="w-full h-full object-cover"
         />
@@ -103,13 +70,13 @@ const TaggedProduct = ({ product, onRemove }) => {
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
         <div className="flex items-center gap-2 mt-1">
-          {product.discountPrice ? (
+          {discountedPrice ? (
             <>
-              <span className="text-sm font-bold text-purple-600">${product.discountPrice}</span>
-              <span className="text-xs text-gray-500 line-through">${product.price}</span>
+              <span className="text-sm font-bold text-purple-600">${discountedPrice.toFixed(2)}</span>
+              <span className="text-xs text-gray-500 line-through">${product.price?.toFixed(2)}</span>
             </>
           ) : (
-            <span className="text-sm font-bold text-gray-900">${product.price}</span>
+            <span className="text-sm font-bold text-gray-900">${product.price?.toFixed(2) || '0.00'}</span>
           )}
         </div>
       </div>
@@ -124,11 +91,20 @@ const TaggedProduct = ({ product, onRemove }) => {
 };
 
 const ProductSearchItem = ({ product, onAdd, isAdded }) => {
+  // Get primary image or first image
+  const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+  const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+
+  // Calculate discounted price
+  const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+    ? product.price - (product.price * product.discountPercentage / 100)
+    : null;
+
   return (
     <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md">
       <div className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
         <img
-          src={product.image}
+          src={imageUrl}
           alt={product.name}
           className="w-full h-full object-cover"
         />
@@ -136,22 +112,22 @@ const ProductSearchItem = ({ product, onAdd, isAdded }) => {
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-gray-900 truncate">{product.name}</h4>
         <div className="flex items-center gap-2">
-          {product.discountPrice ? (
-            <span className="text-xs font-medium text-purple-600">${product.discountPrice}</span>
+          {discountedPrice ? (
+            <span className="text-xs font-medium text-purple-600">${discountedPrice.toFixed(2)}</span>
           ) : (
-            <span className="text-xs font-medium text-gray-900">${product.price}</span>
+            <span className="text-xs font-medium text-gray-900">${product.price?.toFixed(2) || '0.00'}</span>
           )}
-          {!product.inStock && (
+          {!product.isInStock && (
             <span className="text-xs text-red-500">Out of stock</span>
           )}
         </div>
       </div>
       <button
         onClick={onAdd}
-        disabled={isAdded || !product.inStock}
+        disabled={isAdded || !product.isInStock}
         className={`p-1.5 rounded-full ${isAdded
           ? 'bg-purple-100 text-purple-600'
-          : product.inStock
+          : product.isInStock
             ? 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600'
             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
@@ -207,6 +183,12 @@ export default function HostPage() {
   const { user, loading: authLoading } = useAuth();
   const [endedStats, setEndedStats] = useState(null);
   const [loadingEndedStats, setLoadingEndedStats] = useState(false);
+  const [userProducts, setUserProducts] = useState([]);
+  const [loadingUserProducts, setLoadingUserProducts] = useState(false);
+
+  // Socket.IO state
+  const [socket, setSocket] = useState(null);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   // Zego state
   const [zegoClient, setZegoClient] = useState(null);
@@ -226,7 +208,67 @@ export default function HostPage() {
   // Fetch stream data
   useEffect(() => {
     if (streamId && user) {
+      console.log('User authenticated, fetching stream data for:', streamId);
+      console.log('User details:', user);
       fetchStreamData();
+    } else {
+      console.log('Waiting for user authentication...', { streamId, user: !!user });
+    }
+  }, [streamId, user]);
+
+  // Fetch user products
+  useEffect(() => {
+    if (user) {
+      fetchUserProducts();
+    }
+  }, [user]);
+
+  // Socket.IO connection
+  useEffect(() => {
+    if (streamId && user) {
+      console.log('Setting up Socket.IO connection for stream:', streamId);
+      
+      // Connect to Socket.IO server
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const newSocket = io(`${API_BASE_URL}/products`, {
+        auth: {
+          token: typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+        }
+      });
+
+      newSocket.on('connect', () => {
+        console.log('Connected to Socket.IO server');
+        setIsSocketConnected(true);
+        
+        // Join the stream room
+        newSocket.emit('join-stream', streamId);
+        console.log('Joined stream room:', streamId);
+      });
+
+      newSocket.on('disconnect', () => {
+        console.log('Disconnected from Socket.IO server');
+        setIsSocketConnected(false);
+      });
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Socket.IO connection error:', error);
+        setIsSocketConnected(false);
+      });
+
+      newSocket.on('error', (error) => {
+        console.error('Socket.IO error:', error);
+      });
+
+      setSocket(newSocket);
+
+      // Cleanup on unmount
+      return () => {
+        console.log('Cleaning up Socket.IO connection');
+        if (newSocket) {
+          newSocket.emit('leave-stream', streamId);
+          newSocket.disconnect();
+        }
+      };
     }
   }, [streamId, user]);
 
@@ -250,14 +292,49 @@ export default function HostPage() {
       if (result?.data?.status === 'ended') {
         await loadEndedStats();
       }
+      await loadTaggedProducts(); // Load tagged products when stream data is fetched
     } catch (error) {
       console.error('Error fetching stream data:', error);
       // If backend restricts access for non-owners, redirect to viewer
       if (error?.message && /Not authorized|Forbidden|401|403/i.test(error.message)) {
-        router.replace(`/live/view/${streamId}`);
+        router.push(`/live/view/${streamId}`);
       }
     } finally {
       setLoadingStreams(false);
+    }
+  };
+
+  const fetchUserProducts = async () => {
+    if (!user) return;
+
+    try {
+      setLoadingUserProducts(true);
+      const result = await productService.getMyProducts();
+      setUserProducts(result.data || []);
+    } catch (error) {
+      console.error('Error fetching user products:', error);
+    } finally {
+      setLoadingUserProducts(false);
+    }
+  };
+
+  const loadTaggedProducts = async () => {
+    if (!streamId || !user) return;
+
+    try {
+      // Debug: Check authentication state
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      console.log('Loading tagged products for stream:', streamId);
+      console.log('User authenticated:', !!user);
+      console.log('Token exists:', !!token);
+      
+      const result = await productService.getTaggedProducts(streamId);
+      setTaggedProducts(result.data || []);
+      console.log('Tagged products loaded successfully:', result.data?.length || 0, 'products');
+    } catch (error) {
+      console.error('Error loading tagged products:', error);
+      // Don't show alert for loading errors as they might be expected
+      setTaggedProducts([]);
     }
   };
 
@@ -446,7 +523,7 @@ export default function HostPage() {
   // Chat, product, and UI logic (unchanged)
   const chatContainerRef = useRef(null);
 
-  const filteredProducts = SAMPLE_PRODUCTS.filter(product =>
+  const filteredProducts = userProducts.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -599,14 +676,61 @@ export default function HostPage() {
     } catch (_) {}
   };
 
-  const handleAddProduct = (product) => {
-    if (!taggedProducts.some(p => p.id === product.id)) {
-      setTaggedProducts(prev => [...prev, product]);
+  const handleAddProduct = async (product) => {
+    if (!taggedProducts.some(p => (p._id || p.id) === (product._id || product.id))) {
+      try {
+        // Add product to backend using productService
+        await productService.addTaggedProduct(streamId, product._id || product.id);
+        
+        // Add to local state
+        setTaggedProducts(prev => [...prev, product]);
+        
+        // Broadcast via Socket.IO
+        if (socket && isSocketConnected) {
+          socket.emit('tag-product', {
+            streamId,
+            product,
+            action: 'add'
+          });
+        }
+        
+        // Show success feedback
+        console.log('Product tagged successfully:', product.name);
+      } catch (error) {
+        console.error('Error tagging product:', error);
+        // Show error feedback to user
+        alert(`Failed to tag product: ${error.message || 'Unknown error'}`);
+      }
     }
   };
 
-  const handleRemoveProduct = (productId) => {
-    setTaggedProducts(prev => prev.filter(p => p.id !== productId));
+  const handleRemoveProduct = async (productId) => {
+    try {
+      // Remove product from backend using productService
+      await productService.removeTaggedProduct(streamId, productId);
+      
+      // Remove from local state
+      setTaggedProducts(prev => prev.filter(p => (p._id || p.id) !== productId));
+      
+      // Find the product to broadcast removal
+      const removedProduct = taggedProducts.find(p => (p._id || p.id) === productId);
+      
+      // Broadcast via Socket.IO
+      if (socket && isSocketConnected && removedProduct) {
+        socket.emit('tag-product', {
+          streamId,
+          product: removedProduct,
+          action: 'remove'
+        });
+      }
+      
+      // Show success feedback
+      console.log('Product untagged successfully');
+    } catch (error) {
+      console.error('Error untagging product:', error);
+      // Show error feedback to user
+      alert(`Failed to untag product: ${error.message || 'Unknown error'}`);
+    }
   };
 
   return (
@@ -649,26 +773,37 @@ export default function HostPage() {
           {/* Tagged Products Overlay */}
           {isStreaming && taggedProducts.length > 0 && (
             <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
-              {taggedProducts.map(product => (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
-                >
-                  <div className="w-10 h-10 rounded-md overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+              {taggedProducts.map(product => {
+                // Get primary image or first image
+                const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                
+                // Calculate discounted price
+                const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                  ? product.price - (product.price * product.discountPercentage / 100)
+                  : null;
+
+                return (
+                  <div
+                    key={product._id || product.id}
+                    className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
+                  >
+                    <div className="w-10 h-10 rounded-md overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-white text-xs font-medium">{product.name}</p>
+                      <p className="text-purple-300 text-xs font-bold">
+                        ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white text-xs font-medium">{product.name}</p>
-                    <p className="text-purple-300 text-xs font-bold">
-                      ${product.discountPrice || product.price}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -737,26 +872,37 @@ export default function HostPage() {
               {/* Tagged Products Overlay */}
               {isStreaming && taggedProducts.length > 0 && (
                 <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2 overflow-x-auto pb-2 hide-scrollbar">
-                  {taggedProducts.map(product => (
-                    <div
-                      key={product.id}
-                      className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
-                    >
-                      <div className="w-10 h-10 rounded-md overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
+                  {taggedProducts.map(product => {
+                    // Get primary image or first image
+                    const primaryImage = product.images?.find(img => img.isPrimary) || product.images?.[0];
+                    const imageUrl = primaryImage?.url || primaryImage?.key || primaryImage || "https://via.placeholder.com/300x400?text=No+Image";
+                    
+                    // Calculate discounted price
+                    const discountedPrice = product.discountPercentage && product.discountPercentage > 0
+                      ? product.price - (product.price * product.discountPercentage / 100)
+                      : null;
+
+                    return (
+                      <div
+                        key={product._id || product.id}
+                        className="flex-shrink-0 bg-black/70 backdrop-blur-sm rounded-lg p-2 flex items-center gap-2"
+                      >
+                        <div className="w-10 h-10 rounded-md overflow-hidden">
+                          <img
+                            src={imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-white text-xs font-medium">{product.name}</p>
+                          <p className="text-purple-300 text-xs font-bold">
+                            ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-white text-xs font-medium">{product.name}</p>
-                        <p className="text-purple-300 text-xs font-bold">
-                          ${product.discountPrice || product.price}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -834,6 +980,14 @@ export default function HostPage() {
                 <button className="p-3 rounded-full bg-gray-100">
                   <MoreHorizontal className="w-5 h-5" />
                 </button>
+                
+                {/* Socket Connection Indicator */}
+                <div className="flex items-center gap-2 px-2 py-1 rounded-full text-xs">
+                  <div className={`w-2 h-2 rounded-full ${isSocketConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span className={isSocketConnected ? 'text-green-600' : 'text-red-600'}>
+                    {isSocketConnected ? 'Live' : 'Offline'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -844,7 +998,7 @@ export default function HostPage() {
             {showProductPanel && (
               <div className="bg-white rounded-lg shadow-sm p-4 mb-4 lg:overflow-y-auto" style={{ maxHeight: showChatPanel ? '40%' : '100%' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-medium text-gray-900">Tagged Products</h2>
+                  <h2 className="font-medium text-gray-900">Your Products</h2>
                   <div className="flex items-center gap-2">
                     <button className="p-1 text-gray-400 hover:text-purple-600">
                       <Tag className="w-4 h-4" />
@@ -857,9 +1011,9 @@ export default function HostPage() {
                   {taggedProducts.length > 0 ? (
                     taggedProducts.map(product => (
                       <TaggedProduct
-                        key={product.id}
+                        key={product._id || product.id}
                         product={product}
-                        onRemove={() => handleRemoveProduct(product.id)}
+                        onRemove={() => handleRemoveProduct(product._id || product.id)}
                       />
                     ))
                   ) : (
@@ -874,7 +1028,7 @@ export default function HostPage() {
                   <div className="relative mb-3">
                     <input
                       type="text"
-                      placeholder="Search products..."
+                      placeholder="Search your products..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full py-2 px-3 pl-9 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -883,18 +1037,22 @@ export default function HostPage() {
                   </div>
 
                   <div className="max-h-48 overflow-y-auto">
-                    {filteredProducts.length > 0 ? (
+                    {loadingUserProducts ? (
+                      <div className="text-center py-4 text-gray-500 text-sm">
+                        Loading products...
+                      </div>
+                    ) : filteredProducts.length > 0 ? (
                       filteredProducts.map(product => (
                         <ProductSearchItem
-                          key={product.id}
+                          key={product._id || product.id}
                           product={product}
                           onAdd={() => handleAddProduct(product)}
-                          isAdded={taggedProducts.some(p => p.id === product.id)}
+                          isAdded={taggedProducts.some(p => (p._id || p.id) === (product._id || product.id))}
                         />
                       ))
                     ) : (
                       <div className="text-center py-4 text-gray-500 text-sm">
-                        No products found
+                        {userProducts.length === 0 ? 'No products available. Add products in your profile first.' : 'No products found'}
                       </div>
                     )}
                   </div>
