@@ -129,7 +129,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss1.png"
+                      src="/ss/ss1.jpg"
                       alt="Screenshot 1"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -139,7 +139,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss2.png"
+                      src="/ss/ss2.jpg"
                       alt="Screenshot 2"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -149,7 +149,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss3.png"
+                      src="/ss/ss3.jpg"
                       alt="Screenshot 3"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -159,8 +159,38 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss4.png"
+                      src="/ss/ss4.jpg"
                       alt="Screenshot 4"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss5.jpg"
+                      alt="Screenshot 5"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss6.jpg"
+                      alt="Screenshot 6"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss7.jpg"
+                      alt="Screenshot 7"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
                     />
