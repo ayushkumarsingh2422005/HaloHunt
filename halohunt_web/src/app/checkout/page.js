@@ -68,7 +68,7 @@ const CartItem = ({ item }) => {
       <div className="flex-1 min-w-0">
         <h3 className="text-sm font-medium text-gray-900 truncate">{item.name}</h3>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm font-medium text-purple-600">${item.price}</span>
+          <span className="text-sm font-medium text-purple-600">₹{item.price}</span>
           <span className="text-sm text-gray-500">Qty: {item.quantity}</span>
         </div>
       </div>
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
                   <Package className="w-5 h-5 text-purple-600" />
                   <h2 className="font-medium">Order Summary ({cartItems.length} items)</h2>
                 </div>
-                <span className="text-sm font-medium text-purple-600">${subtotal.toFixed(2)}</span>
+                <span className="text-sm font-medium text-purple-600">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="p-6">
                 <div className="divide-y divide-gray-200">
@@ -271,31 +271,31 @@ export default function CheckoutPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">GST (18%)</span>
-                  <span>${gst.toFixed(2)}</span>
+                  <span>₹{gst.toFixed(2)}</span>
                 </div>
                 {codCharges > 0 && (
                   <div className="flex justify-between text-orange-600">
                     <span>COD Charges</span>
-                    <span>+${codCharges.toFixed(2)}</span>
+                    <span>+₹{codCharges.toFixed(2)}</span>
                   </div>
                 )}
                 {payNowDiscount < 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Pay Now Discount</span>
-                    <span>${payNowDiscount.toFixed(2)}</span>
+                    <span>₹{payNowDiscount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="border-t border-gray-200 pt-3 flex justify-between font-medium">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
               </div>
 

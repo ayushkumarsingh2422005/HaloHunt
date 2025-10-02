@@ -583,7 +583,7 @@ export default function LiveStreamPage() {
                     <div>
                       <p className="text-white text-xs font-medium">{product.name}</p>
                       <p className="text-purple-300 text-xs font-bold">
-                        ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                        ₹{discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
                       </p>
                     </div>
                   </div>
@@ -664,7 +664,7 @@ export default function LiveStreamPage() {
                         <div>
                           <p className="text-white text-xs font-medium">{product.name}</p>
                           <p className="text-purple-300 text-xs font-bold">
-                            ${discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
+                            ₹{discountedPrice ? discountedPrice.toFixed(2) : (product.price?.toFixed(2) || '0.00')}
                           </p>
                         </div>
                       </div>

@@ -6,7 +6,7 @@ const LiveShoppingUI = () => {
     {
       id: 1,
       name: "Premium Watch",
-      price: "$299.99",
+      price: "₹299.99",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center",
@@ -15,7 +15,7 @@ const LiveShoppingUI = () => {
     {
       id: 2,
       name: "Premium Watch",
-      price: "$299.99",
+      price: "₹299.99",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop&crop=center",
@@ -24,7 +24,7 @@ const LiveShoppingUI = () => {
     {
       id: 3,
       name: "Premium Watch",
-      price: "$299.99",
+      price: "₹299.99",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&h=300&fit=crop&crop=center",
@@ -33,7 +33,7 @@ const LiveShoppingUI = () => {
     {
       id: 4,
       name: "Premium Watch",
-      price: "$299.99",
+      price: "₹299.99",
       seller: "John Smith",
       rating: 4.8,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",

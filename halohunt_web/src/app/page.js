@@ -70,8 +70,8 @@ const LiveShoppingUI = () => {
     {
       id: 1,
       name: "Premium Watch",
-      price: "$299.99",
-      originalPrice: "$399.99",
+      price: "₹299.99",
+      originalPrice: "₹399.99",
       discount: "25%",
       seller: "John Smith",
       rating: 4.8,
@@ -85,8 +85,8 @@ const LiveShoppingUI = () => {
     {
       id: 2,
       name: "Premium Watch",
-      price: "$299.99",
-      originalPrice: "$349.99",
+      price: "₹299.99",
+      originalPrice: "₹349.99",
       discount: "15%",
       seller: "John Smith",
       rating: 4.8,
@@ -100,8 +100,8 @@ const LiveShoppingUI = () => {
     {
       id: 3,
       name: "Premium Watch",
-      price: "$299.99",
-      originalPrice: "$399.99",
+      price: "₹299.99",
+      originalPrice: "₹399.99",
       discount: "25%",
       seller: "John Smith",
       rating: 4.8,
@@ -115,8 +115,8 @@ const LiveShoppingUI = () => {
     {
       id: 4,
       name: "Premium Watch",
-      price: "$299.99",
-      originalPrice: "$349.99",
+      price: "₹299.99",
+      originalPrice: "₹349.99",
       discount: "15%",
       seller: "John Smith",
       rating: 4.8,
