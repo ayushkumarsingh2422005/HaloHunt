@@ -1,8 +1,9 @@
 "use client"
 
 import { motion } from 'framer-motion';
-import { FaVideo, FaShoppingCart, FaUsers, FaHeart, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaDiscord, FaFacebook } from 'react-icons/fa';
-import { BsGlobe, BsArrowUp } from 'react-icons/bs';
+import { FaTwitter, FaInstagram, FaLinkedin, FaFacebook } from 'react-icons/fa';
+import { BsArrowUp } from 'react-icons/bs';
+import Image from 'next/image';
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -51,7 +52,7 @@ export default function Footer() {
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-purple-50 blur-3xl" />
         <div className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-pink-50 blur-3xl" />
       </div>
-      
+
       <div className="container relative z-10 mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 pt-16 pb-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
@@ -65,17 +66,17 @@ export default function Footer() {
               className="mb-6"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">H</span>
+                <div className="rounded-lgflex items-center justify-center">
+                  <Image src="/h_purple.png" className='h-12 w-auto' height={42} width={42} alt="HaloHunt Logo" />
                 </div>
-                <span className="text-gray-900 font-bold text-2xl">HaloHunt</span>
+                <Image src="/full_purple.png" className='h-12 w-auto' height={90} width={90} alt="HaloHunt Logo" />
               </div>
               <p className="text-gray-600 leading-relaxed max-w-md">
-                The future of live commerce is here. Connect with your audience, showcase products in real-time, 
+                The future of live commerce is here. Connect with your audience, showcase products in real-time,
                 and sell instantly with our revolutionary platform.
               </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -97,7 +98,7 @@ export default function Footer() {
               ))}
             </motion.div>
           </div>
-          
+
           {/* Links Sections */}
           {Object.entries(footerLinks).map(([section, links], sectionIndex) => (
             <motion.div
@@ -126,7 +127,7 @@ export default function Footer() {
             </motion.div>
           ))}
         </div>
-        
+
         {/* Bottom Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -138,7 +139,7 @@ export default function Footer() {
           <div className="text-gray-600 text-sm">
             © 2024 HaloHunt. All rights reserved. Made with ❤️ for the future of commerce.
           </div>
-          
+
           <motion.button
             onClick={scrollToTop}
             whileHover={{ scale: 1.1, y: -2 }}

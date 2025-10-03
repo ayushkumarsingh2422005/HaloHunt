@@ -64,8 +64,8 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <Image src="/h_purple.png" height={42} width={42} alt="HaloHunt Logo"/>
-            <span className="text-gray-900 font-bold text-xl">HaloHunt</span>
+            <Image src="/h_purple.png" className='block lg:hidden' height={42} width={42} alt="HaloHunt Logo"/>
+            <Image src="/full_purple.png" className='hidden lg:block h-12 w-auto' height={90} width={90} alt="HaloHunt Logo"/>
           </motion.button>
 
           {/* Desktop Navigation */}
