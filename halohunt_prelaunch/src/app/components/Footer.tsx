@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion';
-import { FaVideo, FaShoppingCart, FaUsers, FaHeart, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaDiscord } from 'react-icons/fa';
+import { FaVideo, FaShoppingCart, FaUsers, FaHeart, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaDiscord, FaFacebook } from 'react-icons/fa';
 import { BsGlobe, BsArrowUp } from 'react-icons/bs';
 
 export default function Footer() {
@@ -38,11 +38,10 @@ export default function Footer() {
   };
 
   const socialLinks = [
-    { icon: FaTwitter, href: '#', label: 'Twitter' },
-    { icon: FaInstagram, href: '#', label: 'Instagram' },
-    { icon: FaLinkedin, href: '#', label: 'LinkedIn' },
-    { icon: FaYoutube, href: '#', label: 'YouTube' },
-    { icon: FaDiscord, href: '#', label: 'Discord' },
+    { icon: FaInstagram, href: 'https://www.instagram.com/halohuntapp', label: 'Instagram' },
+    { icon: FaTwitter, href: 'https://x.com/Halohuntapp', label: 'X (Twitter)' },
+    { icon: FaFacebook, href: 'https://www.facebook.com/people/Halohunt/61572176945854/', label: 'Facebook' },
+    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/halo-halohunt-274872384', label: 'LinkedIn' },
   ];
 
   return (
