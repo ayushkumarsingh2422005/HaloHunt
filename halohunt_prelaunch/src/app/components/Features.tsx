@@ -1,37 +1,36 @@
 "use client"
 
-import { FaPhotoVideo, FaTag, FaComments, FaShoppingCart, FaHeart, FaUsers, FaMobile, FaVideo } from 'react-icons/fa';
-import { BsLightning, BsGlobe } from 'react-icons/bs';
+import { FaComments, FaShoppingCart, FaHeart, FaUsers, FaVideo } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const features = [
   {
-    icon: FaVideo, // ye rahega
-    title: "Live Streaming",
-    description: "Go live instantly with high-quality video streaming. Showcase your products in real-time to engage your audience.",
+    icon: FaVideo,
+    title: "See Before You Buy",
+    description: "Watch real people demo the product LIVE—no more surprises or Photoshop!",
     gradient: "from-purple-500 to-purple-400",
     delay: 0.1
   },
   {
     icon: FaComments,
-    title: "Real-time Chat", // rahega
-    description: "Interactive chat system where viewers can ask questions, request product details, and engage with the seller.",
+    title: "Get Answers Instantly",
+    description: "Ask anything in real time—size, color, quality, return policy—and get honest answers on the spot.",
     gradient: "from-green-500 to-emerald-500",
     delay: 0.3
   },
   {
-    icon: FaShoppingCart, // ye rahega
-    title: "One-Click Purchase",
-    description: "Seamless checkout process. Viewers can buy products directly from the live stream with just one click.",
-    gradient: "from-orange-500 to-red-500",
-    delay: 0.4
+    icon: FaUsers,
+    title: "Buy Together, Share Experience",
+    description: "Shop live with friends or family, vote on favorites, and enjoy a social shopping experience.",
+    gradient: "from-blue-500 to-cyan-500",
+    delay: 0.5
   },
   {
-    icon: FaMobile,
-    title: "Cross-Platform", // rahega
-    description: "Stream and shop from any device - mobile, tablet, or desktop. Available on iOS, Android, and web.",
-    gradient: "from-violet-500 to-purple-500",
-    delay: 0.8
+    icon: FaShoppingCart,
+    title: "No-Hassle Returns",
+    description: "Clear product understanding means fewer returns, but if you need it, our process is simple and quick.",
+    gradient: "from-orange-500 to-red-500",
+    delay: 0.7
   }
 ];
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { FaVideo, FaTag, FaShoppingCart, FaUsers, FaChartLine, FaPlay, FaHeart } from 'react-icons/fa';
+import { FaVideo, FaTag, FaShoppingCart, FaUsers, FaChartLine, FaPlay, FaHeart, FaBolt, FaRegEye, FaComments } from 'react-icons/fa';
 import { BsArrowRight, BsGlobe } from 'react-icons/bs';
 import { motion } from 'framer-motion';
 
@@ -99,34 +99,34 @@ export default function HowItWorks() {
           {/* Step 1 */}
           <div className="flex flex-col items-center text-center p-8 bg-white border border-purple-100 rounded-2xl shadow-lg">
             <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-red-500 to-pink-500 mb-4 shadow">
-              <FaVideo className="text-white text-3xl" />
+              <FaBolt className="text-white text-3xl" />
             </div>
-            <h3 className="font-bold text-xl mb-2 text-gray-900">Go Live</h3>
-            <p className="text-gray-600 text-base">Start streaming your product instantly</p>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Start Instantly</h3>
+            <p className="text-gray-600 text-base">Launch your live show in seconds—no tech stress, just one tap and you’re on-air</p>
           </div>
           {/* Step 2 */}
           <div className="flex flex-col items-center text-center p-8 bg-white border border-blue-100 rounded-2xl shadow-lg">
             <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 mb-4 shadow">
-              <FaTag className="text-white text-3xl" />
+              <FaRegEye className="text-white text-3xl" />
             </div>
-            <h3 className="font-bold text-xl mb-2 text-gray-900">Tag Product</h3>
-            <p className="text-gray-600 text-base">Add clickable product tags to your stream</p>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Showcase Authenticity</h3>
+            <p className="text-gray-600 text-base">Demonstrate product features, usage, and details LIVE—build instant trust with your viewers</p>
           </div>
           {/* Step 3 */}
           <div className="flex flex-col items-center text-center p-8 bg-white border border-green-100 rounded-2xl shadow-lg">
             <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 mb-4 shadow">
-              <FaUsers className="text-white text-3xl" />
+              <FaComments className="text-white text-3xl" />
             </div>
-            <h3 className="font-bold text-xl mb-2 text-gray-900">Engage Viewers</h3>
-            <p className="text-gray-600 text-base">Chat Live & Answer questions in real time</p>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Interactive Selling</h3>
+            <p className="text-gray-600 text-base">Respond to questions, highlight viewers’ names, and give exclusive live-only offers to boost conversions</p>
           </div>
           {/* Step 4 */}
           <div className="flex flex-col items-center text-center p-8 bg-white border border-orange-100 rounded-2xl shadow-lg">
             <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 mb-4 shadow">
-              <FaShoppingCart className="text-white text-3xl" />
+              <FaChartLine className="text-white text-3xl" />
             </div>
-            <h3 className="font-bold text-xl mb-2 text-gray-900">Close Sells</h3>
-            <p className="text-gray-600 text-base">Convert viewers to customers</p>
+            <h3 className="font-bold text-xl mb-2 text-gray-900">Real-Time Analytics</h3>
+            <p className="text-gray-600 text-base">Track viewer count, engagement, and instant sales while you stream. Optimize your pitch on the fly</p>
           </div>
         </div>
         {/* Demo Preview Section */}
