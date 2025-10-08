@@ -129,7 +129,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss1.jpg"
+                      src="/ss/ss1.png"
                       alt="Screenshot 1"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -139,7 +139,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss2.jpg"
+                      src="/ss/ss2.png"
                       alt="Screenshot 2"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -149,7 +149,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss3.jpg"
+                      src="/ss/ss3.png"
                       alt="Screenshot 3"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -159,7 +159,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss4.jpg"
+                      src="/ss/ss4.png"
                       alt="Screenshot 4"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -169,7 +169,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss5.jpg"
+                      src="/ss/ss5.png"
                       alt="Screenshot 5"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -179,7 +179,7 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss6.jpg"
+                      src="/ss/ss6.png"
                       alt="Screenshot 6"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
@@ -189,7 +189,17 @@ export default function Hero() {
                 <SwiperSlide>
                   <div className="w-full h-full aspect-[9/16]">
                     <img
-                      src="/ss/ss7.jpg"
+                      src="/ss/ss7.png"
+                      alt="Screenshot 7"
+                      className="w-full h-full object-contain rounded-xl bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                </SwiperSlide>
+                <SwiperSlide>
+                  <div className="w-full h-full aspect-[9/16]">
+                    <img
+                      src="/ss/ss8.png"
                       alt="Screenshot 7"
                       className="w-full h-full object-contain rounded-xl bg-white"
                       style={{ objectFit: 'contain' }}
